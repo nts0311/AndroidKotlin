@@ -1,4 +1,4 @@
-package com.android.walletforest.model
+package com.android.walletforest.model.Entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
