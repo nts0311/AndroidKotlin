@@ -8,6 +8,7 @@ data class Wallet(
     @PrimaryKey(autoGenerate = true)
     val id:Long,
     var name:String,
+    var imageId:Int,
     var amount:String
 ) {
 }
