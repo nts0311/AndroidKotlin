@@ -1,7 +1,6 @@
 package com.android.walletforest.TransactionsFragment
 
 import com.android.walletforest.enums.TimeRange
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.DayOfWeek
