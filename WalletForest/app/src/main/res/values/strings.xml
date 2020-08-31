@@ -16,4 +16,8 @@
     <string name="year">Year</string>
     <string name="custom_range">Custom</string>
 
+    <string name="this_month">This month</string>
+    <string name="this_week">This week</string>
+    <string name="this_year">This year</string>
+
 </resources>
