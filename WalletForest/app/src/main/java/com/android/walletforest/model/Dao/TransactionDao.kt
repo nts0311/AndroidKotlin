@@ -11,10 +11,11 @@ interface TransactionDao {
     fun getTransactionsBetweenRange(start: Long, end: Long): LiveData<List<Transaction>>
 
     @Query("SELECT time FROM transactions WHERE walletId=:walletId ORDER BY time ASC LIMIT 1")
-    fun getOldestTransactionTime(walletId: Long): Flow<Long>
+    fun getOldestTransactionTime(walletId: Long): LiveData<Long>
 
     @Query("SELECT time FROM transactions WHERE walletId=:walletId ORDER BY time DESC LIMIT 1")
-    fun getNewestTransactionTime(walletId: Long): Flow<Long>
+    fun getNewestTransactionTime(walletId: Long): LiveData<Long>
+
 
     @Update
     suspend fun updateTransaction(transaction: Transaction)

@@ -41,7 +41,7 @@ class TabInfoUtils() {
         return _tabInfoList
     }
 
-    private fun toLocalDate(time: Long): LocalDate {
+    fun toLocalDate(time: Long): LocalDate {
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = time
 
@@ -49,7 +49,7 @@ class TabInfoUtils() {
             calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH))
     }
 
-    private fun toEpoch(ld: LocalDate): Long = ld.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+    fun toEpoch(ld: LocalDate): Long = ld.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
     private fun getWeekTitle(ld1: LocalDate, ld2: LocalDate): String {
         val sb = StringBuilder("")

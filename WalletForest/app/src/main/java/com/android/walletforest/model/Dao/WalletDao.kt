@@ -12,7 +12,7 @@ interface WalletDao {
     fun getWallets():LiveData<List<Wallet>>
 
     @Query("SELECT * FROM wallet LIMIT 1")
-    fun getWallet(): Flow<Wallet>
+    fun getWallet(): LiveData<Wallet>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertWallet(wallet: Wallet)

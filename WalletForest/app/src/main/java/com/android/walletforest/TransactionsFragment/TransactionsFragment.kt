@@ -11,20 +11,16 @@ import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
 import com.android.walletforest.databinding.FragmentTransactionsBinding
 import com.android.walletforest.model.Repository
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_transactions.*
-
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
 
 class TransactionsFragment : Fragment() {
 
     lateinit var binding: FragmentTransactionsBinding
     lateinit var viewModel: TransactionsFragViewModel
-    lateinit var viewPagerAdapter:TabFragmentStateAdapter
+    lateinit var viewPagerAdapter: TabFragmentStateAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,10 +30,13 @@ class TransactionsFragment : Fragment() {
 
         binding = FragmentTransactionsBinding.inflate(inflater)
 
-        val repo=Repository.getInstance(requireContext().applicationContext)
-        val vmFactory=RepoViewModelFactory(repo)
+        val repo = Repository.getInstance(requireContext().applicationContext)
+        val vmFactory = RepoViewModelFactory(repo)
 
-        viewModel=ViewModelProvider(requireActivity(), vmFactory).get(TransactionsFragViewModel::class.java)
+        viewModel = ViewModelProvider(
+            requireActivity(),
+            vmFactory
+        ).get(TransactionsFragViewModel::class.java)
 
         setupObservers()
         //setUpViewPager()
@@ -45,20 +44,33 @@ class TransactionsFragment : Fragment() {
         return binding.root
     }
 
-    private fun setupObservers()
-    {
+    private fun setupObservers() {
         viewModel.tabInfoList.observe(viewLifecycleOwner)
         {
-            if(it!=null)
-                viewPagerAdapter.tabInfoList=it
+            if (it != null)
+                viewPagerAdapter.tabInfoList = it
         }
+
+        viewModel.currentWallet.observe(viewLifecycleOwner)
+        {
+            if (it != null) {
+                binding.walletName.text = it.name
+                binding.walletBalance.text = it.amount.toString()
+                viewModel.onCurrentWalletChange()
+            }
+        }
+
+
     }
 
     private fun setUpViewPager() {
-        binding.mainViewPager.adapter=viewPagerAdapter
-        TabLayoutMediator(binding.tabLayout, binding.mainViewPager){
-            tab, position->
-            tab.text=viewPagerAdapter.tabInfoList[position].tabTitle
+        binding.mainViewPager.adapter = viewPagerAdapter
+        binding.mainViewPager.offscreenPageLimit = 3
+
+        binding.tabLayout.tabMode = TabLayout.MODE_SCROLLABLE
+
+        TabLayoutMediator(binding.tabLayout, binding.mainViewPager) { tab, position ->
+            tab.text = viewPagerAdapter.tabInfoList[position].tabTitle
         }.attach()
     }
 

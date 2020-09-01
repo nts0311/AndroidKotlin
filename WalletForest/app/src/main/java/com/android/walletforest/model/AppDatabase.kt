@@ -49,7 +49,7 @@ abstract class AppDatabase() : RoomDatabase() {
 
                         scope.launch {
                             database.WalletDao.insertWallet(
-                                Wallet(0,"Cash", R.drawable.ic_bk_cashbook, 100000))
+                                Wallet(1,"Cash", R.drawable.ic_bk_cashbook, 100000))
 
                             database.CategoryDao.insertCategory(
                                 Category(0,0,"Food",R.drawable.ic_category_foodndrink)
@@ -58,19 +58,19 @@ abstract class AppDatabase() : RoomDatabase() {
                                 Category(1,1,"Family",R.drawable.ic_category_family))
 
                             database.TransactionDao.insertTransaction(
-                                Transaction(0,0,0,Constants.TYPE_EXPENSE,1000,"aaa",1582995600000))
+                                Transaction(0,0,1,Constants.TYPE_EXPENSE,1000,"aaa",1582995600000))
 
                             database.TransactionDao.insertTransaction(
-                                Transaction(1,1,0,Constants.TYPE_EXPENSE,2000,"bbb",1584118800000))
+                                Transaction(1,1,1,Constants.TYPE_EXPENSE,2000,"bbb",1584118800000))
 
                             database.TransactionDao.insertTransaction(
-                                Transaction(2,0,0,Constants.TYPE_EXPENSE,3000,"ccc",1585242000000))
+                                Transaction(2,0,1,Constants.TYPE_EXPENSE,3000,"ccc",1585242000000))
 
                             database.TransactionDao.insertTransaction(
-                                Transaction(3,1,0,Constants.TYPE_EXPENSE,4000,"ddd",1585760400000))
+                                Transaction(3,1,1,Constants.TYPE_EXPENSE,4000,"ddd",1585760400000))
 
                             database.TransactionDao.insertTransaction(
-                                Transaction(4,0,0,Constants.TYPE_EXPENSE,5000,"eee",1588352400000))
+                                Transaction(4,0,1,Constants.TYPE_EXPENSE,5000,"eee",1588352400000))
                         }
 
                     }
