@@ -11,17 +11,24 @@ import kotlinx.coroutines.async
 
 class TransactionsFragViewModel(val repository: Repository) : ViewModel() {
     var currentWallet: LiveData<Wallet> = repository.getFirstWallet()
-    private var startTime: Long = 0L
-    private var endTime: Long = System.currentTimeMillis()
+    var startTime: Long = 0L
+    var endTime: Long = System.currentTimeMillis()
     private var _tabInfoList = MutableLiveData<List<TabInfo>>()
     private val tabInfoUtils = TabInfoUtils()
-    private val timeRange = TimeRange.MONTH
+
+    var timeRange = TimeRange.MONTH
+        set(value) {
+            if (field.value == value.value)
+                return
+            field = value
+            getTabInfoList()
+        }
 
     var tabInfoList: LiveData<List<TabInfo>> = _tabInfoList
 
     init {
-        startTime = tabInfoUtils.toEpoch(
-            tabInfoUtils.toLocalDate(endTime).minusMonths(18)
+        startTime = TabInfoUtils.toEpoch(
+            TabInfoUtils.toLocalDate(endTime).minusMonths(18)
         )
 
     }
