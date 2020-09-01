@@ -9,6 +9,6 @@ data class Wallet(
     val id:Long,
     var name:String,
     var imageId:Int,
-    var amount:String
+    var amount: Long
 ) {
 }
