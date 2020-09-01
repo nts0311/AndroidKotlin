@@ -5,19 +5,18 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "transactions",
-    foreignKeys = arrayOf(
-        ForeignKey(
-            entity = Wallet::class,
-            parentColumns = arrayOf("id"),
-            childColumns = arrayOf("walletId"),
-            onDelete = ForeignKey.CASCADE))
+    tableName = "transactions"/*,
+    foreignKeys = [ForeignKey(
+        entity = Wallet::class,
+        parentColumns = arrayOf("id"),
+        childColumns = arrayOf("walletId"),
+        onDelete = ForeignKey.CASCADE)]*/
 )
 data class Transaction(
     @PrimaryKey(autoGenerate = true)
-    val id: Long,
-    val categoryId: Long,
-    val walletId: Long,
+    var id: Long,
+    var categoryId: Long,
+    var walletId: Long,
     var type: String,
     var amount: Long,
     var note: String,

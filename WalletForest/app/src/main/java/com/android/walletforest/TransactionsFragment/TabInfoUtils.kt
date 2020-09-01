@@ -9,7 +9,20 @@ import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.*
 
-class TabInfoUtils(var start: Long, var end: Long, var timeRange: TimeRange, var walletId: Long) {
+class TabInfoUtils() {
+
+    var start: Long = 0L
+    var end: Long = 0L
+    var timeRange: TimeRange = TimeRange.MONTH
+    var walletId: Long = 0
+
+    fun setProperties(start: Long, end: Long, timeRange: TimeRange, walletId: Long)
+    {
+        this.start=start
+        this.end=end
+        this.timeRange=timeRange
+        this.walletId=walletId
+    }
 
     private var _tabInfoList: MutableList<TabInfo> = mutableListOf()
 

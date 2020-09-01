@@ -3,8 +3,15 @@ package com.android.walletforest.TransactionsFragment
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.ViewModelProvider
 import com.android.walletforest.R
+import com.android.walletforest.RepoViewModelFactory
+import com.android.walletforest.databinding.FragmentTransactionsBinding
+import com.android.walletforest.model.Repository
+import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_transactions.*
 
 // TODO: Rename parameter arguments, choose names that match
@@ -12,25 +19,12 @@ import kotlinx.android.synthetic.main.fragment_transactions.*
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [TransactionsFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+
 class TransactionsFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-        setHasOptionsMenu(true)
-    }
-
+    lateinit var binding: FragmentTransactionsBinding
+    lateinit var viewModel: TransactionsFragViewModel
+    lateinit var viewPagerAdapter:TabFragmentStateAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,36 +32,46 @@ class TransactionsFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
 
-        return inflater.inflate(R.layout.fragment_transactions, container, false)
+        binding = FragmentTransactionsBinding.inflate(inflater)
+
+        val repo=Repository.getInstance(requireContext().applicationContext)
+        val vmFactory=RepoViewModelFactory(repo)
+
+        viewModel=ViewModelProvider(requireActivity(), vmFactory).get(TransactionsFragViewModel::class.java)
+
+        setupObservers()
+        //setUpViewPager()
+
+        return binding.root
+    }
+
+    private fun setupObservers()
+    {
+        viewModel.tabInfoList.observe(viewLifecycleOwner)
+        {
+            if(it!=null)
+                viewPagerAdapter.tabInfoList=it
+        }
+    }
+
+    private fun setUpViewPager() {
+        binding.mainViewPager.adapter=viewPagerAdapter
+        TabLayoutMediator(binding.tabLayout, binding.mainViewPager){
+            tab, position->
+            tab.text=viewPagerAdapter.tabInfoList[position].tabTitle
+        }.attach()
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        setHasOptionsMenu(true)
         (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
+        viewPagerAdapter = TabFragmentStateAdapter(parentFragmentManager, lifecycle)
+        setUpViewPager()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.transactions_frag_menu,menu)
-    }
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment TransactionsFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            TransactionsFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+        inflater.inflate(R.menu.transactions_frag_menu, menu)
     }
 }
