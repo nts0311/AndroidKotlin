@@ -35,14 +35,13 @@ class TabInfoUtils() {
             TimeRange.WEEK -> getTabInfoByWeek(dStart, dEnd)
             TimeRange.MONTH -> getTabInfoByMonth(dStart, dEnd)
             TimeRange.YEAR -> getTabInfoByYear(dStart, dEnd)
-            else -> getTabInfoByMonth(dStart, dEnd)
+            TimeRange.CUSTOM -> getTabInfoCustomRange(dStart, dEnd)
         }
 
         return _tabInfoList
     }
 
-    companion object
-    {
+    companion object {
         fun toLocalDate(time: Long): LocalDate {
             val calendar = Calendar.getInstance()
             calendar.timeInMillis = time
@@ -116,15 +115,16 @@ class TabInfoUtils() {
             val monthDiff = ChronoUnit.MONTHS.between(dStart, dEnd)
 
             for (i in 0..monthDiff.toInt()) {
+                val nextMonth = dStart.plusMonths(1)
                 _tabInfoList.add(
                     TabInfo(
                         walletId,
                         toEpoch(dStart),
-                        toEpoch(dStart),
+                        toEpoch(nextMonth),
                         getMonthTitle(dStart)
                     )
                 )
-                dStart = dStart.plusMonths(1)
+                dStart = nextMonth
             }
 
             funAddFutureTab("This month", toEpoch(dStart))
@@ -140,18 +140,46 @@ class TabInfoUtils() {
             val yearDiff = ChronoUnit.YEARS.between(dStart, dEnd)
 
             for (i in 0..yearDiff.toInt()) {
+                val nextYear = dStart.plusYears(1)
                 _tabInfoList.add(
                     TabInfo(
                         walletId,
                         toEpoch(dStart),
-                        toEpoch(dStart),
+                        toEpoch(nextYear),
                         dStart.year.toString()
                     )
                 )
-                dStart = dStart.plusYears(1)
+                dStart = nextYear
             }
 
             funAddFutureTab("This year", toEpoch(dStart))
+        }
+    }
+
+    private suspend fun getTabInfoCustomRange(start: LocalDate, end: LocalDate) {
+        withContext(Dispatchers.Default)
+        {
+
+            val sb = java.lang.StringBuilder("")
+
+            if (start.year == end.year) {
+                sb.append(start.dayOfMonth.toString() + "/" + start.month.toString())
+                sb.append(" - ")
+                sb.append(end.dayOfMonth.toString() + "/" + end.month.toString())
+            } else {
+                sb.append(start.dayOfMonth.toString() + "/" + start.month.toString() + "/" + start.year)
+                sb.append(" - ")
+                sb.append(end.dayOfMonth.toString() + "/" + end.month.toString() + "/" + end.year)
+            }
+
+            _tabInfoList.add(
+                TabInfo(
+                    walletId,
+                    toEpoch(start),
+                    toEpoch(end),
+                    sb.toString()
+                )
+            )
         }
     }
 }
