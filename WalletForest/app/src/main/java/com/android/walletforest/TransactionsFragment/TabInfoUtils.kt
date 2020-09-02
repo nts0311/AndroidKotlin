@@ -163,13 +163,13 @@ class TabInfoUtils() {
             val sb = java.lang.StringBuilder("")
 
             if (start.year == end.year) {
-                sb.append(start.dayOfMonth.toString() + "/" + start.month.toString())
+                sb.append(start.dayOfMonth.toString() + "/" + start.monthValue.toString())
                 sb.append(" - ")
-                sb.append(end.dayOfMonth.toString() + "/" + end.month.toString())
+                sb.append(end.dayOfMonth.toString() + "/" + end.monthValue.toString())
             } else {
-                sb.append(start.dayOfMonth.toString() + "/" + start.month.toString() + "/" + start.year)
+                sb.append(start.dayOfMonth.toString() + "/" + start.monthValue.toString() + "/" + start.year)
                 sb.append(" - ")
-                sb.append(end.dayOfMonth.toString() + "/" + end.month.toString() + "/" + end.year)
+                sb.append(end.dayOfMonth.toString() + "/" + end.monthValue.toString() + "/" + end.year)
             }
 
             _tabInfoList.add(

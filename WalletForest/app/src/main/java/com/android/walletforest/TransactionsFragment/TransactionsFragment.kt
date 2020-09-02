@@ -46,7 +46,6 @@ class TransactionsFragment : Fragment() {
         ).get(TransactionsFragViewModel::class.java)
 
         setupObservers()
-        //setUpViewPager()
 
         return binding.root
     }
@@ -57,6 +56,7 @@ class TransactionsFragment : Fragment() {
         (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
 
         setUpViewPager()
+        createDialogs()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -67,14 +67,10 @@ class TransactionsFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         //return super.onOptionsItemSelected(item)
         when (item.itemId) {
-            R.id.range_month_item -> viewModel.timeRange = TimeRange.MONTH
-            R.id.range_week_item -> viewModel.timeRange = TimeRange.WEEK
-            R.id.range_year_item -> viewModel.timeRange = TimeRange.YEAR
-            R.id.range_custom_item -> {
-                createDialogs()
-                showRangeSelectDialog()
-
-            }
+            R.id.range_month_item ->viewModel.onTimeRangeChanged(TimeRange.MONTH)
+            R.id.range_week_item -> viewModel.onTimeRangeChanged(TimeRange.WEEK)
+            R.id.range_year_item -> viewModel.onTimeRangeChanged(TimeRange.YEAR)
+            R.id.range_custom_item -> showRangeSelectDialog()
         }
 
         return true
@@ -120,61 +116,64 @@ class TransactionsFragment : Fragment() {
 
     }
 
-    fun showRangeSelectDialog() {
+    private fun showRangeSelectDialog() {
         rangeSelectDialog?.show()
 
         val startDate = TabInfoUtils.toLocalDate(viewModel.startTime)
-        val endTime = TabInfoUtils.toLocalDate(viewModel.endTime)
+        val endDate = TabInfoUtils.toLocalDate(viewModel.endTime)
 
         val startEdt = rangeSelectDialog?.findViewById<EditText>(R.id.start_time_edt)
         startEdt?.setText(dateToString(startDate))
 
         val endEdt = rangeSelectDialog?.findViewById<EditText>(R.id.end_time_edt)
-        endEdt?.setText(dateToString(endTime))
+        endEdt?.setText(dateToString(endDate))
+
+        val startDateSetListener: (DatePicker, Int, Int, Int) -> Unit =
+            { _, year, monthOfYear, dayOfMonth ->
+                val ld = LocalDate.of(year, monthOfYear, dayOfMonth)
+                startEdt?.setText(dateToString(ld))
+                startEdt?.tag = TabInfoUtils.toEpoch(ld)
+            }
+
+        val endDateSetListener: (DatePicker, Int, Int, Int) -> Unit =
+            { _, year, monthOfYear, dayOfMonth ->
+                val ld = LocalDate.of(year, monthOfYear, dayOfMonth)
+                endEdt?.setText(dateToString(ld))
+                endEdt?.tag = TabInfoUtils.toEpoch(ld)
+            }
+
+        startEdt?.setOnClickListener {
+            DatePickerDialog(
+                requireContext(), startDateSetListener,
+                startDate.year, startDate.monthValue - 1, startDate.dayOfMonth
+            ).show()
+        }
+
+        endEdt?.setOnClickListener {
+            DatePickerDialog(
+                requireContext(), endDateSetListener,
+                endDate.year, endDate.monthValue - 1, endDate.dayOfMonth
+            ).show()
+        }
 
     }
 
     private fun dateToString(ld: LocalDate): String =
         DateTimeFormatter.ofPattern("dd/MM/yyyy").format(ld)
 
-    fun createDialogs() {
+    private fun createDialogs() {
         rangeSelectDialog = AlertDialog.Builder(requireContext()).run {
 
             val inflater = requireActivity().layoutInflater
 
             val dialogView = inflater.inflate(R.layout.range_selection_dialog, null)
 
-            val startDate = TabInfoUtils.toLocalDate(viewModel.startTime)
-            val endDate = TabInfoUtils.toLocalDate(viewModel.endTime)
-
             val startEdt = dialogView.findViewById<EditText>(R.id.start_time_edt)
             val endEdt = dialogView.findViewById<EditText>(R.id.end_time_edt)
 
-            val startDateSetListener: (DatePicker, Int, Int, Int) -> Unit =
-                { _, year, monthOfYear, dayOfMonth ->
-                    val ld = LocalDate.of(year, monthOfYear, dayOfMonth)
-                    startEdt?.setText(dateToString(ld))
-                }
-
-            val endDateSetListener: (DatePicker, Int, Int, Int) -> Unit =
-                { _, year, monthOfYear, dayOfMonth ->
-                    val ld = LocalDate.of(year, monthOfYear, dayOfMonth)
-                    endEdt?.setText(dateToString(ld))
-                }
-
-            startEdt?.setOnClickListener {
-                DatePickerDialog(requireContext(), startDateSetListener,
-                    startDate.year, startDate.monthValue, startDate.dayOfMonth).show()
-            }
-
-            endEdt?.setOnClickListener {
-                DatePickerDialog(requireContext(), endDateSetListener,
-                    endDate.year, endDate.monthValue, endDate.dayOfMonth).show()
-            }
-
             setView(dialogView)
             setPositiveButton(R.string.select_time) { dialog, id ->
-
+                viewModel.onSelectCustomTimeRange(startEdt.tag as Long, endEdt.tag as Long)
             }
 
             setNegativeButton(R.string.cancel) { dialog, id ->
