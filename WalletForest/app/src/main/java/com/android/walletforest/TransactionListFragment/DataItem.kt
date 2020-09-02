@@ -2,6 +2,7 @@ package com.android.walletforest.TransactionListFragment
 
 import com.android.walletforest.enums.ItemType
 import com.android.walletforest.model.Entities.Transaction
+import java.time.LocalDate
 
 sealed class DataItem {
     abstract var itemType:ItemType
@@ -12,7 +13,7 @@ sealed class DataItem {
     }
 
     data class DividerItem(
-        var date: Long,
+        var date: LocalDate,
         var categoryId: Long,
         var totalAmount: Long,
         var numOfTransactions:Int
