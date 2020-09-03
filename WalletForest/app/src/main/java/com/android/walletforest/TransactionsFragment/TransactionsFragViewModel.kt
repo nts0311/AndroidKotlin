@@ -34,7 +34,7 @@ class TransactionsFragViewModel(private val repository: Repository) : ViewModel(
 
     init {
         initTimeRange()
-        test()
+        //test()
     }
 
     private fun initTimeRange() {
@@ -85,62 +85,98 @@ class TransactionsFragViewModel(private val repository: Repository) : ViewModel(
         }
     }
 
-    private fun test()
-    {
+    fun switchViewMode(): ViewType {
+        val currentViewMode = repository.viewMode
+
+        val newViewMode = if (currentViewMode.value == ViewType.TRANSACTION)
+            ViewType.CATEGORY
+        else
+            ViewType.TRANSACTION
+
+        currentViewMode.value = newViewMode
+        return newViewMode
+    }
+
+    private fun test() {
         viewModelScope.launch {
-            val transactions:MutableList<Transaction> = mutableListOf()
+            val transactions: MutableList<Transaction> = mutableListOf()
 
             //2-9
-            transactions.add(Transaction
-                (0,0,1, Constants.TYPE_EXPENSE,1000,"aaa",1599004800000))
+            transactions.add(
+                Transaction
+                    (0, 0, 1, Constants.TYPE_EXPENSE, 1000, "aaa", 1599004800000)
+            )
 
-            transactions.add(Transaction
-                (1,1,1, Constants.TYPE_EXPENSE,1000,"aaa",1599004800000))
+            transactions.add(
+                Transaction
+                    (1, 1, 1, Constants.TYPE_EXPENSE, 1000, "aaa", 1599004800000)
+            )
 
-            transactions.add(Transaction
-                (2,2,1, Constants.TYPE_EXPENSE,1000,"aaa",1599004800000))
+            transactions.add(
+                Transaction
+                    (2, 2, 1, Constants.TYPE_EXPENSE, 1000, "aaa", 1599004800000)
+            )
 
             //5-9
-            transactions.add(Transaction
-                (3,2,1, Constants.TYPE_EXPENSE,1000,"aaa",1599264000000))
+            transactions.add(
+                Transaction
+                    (3, 2, 1, Constants.TYPE_EXPENSE, 1000, "aaa", 1599264000000)
+            )
 
-            transactions.add(Transaction
-                (4,0,1, Constants.TYPE_EXPENSE,1000,"aaa",1599264000000))
+            transactions.add(
+                Transaction
+                    (4, 0, 1, Constants.TYPE_EXPENSE, 1000, "aaa", 1599264000000)
+            )
 
 
             //13-9
-            transactions.add(Transaction
-                (5,1,1, Constants.TYPE_EXPENSE,1000,"aaa",1599955200000))
+            transactions.add(
+                Transaction
+                    (5, 1, 1, Constants.TYPE_EXPENSE, 1000, "aaa", 1599955200000)
+            )
 
-            transactions.add(Transaction
-                (6,2,1, Constants.TYPE_EXPENSE,1000,"aaa",1599955200000))
+            transactions.add(
+                Transaction
+                    (6, 2, 1, Constants.TYPE_EXPENSE, 1000, "aaa", 1599955200000)
+            )
 
-            transactions.add(Transaction
-                (7,0,1, Constants.TYPE_EXPENSE,1000,"aaa",1599955200000))
+            transactions.add(
+                Transaction
+                    (7, 0, 1, Constants.TYPE_EXPENSE, 1000, "aaa", 1599955200000)
+            )
 
-            transactions.add(Transaction
-                (8,3,1, Constants.TYPE_EXPENSE,1000,"aaa",1599955200000))
+            transactions.add(
+                Transaction
+                    (8, 3, 1, Constants.TYPE_EXPENSE, 1000, "aaa", 1599955200000)
+            )
 
 
             //24-9
-            transactions.add(Transaction
-                (9,3,1, Constants.TYPE_EXPENSE,1000,"aaa",1600905600000))
+            transactions.add(
+                Transaction
+                    (9, 3, 1, Constants.TYPE_EXPENSE, 1000, "aaa", 1600905600000)
+            )
 
             //2-9
-            transactions.add(Transaction
-                (10,0,1, Constants.TYPE_EXPENSE,1000,"aaa",1599004800000))
+            transactions.add(
+                Transaction
+                    (10, 0, 1, Constants.TYPE_EXPENSE, 1000, "aaa", 1599004800000)
+            )
 
             //3-8
-            transactions.add(Transaction
-                (11,0,1, Constants.TYPE_EXPENSE,1000,"aaa",1596412800000))
+            transactions.add(
+                Transaction
+                    (11, 0, 1, Constants.TYPE_EXPENSE, 1000, "aaa", 1596412800000)
+            )
 
-            val grouper=DataGrouper()
+            val grouper = DataGrouper()
 
-            val result = async { grouper.doGrouping(transactions, TimeRange.MONTH, ViewType.TRANSACTION) }
+            val result =
+                async { grouper.doGrouping(transactions, TimeRange.MONTH, ViewType.TRANSACTION) }
 
             val data = result.await()
 
-            Log.i("aaaa","${data.size}")
+            Log.i("aaaa", "${data.size}")
         }
     }
 

@@ -23,6 +23,7 @@ class TabFragmentStateAdapter(fragmentManager: FragmentManager, lifecycle: Lifec
 
     override fun getItemCount(): Int = tabInfoList.size
 
+
     override fun createFragment(position: Int): Fragment {
         val tabInfo = tabInfoList[position]
         return TransactionListFragment.newInstance(

@@ -13,6 +13,7 @@ import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
 import com.android.walletforest.databinding.FragmentTransactionsBinding
 import com.android.walletforest.enums.TimeRange
+import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Repository
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -67,10 +68,18 @@ class TransactionsFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         //return super.onOptionsItemSelected(item)
         when (item.itemId) {
-            R.id.range_month_item ->viewModel.onTimeRangeChanged(TimeRange.MONTH)
+            R.id.range_month_item -> viewModel.onTimeRangeChanged(TimeRange.MONTH)
             R.id.range_week_item -> viewModel.onTimeRangeChanged(TimeRange.WEEK)
             R.id.range_year_item -> viewModel.onTimeRangeChanged(TimeRange.YEAR)
             R.id.range_custom_item -> showRangeSelectDialog()
+            R.id.switch_view_mode_item -> {
+                val newViewMode = viewModel.switchViewMode()
+
+                if (newViewMode == ViewType.TRANSACTION)
+                    item.title = getString(R.string.view_by) + " " + getString(R.string.category)
+                else
+                    item.title = getString(R.string.view_by) + " " + getString(R.string.transaction)
+            }
         }
 
         return true

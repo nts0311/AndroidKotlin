@@ -21,7 +21,7 @@
     </item>
     <item
         android:id="@+id/switch_view_mode_item"
-        android:title="@string/view_by_trans" />
+        android:title="@string/view_by_cate" />
     <item
         android:id="@+id/edit_wallet_item"
         android:title="@string/edit_wallet" />
