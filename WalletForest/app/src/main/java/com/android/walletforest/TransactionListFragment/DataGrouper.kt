@@ -23,6 +23,8 @@ class DataGrouper {
         this.transactions = transactions
         this.viewType = viewType
 
+        if(transactions.isEmpty()) return mutableListOf()
+
         if (viewType == ViewType.TRANSACTION) {
             when (timeRange) {
                 TimeRange.WEEK, TimeRange.MONTH -> group { dividerItem, transaction ->

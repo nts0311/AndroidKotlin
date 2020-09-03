@@ -37,7 +37,7 @@ abstract class AppDatabase() : RoomDatabase() {
 
         private fun buildDatabase(context: Context) =
             Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
-                .addCallback(object : Callback()
+                /*.addCallback(object : Callback()
                 {
                     //TEST DATA
                     override fun onCreate(db: SupportSQLiteDatabase) {
@@ -74,7 +74,7 @@ abstract class AppDatabase() : RoomDatabase() {
                         }
 
                     }
-                })
+                })*/
                 .fallbackToDestructiveMigration()
                 .build()
     }

@@ -1,16 +1,20 @@
 package com.android.walletforest.TransactionListFragment
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
-import com.android.walletforest.TransactionsFragment.TransactionsFragViewModel
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.model.Repository
+import kotlinx.android.synthetic.main.fragment_transaction_list.*
 
 
 private const val START_TIME_PARAM = "startTime"
@@ -56,9 +60,14 @@ class TransactionListFragment : Fragment() {
             viewModel.setTimeRange(startTime!!, endTime!!, timeRange!!)
         }
 
-        registerObservers()
+        //registerObservers()
 
         return inflater.inflate(R.layout.fragment_transaction_list, container, false)
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        registerObservers()
     }
 
     private fun registerObservers() {
@@ -70,15 +79,14 @@ class TransactionListFragment : Fragment() {
         }
 
         viewModel.transactionList.observe(viewLifecycleOwner){
-            if(it!=null)
-                viewModel.groupData(it)
+            if(it!=null && it.isNotEmpty())
+                viewModel.onTransactionListChange(it)
         }
 
         //display transaction here
-        viewModel.dataItemList.observe(viewLifecycleOwner)
-        {
+        /*viewModel.dataItemList.observe(viewLifecycleOwner) {
 
-        }
+        }*/
     }
 
     companion object {

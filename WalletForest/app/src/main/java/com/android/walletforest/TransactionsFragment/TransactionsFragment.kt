@@ -108,8 +108,10 @@ class TransactionsFragment : Fragment() {
     }
 
     private fun setUpViewPager() {
+
+        //dont use activity's fragManager here, it will result in crash
         viewPagerAdapter =
-            TabFragmentStateAdapter(parentFragmentManager, requireActivity().lifecycle)
+            TabFragmentStateAdapter(childFragmentManager, requireActivity().lifecycle)
 
         binding.apply {
             mainViewPager.adapter = viewPagerAdapter

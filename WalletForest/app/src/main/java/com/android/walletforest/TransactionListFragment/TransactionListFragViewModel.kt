@@ -5,10 +5,8 @@ import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Entities.Transaction
 import com.android.walletforest.model.Repository
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
 
@@ -26,12 +24,18 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
     var dataItemList: LiveData<List<DataItem>> = _dataItemList
 
     fun switchViewMode(viewType: ViewType) {
+        if (currentViewMode == viewType) return
+
         currentViewMode = viewType
         if (transactionList.value != null)
             groupData(transactionList.value!!)
     }
 
-    fun groupData(transactionList: List<Transaction>) {
+    fun onTransactionListChange(transactionList: List<Transaction>) {
+        groupData(transactionList)
+    }
+
+    private fun groupData(transactionList: List<Transaction>) {
         viewModelScope.launch {
             val result =
                 async { dataGrouper.doGrouping(transactionList, timeRange, currentViewMode) }
@@ -39,7 +43,9 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
         }
     }
 
+
     fun setTimeRange(start: Long, end: Long, range: String) {
+
         startTime = start
         endTime = end
         timeRange = TimeRange.valueOf(range)
