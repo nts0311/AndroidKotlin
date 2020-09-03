@@ -48,6 +48,15 @@ class DataGrouper {
         return result
     }
 
+    private fun cmpLong(l1:Long, l2:Long) : Int
+    {
+        when {
+            l1>l2 -> return 1
+            l1==l2 -> return 0
+            l1<l2 -> return -1
+        }
+        return 0
+    }
 
     private suspend fun group(belongToGroup: (DataItem.DividerItem, Transaction) -> Boolean) {
         withContext(Dispatchers.Default)
@@ -58,12 +67,23 @@ class DataGrouper {
                 transactions.sortedWith { t1: Transaction, t2: Transaction ->
 
                     if (t1.time == t2.time)
-                        (t2.id - t1.id).toInt()
+                        cmpLong(t2.id, t1.id)
                     else
-                        (t2.time - t1.time).toInt()
+                        cmpLong(t2.time, t1.time)
                 }
-            } else
-                transactions.sortedBy { it.categoryId }
+            } else {
+                transactions.sortedWith { t1: Transaction, t2: Transaction ->
+
+                    if (t1.categoryId == t2.categoryId) {
+                        if (t2.time == t1.time)
+                            cmpLong(t2.id, t1.id)
+                        else
+                            cmpLong(t2.time, t1.time)
+                    } else
+                        cmpLong(t1.categoryId, t2.categoryId)
+                }
+            }
+
 
             var totalAmount = 0L
             var numOfTransaction = 0

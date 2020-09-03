@@ -40,10 +40,6 @@ class TransactionsFragViewModel(private val repository: Repository) : ViewModel(
     private fun initTimeRange() {
 
         val ld = TabInfoUtils.toLocalDate(endTime)
-       /* endTime = TabInfoUtils.toEpoch(
-            LocalDate.of(ld.year, ld.monthValue + 1, 1)
-                .minusDays(1)
-        )*/
 
         startTime = TabInfoUtils.toEpoch(
             LocalDate.of(ld.year, ld.monthValue, 1)
@@ -134,13 +130,17 @@ class TransactionsFragViewModel(private val repository: Repository) : ViewModel(
             transactions.add(Transaction
                 (10,0,1, Constants.TYPE_EXPENSE,1000,"aaa",1599004800000))
 
+            //3-8
+            transactions.add(Transaction
+                (11,0,1, Constants.TYPE_EXPENSE,1000,"aaa",1596412800000))
+
             val grouper=DataGrouper()
 
-            val result = async { grouper.doGrouping(transactions, TimeRange.YEAR, ViewType.TRANSACTION) }
+            val result = async { grouper.doGrouping(transactions, TimeRange.MONTH, ViewType.TRANSACTION) }
 
             val data = result.await()
 
-            Log.i("aaaa","aaaaa")
+            Log.i("aaaa","${data.size}")
         }
     }
 

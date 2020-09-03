@@ -8,15 +8,14 @@ import android.view.ViewGroup
 import com.android.walletforest.R
 import com.android.walletforest.enums.TimeRange
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+
 private const val START_TIME_PARAM = "startTime"
 private const val END_TIME_PARAM = "endTime"
 private const val WALLET_ID_PARAM = "walletId"
 private const val TIME_RANGE_PARAM = "timeRange"
 
 class TransactionListFragment : Fragment() {
-    // TODO: Rename and change types of parameters
+
     private var startTime: Long? = null
     private var endTime: Long? = null
     private var walletId: Long? = null
