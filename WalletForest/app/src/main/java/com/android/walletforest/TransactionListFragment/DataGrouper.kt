@@ -23,7 +23,7 @@ class DataGrouper {
         this.transactions = transactions
         this.viewType = viewType
 
-        if(transactions.isEmpty()) return mutableListOf()
+        if (transactions.isEmpty()) return mutableListOf()
 
         if (viewType == ViewType.TRANSACTION) {
             when (timeRange) {
@@ -50,12 +50,11 @@ class DataGrouper {
         return result
     }
 
-    private fun cmpLong(l1:Long, l2:Long) : Int
-    {
+    private fun cmpLong(l1: Long, l2: Long): Int {
         when {
-            l1>l2 -> return 1
-            l1==l2 -> return 0
-            l1<l2 -> return -1
+            l1 > l2 -> return 1
+            l1 == l2 -> return 0
+            l1 < l2 -> return -1
         }
         return 0
     }
