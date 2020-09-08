@@ -60,6 +60,8 @@ class DataGrouper {
     }
 
     private suspend fun group(belongToGroup: (DataItem.DividerItem, Transaction) -> Boolean) {
+        if(transactions.isEmpty()) return
+
         withContext(Dispatchers.Default)
         {
             result.clear()

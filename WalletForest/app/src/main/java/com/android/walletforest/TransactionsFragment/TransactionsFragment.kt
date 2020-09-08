@@ -104,7 +104,12 @@ class TransactionsFragment : Fragment() {
             }
         }
 
-
+        viewModel.categoryList.observe(viewLifecycleOwner)
+        {
+            if (it != null) {
+                viewModel.updateCategories(it)
+            }
+        }
     }
 
     private fun setUpViewPager() {

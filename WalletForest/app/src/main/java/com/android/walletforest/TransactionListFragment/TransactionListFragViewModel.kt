@@ -14,8 +14,8 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
 
     private var startTime: Long = 0L
     private var endTime: Long = 0L
-    private var timeRange = TimeRange.MONTH
-    private var currentViewMode = ViewType.TRANSACTION
+    var timeRange = TimeRange.MONTH
+    var currentViewMode = ViewType.TRANSACTION
     private var dataGrouper = DataGrouper()
 
     var transactionList: LiveData<List<Transaction>> = MutableLiveData()

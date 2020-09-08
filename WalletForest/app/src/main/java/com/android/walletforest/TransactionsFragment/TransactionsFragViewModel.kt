@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
+import com.android.walletforest.model.Entities.Category
 import com.android.walletforest.model.Entities.Transaction
 import kotlinx.coroutines.async
 import java.time.LocalDate
@@ -18,7 +19,7 @@ import java.time.LocalDate
 class TransactionsFragViewModel(private val repository: Repository) : ViewModel() {
 
     var currentWallet: LiveData<Wallet> = repository.getFirstWallet()
-
+    var categoryList = repository.getCategoriesLiveData()
 
     var startTime: Long = 0L
         private set
@@ -69,6 +70,11 @@ class TransactionsFragViewModel(private val repository: Repository) : ViewModel(
             return
         this.timeRange = timeRange
         getTabInfoList()
+    }
+
+    fun updateCategories(categories : List<Category>)
+    {
+        repository.updateCategoriesMap(categories)
     }
 
     private fun getTabInfoList() {

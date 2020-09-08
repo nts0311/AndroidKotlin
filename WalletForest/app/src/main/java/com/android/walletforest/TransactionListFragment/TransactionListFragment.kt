@@ -28,6 +28,8 @@ class TransactionListFragment : Fragment() {
     private var endTime: Long? = null
     private var walletId: Long? = null
     private var timeRange: String? = null
+    private var itemAdapter: DataItemAdapter? = null
+    private lateinit var repo : Repository
 
     private lateinit var viewModel: TransactionListFragViewModel
 
@@ -47,7 +49,7 @@ class TransactionListFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
 
-        val repo = Repository.getInstance(requireContext().applicationContext)
+        repo = Repository.getInstance(requireContext().applicationContext)
         val vmFactory = RepoViewModelFactory(repo)
 
         viewModel = ViewModelProvider(
@@ -60,6 +62,8 @@ class TransactionListFragment : Fragment() {
             viewModel.setTimeRange(startTime!!, endTime!!, timeRange!!)
         }
 
+
+
         //registerObservers()
 
         return inflater.inflate(R.layout.fragment_transaction_list, container, false)
@@ -68,6 +72,9 @@ class TransactionListFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         registerObservers()
+
+        itemAdapter = DataItemAdapter(viewModel.currentViewMode, viewModel.timeRange, repo.categoryMap)
+        transaction_list_rv.adapter=itemAdapter
     }
 
     private fun registerObservers() {
@@ -84,9 +91,10 @@ class TransactionListFragment : Fragment() {
         }
 
         //display transaction here
-        /*viewModel.dataItemList.observe(viewLifecycleOwner) {
-
-        }*/
+        viewModel.dataItemList.observe(viewLifecycleOwner) {
+            if(it!=null && it.isNotEmpty())
+                itemAdapter?.submitList(it)
+        }
     }
 
     companion object {

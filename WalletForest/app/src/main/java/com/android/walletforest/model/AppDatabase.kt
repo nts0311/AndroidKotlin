@@ -37,7 +37,7 @@ abstract class AppDatabase() : RoomDatabase() {
 
         private fun buildDatabase(context: Context) =
             Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
-                /*.addCallback(object : Callback()
+                .addCallback(object : Callback()
                 {
                     //TEST DATA
                     override fun onCreate(db: SupportSQLiteDatabase) {
@@ -52,29 +52,83 @@ abstract class AppDatabase() : RoomDatabase() {
                                 Wallet(1,"Cash", R.drawable.ic_bk_cashbook, 100000))
 
                             database.categoryDao.insertCategory(
-                                Category(0,0,"Food",R.drawable.ic_category_foodndrink)
-                            )
-                            database.categoryDao.insertCategory(
                                 Category(1,1,"Family",R.drawable.ic_category_family))
+                            database.categoryDao.insertCategory(
+                                Category(2,2,"Food",R.drawable.ic_category_foodndrink))
+                            database.categoryDao.insertCategory(
+                                Category(3,3,"Friend",R.drawable.ic_category_friendnlover))
+                            database.categoryDao.insertCategory(
+                                Category(4,4,"Education",R.drawable.ic_category_education))
 
                             database.transactionDao.insertTransaction(
-                                Transaction(0,0,1,Constants.TYPE_EXPENSE,1000,"aaa",1582995600000))
+                                Transaction
+                                    (12, 1, 1, Constants.TYPE_EXPENSE, 1000, "aaa", 1599004800000))
 
                             database.transactionDao.insertTransaction(
-                                Transaction(1,1,1,Constants.TYPE_EXPENSE,2000,"bbb",1584118800000))
+                                Transaction
+                                    (1, 2, 1, Constants.TYPE_EXPENSE, 1000, "aaa", 1599004800000)
+                            )
 
                             database.transactionDao.insertTransaction(
-                                Transaction(2,0,1,Constants.TYPE_EXPENSE,3000,"ccc",1585242000000))
+                                Transaction
+                                    (2, 3, 1, Constants.TYPE_EXPENSE, 1000, "aaa", 1599004800000)
+                            )
+
+                            //5-9
+                            database.transactionDao.insertTransaction(
+                                Transaction
+                                    (3, 3, 1, Constants.TYPE_EXPENSE, 1000, "aaa", 1599264000000)
+                            )
 
                             database.transactionDao.insertTransaction(
-                                Transaction(3,1,1,Constants.TYPE_EXPENSE,4000,"ddd",1585760400000))
+                                Transaction
+                                    (4, 1, 1, Constants.TYPE_EXPENSE, 1000, "aaa", 1599264000000)
+                            )
+
+
+                            //13-9
+                            database.transactionDao.insertTransaction(
+                                Transaction
+                                    (5, 2, 1, Constants.TYPE_EXPENSE, 1000, "aaa", 1599955200000)
+                            )
 
                             database.transactionDao.insertTransaction(
-                                Transaction(4,0,1,Constants.TYPE_EXPENSE,5000,"eee",1588352400000))
+                                Transaction
+                                    (6, 3, 1, Constants.TYPE_EXPENSE, 1000, "aaa", 1599955200000)
+                            )
+
+                            database.transactionDao.insertTransaction(
+                                Transaction
+                                    (7, 1, 1, Constants.TYPE_EXPENSE, 1000, "aaa", 1599955200000)
+                            )
+
+                            database.transactionDao.insertTransaction(
+                                Transaction
+                                    (8, 4, 1, Constants.TYPE_EXPENSE, 1000, "aaa", 1599955200000)
+                            )
+
+
+                            //24-9
+                            database.transactionDao.insertTransaction(
+                                Transaction
+                                    (9, 4, 1, Constants.TYPE_EXPENSE, 1000, "aaa", 1600905600000)
+                            )
+
+                            //2-9
+                            database.transactionDao.insertTransaction(
+                                Transaction
+                                    (10, 1, 1, Constants.TYPE_EXPENSE, 1000, "aaa", 1599004800000)
+                            )
+
+                            //3-8
+                            database.transactionDao.insertTransaction(
+                                Transaction
+                                    (11, 1, 1, Constants.TYPE_EXPENSE, 1000, "aaa", 1596412800000)
+                            )
                         }
 
                     }
-                })*/
+                })
                 .fallbackToDestructiveMigration()
                 .build()
     }
