@@ -68,9 +68,19 @@ class TransactionsFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         //return super.onOptionsItemSelected(item)
         when (item.itemId) {
-            R.id.range_month_item -> viewModel.onTimeRangeChanged(TimeRange.MONTH)
-            R.id.range_week_item -> viewModel.onTimeRangeChanged(TimeRange.WEEK)
-            R.id.range_year_item -> viewModel.onTimeRangeChanged(TimeRange.YEAR)
+            R.id.range_month_item -> {
+                viewModel.onTimeRangeChanged(TimeRange.MONTH)
+                viewPagerAdapter.timeRange = TimeRange.MONTH
+            }
+            R.id.range_week_item -> {
+                viewModel.onTimeRangeChanged(TimeRange.WEEK)
+                viewPagerAdapter.timeRange = TimeRange.WEEK
+            }
+            R.id.range_year_item -> {
+                viewModel.onTimeRangeChanged(TimeRange.YEAR)
+                viewPagerAdapter.timeRange = TimeRange.YEAR
+            }
+
             R.id.range_custom_item -> showRangeSelectDialog()
             R.id.switch_view_mode_item -> {
                 val newViewMode = viewModel.switchViewMode()
@@ -146,14 +156,14 @@ class TransactionsFragment : Fragment() {
 
         val startDateSetListener: (DatePicker, Int, Int, Int) -> Unit =
             { _, year, monthOfYear, dayOfMonth ->
-                val ld = LocalDate.of(year, monthOfYear, dayOfMonth)
+                val ld = LocalDate.of(year, monthOfYear + 1, dayOfMonth)
                 startEdt?.setText(dateToString(ld))
                 startEdt?.tag = TabInfoUtils.toEpoch(ld)
             }
 
         val endDateSetListener: (DatePicker, Int, Int, Int) -> Unit =
             { _, year, monthOfYear, dayOfMonth ->
-                val ld = LocalDate.of(year, monthOfYear, dayOfMonth)
+                val ld = LocalDate.of(year, monthOfYear + 1, dayOfMonth)
                 endEdt?.setText(dateToString(ld))
                 endEdt?.tag = TabInfoUtils.toEpoch(ld)
             }

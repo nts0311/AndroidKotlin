@@ -68,12 +68,15 @@ class TransactionsFragViewModel(private val repository: Repository) : ViewModel(
     fun onTimeRangeChanged(timeRange: TimeRange) {
         if (timeRange.value == this.timeRange.value)
             return
+
+        if (this.timeRange == TimeRange.CUSTOM && timeRange!=TimeRange.CUSTOM)
+            initTimeRange()
+
         this.timeRange = timeRange
         getTabInfoList()
     }
 
-    fun updateCategories(categories : List<Category>)
-    {
+    fun updateCategories(categories: List<Category>) {
         repository.updateCategoriesMap(categories)
     }
 

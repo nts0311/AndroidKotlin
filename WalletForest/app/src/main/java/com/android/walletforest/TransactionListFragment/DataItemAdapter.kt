@@ -129,7 +129,7 @@ class TransactionItemViewHolder(var binding: ItemTransactionBinding) :
     companion object {
         fun from(parent: ViewGroup): TransactionItemViewHolder {
             val inflater = LayoutInflater.from(parent.context)
-            val binding = ItemTransactionBinding.inflate(inflater)
+            val binding = ItemTransactionBinding.inflate(inflater, parent, false)
             return TransactionItemViewHolder(binding)
         }
     }
@@ -178,6 +178,8 @@ class DividerItemViewHolder(var binding: ItemDividerBinding) :
             binding.monthYearText.text = formatter.format(dividerItem.date)
 
         } else if (timeRange == TimeRange.YEAR) {
+            binding.dayOfWeekText.visibility = View.INVISIBLE
+
             val formatter = DateTimeFormatter.ofPattern("MMM")
             binding.dayOrMonthText.text = formatter.format(dividerItem.date)
 
@@ -207,7 +209,7 @@ class DividerItemViewHolder(var binding: ItemDividerBinding) :
     companion object {
         fun from(parent: ViewGroup): DividerItemViewHolder {
             val inflater = LayoutInflater.from(parent.context)
-            val binding = ItemDividerBinding.inflate(inflater)
+            val binding = ItemDividerBinding.inflate(inflater, parent, false)
             return DividerItemViewHolder(binding)
         }
     }

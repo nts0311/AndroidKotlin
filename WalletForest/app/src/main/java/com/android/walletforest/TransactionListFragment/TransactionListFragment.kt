@@ -6,12 +6,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
+import com.android.walletforest.TransactionsFragment.TabInfoUtils
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.model.Repository
 import kotlinx.android.synthetic.main.fragment_transaction_list.*
@@ -53,7 +55,7 @@ class TransactionListFragment : Fragment() {
         val vmFactory = RepoViewModelFactory(repo)
 
         viewModel = ViewModelProvider(
-            requireActivity(),
+            this,
             vmFactory
         ).get(TransactionListFragViewModel::class.java)
 
@@ -61,8 +63,6 @@ class TransactionListFragment : Fragment() {
         {
             viewModel.setTimeRange(startTime!!, endTime!!, timeRange!!)
         }
-
-
 
         //registerObservers()
 
@@ -82,6 +82,7 @@ class TransactionListFragment : Fragment() {
         {
             if (it != null) {
                 viewModel.switchViewMode(it)
+                itemAdapter?.viewMode=it
             }
         }
 
