@@ -19,4 +19,9 @@
         android:name="com.android.walletforest.PlanningFragment"
         android:label="fragment_planning"
         tools:layout="@layout/fragment_planning" />
+    <fragment
+        android:id="@+id/addTransactionFragment"
+        android:name="com.android.walletforest.AddTransactionFragmentt.AddTransactionFragment"
+        android:label="fragment_add_transaction"
+        tools:layout="@layout/fragment_add_transaction" />
 </navigation>
