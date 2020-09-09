@@ -3,6 +3,7 @@ package com.android.walletforest
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.navigation.findNavController
+import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -16,5 +17,10 @@ class MainActivity : AppCompatActivity()
 
         val navController=findNavController(R.id.nav_host_fragment)
         bottomNavigationView.setupWithNavController(navController)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        val navController = this.findNavController(R.id.nav_host_fragment)
+        return navController.navigateUp()
     }
 }

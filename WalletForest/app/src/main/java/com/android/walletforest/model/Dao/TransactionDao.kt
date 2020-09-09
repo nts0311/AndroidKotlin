@@ -7,6 +7,10 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TransactionDao {
+
+    @Query("SELECT * FROM transactions WHERE id = :id")
+    fun getTransaction(id:Long):LiveData<Transaction>
+
     @Query("SELECT * FROM transactions WHERE time >= :start AND time <= :end")
     fun getTransactionsBetweenRange(start: Long, end: Long): LiveData<List<Transaction>>
 

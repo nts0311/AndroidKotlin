@@ -120,6 +120,13 @@ class TransactionsFragment : Fragment() {
                 viewModel.updateCategories(it)
             }
         }
+
+        viewModel.walletList.observe(viewLifecycleOwner)
+        {
+            if (it != null) {
+                viewModel.updateWallets(it)
+            }
+        }
     }
 
     private fun setUpViewPager() {

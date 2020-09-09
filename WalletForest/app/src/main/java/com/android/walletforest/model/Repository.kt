@@ -12,13 +12,30 @@ class Repository private constructor(appContext: Context) {
     private val appDatabase = AppDatabase.getInstance(appContext)
 
     var viewMode = MutableLiveData(ViewType.TRANSACTION)
+
     private var fetchedRange: MutableMap<String, LiveData<List<Transaction>>> = mutableMapOf()
+
     private var _categoriesMap: MutableMap<Long, Category> = mutableMapOf()
-    var categoryMap : Map<Long, Category> = _categoriesMap
+    var categoryMap: Map<Long, Category> = _categoriesMap
 
+    private var _walletsMap: MutableMap<Long, Wallet> = mutableMapOf()
+    var walletMap: Map<Long, Wallet> = _walletsMap
 
-    fun getFirstWallet(): LiveData<Wallet> =
-        appDatabase.walletDao.getWallet()
+    fun getFirstWallet() = appDatabase.walletDao.getWallet()
+
+    fun getWallets() = appDatabase.walletDao.getWallets()
+
+    fun getTransaction(id: Long) = appDatabase.transactionDao.getTransaction(id)
+
+    suspend fun updateTransaction(transaction: Transaction)
+    {
+        appDatabase.transactionDao.updateTransaction(transaction)
+    }
+
+    suspend fun insertTransaction(transaction: Transaction)
+    {
+        appDatabase.transactionDao.insertTransaction(transaction)
+    }
 
     fun getTransactionsBetweenRange(start: Long, end: Long): LiveData<List<Transaction>> {
         val key = "$start-$end"
@@ -33,16 +50,22 @@ class Repository private constructor(appContext: Context) {
 
     fun getCategoriesLiveData(): LiveData<List<Category>> = appDatabase.categoryDao.getCategories()
 
-    fun updateCategoriesMap(categories : List<Category>) {
-        for(category in categories)
-        {
-            if(!_categoriesMap.containsKey(category.id))
+    fun updateCategoriesMap(categories: List<Category>) {
+        for (category in categories) {
+            if (!_categoriesMap.containsKey(category.id))
                 _categoriesMap[category.id] = category
         }
     }
 
+    fun updateWalletsMap(wallets: List<Wallet>) {
+        for (wallet in wallets) {
+            if (!_walletsMap.containsKey(wallet.id))
+                _walletsMap[wallet.id] = wallet
+        }
+    }
+
     companion object {
-        var instance: Repository? = null
+        private var instance: Repository? = null
 
         fun getInstance(appContext: Context): Repository {
             synchronized(Repository::class.java)

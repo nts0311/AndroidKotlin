@@ -50,34 +50,36 @@ class DataItemAdapter(
             notifyDataSetChanged()
         }
 
-    override fun getItemViewType(position: Int): Int = when(getItem(position))
-    {
+    var itemClickListener: (transaction: Transaction) -> Unit = {}
+
+    override fun getItemViewType(position: Int): Int = when (getItem(position)) {
         is DataItem.TransactionItem -> ITEM_TRANSACTION
         is DataItem.DividerItem -> ITEM_DIVIDER
         is DataItem.HeaderItem -> ITEM_HEADER
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
-        when(viewType)
-        {
+        when (viewType) {
             ITEM_TRANSACTION -> TransactionItemViewHolder.from(parent)
             ITEM_DIVIDER -> DividerItemViewHolder.from(parent)
             else -> throw ClassCastException("Unknown viewType ${viewType}")
         }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when(holder)
-        {
-            is TransactionItemViewHolder ->
-            {
+        when (holder) {
+            is TransactionItemViewHolder -> {
                 val transaction = (getItem(position) as DataItem.TransactionItem).transaction
-                holder.bind(transaction, viewMode, categoriesMap[transaction.categoryId]!!)
+                holder.bind(transaction, viewMode, categoriesMap[transaction.categoryId]!!, itemClickListener)
             }
 
-            is DividerItemViewHolder ->
-            {
+            is DividerItemViewHolder -> {
                 val dividerItem = getItem(position) as DataItem.DividerItem
-                holder.bind(dividerItem, viewMode, timeRange, categoriesMap[dividerItem.categoryId]!!)
+                holder.bind(
+                    dividerItem,
+                    viewMode,
+                    timeRange,
+                    categoriesMap[dividerItem.categoryId]!!
+                )
             }
         }
     }
@@ -87,7 +89,15 @@ class DataItemAdapter(
 class TransactionItemViewHolder(var binding: ItemTransactionBinding) :
     RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(transaction: Transaction, viewMode: ViewType, category: Category) {
+
+    fun bind(
+        transaction: Transaction,
+        viewMode: ViewType,
+        category: Category,
+        itemClickListener: (transaction: Transaction) -> Unit
+    ) {
+
+        binding.root.setOnClickListener { itemClickListener(transaction) }
 
         val color = if (transaction.type == Constants.TYPE_EXPENSE)
             ContextCompat.getColor(binding.root.context, R.color.expense_text)
@@ -122,6 +132,7 @@ class TransactionItemViewHolder(var binding: ItemTransactionBinding) :
 
                 dayOfMonthText.text = date.dayOfMonth.toString()
                 dayOfMonthText.visibility = View.VISIBLE
+
             }
         }
     }
@@ -130,6 +141,9 @@ class TransactionItemViewHolder(var binding: ItemTransactionBinding) :
         fun from(parent: ViewGroup): TransactionItemViewHolder {
             val inflater = LayoutInflater.from(parent.context)
             val binding = ItemTransactionBinding.inflate(inflater, parent, false)
+            binding.root.setOnClickListener {
+
+            }
             return TransactionItemViewHolder(binding)
         }
     }
@@ -145,11 +159,9 @@ class DividerItemViewHolder(var binding: ItemDividerBinding) :
     ) {
         binding.amountText.text = dividerItem.totalAmount.toString()
 
-        if(viewMode==ViewType.TRANSACTION)
-        {
+        if (viewMode == ViewType.TRANSACTION) {
             bindWithTime(dividerItem, timeRange)
-        }
-        else
+        } else
             bindWithCategory(dividerItem, category)
     }
 

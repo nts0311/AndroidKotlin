@@ -8,7 +8,11 @@
         android:id="@+id/transactionsFragment"
         android:name="com.android.walletforest.TransactionsFragment.TransactionsFragment"
         android:label="fragment_transactions"
-        tools:layout="@layout/fragment_transactions" />
+        tools:layout="@layout/fragment_transactions" >
+        <action
+            android:id="@+id/action_transactionsFragment_to_addTransactionFragment"
+            app:destination="@id/addTransactionFragment" />
+    </fragment>
     <fragment
         android:id="@+id/reportFragment"
         android:name="com.android.walletforest.ReportFragment"
@@ -21,7 +25,23 @@
         tools:layout="@layout/fragment_planning" />
     <fragment
         android:id="@+id/addTransactionFragment"
-        android:name="com.android.walletforest.AddTransactionFragmentt.AddTransactionFragment"
+        android:name="com.android.walletforest.add_transaction_fragment.AddTransactionFragment"
         android:label="fragment_add_transaction"
-        tools:layout="@layout/fragment_add_transaction" />
+        tools:layout="@layout/fragment_add_transaction" >
+        <argument
+            android:name="transactionId"
+            app:argType="long" />
+        <argument
+            android:name="walletId"
+            app:argType="long" />
+    </fragment>
+    <fragment
+        android:id="@+id/transactionListFragment"
+        android:name="com.android.walletforest.TransactionListFragment.TransactionListFragment"
+        android:label="fragment_transaction_list"
+        tools:layout="@layout/fragment_transaction_list" >
+        <action
+            android:id="@+id/action_transactionListFragment_to_addTransactionFragment"
+            app:destination="@id/addTransactionFragment" />
+    </fragment>
 </navigation>

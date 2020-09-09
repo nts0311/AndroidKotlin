@@ -9,11 +9,13 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
 import com.android.walletforest.TransactionsFragment.TabInfoUtils
+import com.android.walletforest.TransactionsFragment.TransactionsFragmentDirections
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.model.Repository
 import kotlinx.android.synthetic.main.fragment_transaction_list.*
@@ -75,8 +77,17 @@ class TransactionListFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         registerObservers()
 
+        setUpRecycleView()
+    }
+
+    private fun setUpRecycleView()
+    {
         itemAdapter = DataItemAdapter(viewModel.currentViewMode, viewModel.timeRange, repo.categoryMap)
         transaction_list_rv.adapter=itemAdapter
+        itemAdapter?.itemClickListener = {
+            findNavController().navigate(TransactionsFragmentDirections
+                .actionTransactionsFragmentToAddTransactionFragment(it.id, it.walletId))
+        }
     }
 
     private fun registerObservers() {
@@ -96,7 +107,12 @@ class TransactionListFragment : Fragment() {
         //display transaction here
         viewModel.dataItemList.observe(viewLifecycleOwner) {
             if(it!=null)
-                itemAdapter?.submitList(it)
+            {
+                //copy to a brand new list to avoid ListAdapter not update the recyclerview
+                itemAdapter?.submitList(it.toList())
+
+            }
+
         }
     }
 
