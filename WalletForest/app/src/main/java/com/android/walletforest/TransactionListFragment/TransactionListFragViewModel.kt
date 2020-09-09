@@ -45,7 +45,6 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
 
 
     fun setTimeRange(start: Long, end: Long, range: String) {
-
         startTime = start
         endTime = end
         timeRange = TimeRange.valueOf(range)

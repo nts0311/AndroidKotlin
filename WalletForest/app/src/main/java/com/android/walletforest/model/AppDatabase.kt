@@ -125,6 +125,8 @@ abstract class AppDatabase() : RoomDatabase() {
                                 Transaction
                                     (11, 1, 1, Constants.TYPE_EXPENSE, 1000, "aaa", 1596412800000)
                             )
+
+                            Thread.sleep(5000)
                         }
 
                     }

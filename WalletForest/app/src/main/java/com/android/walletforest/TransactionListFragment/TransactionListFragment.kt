@@ -32,6 +32,7 @@ class TransactionListFragment : Fragment() {
     private var timeRange: String? = null
     private var itemAdapter: DataItemAdapter? = null
     private lateinit var repo : Repository
+    var key=""
 
     private lateinit var viewModel: TransactionListFragViewModel
 
@@ -42,6 +43,7 @@ class TransactionListFragment : Fragment() {
             endTime = it.getLong(END_TIME_PARAM)
             walletId = it.getLong(WALLET_ID_PARAM)
             timeRange = it.getString(TIME_RANGE_PARAM, TimeRange.MONTH.value)
+            key="$startTime - $endTime"
         }
     }
 
@@ -55,9 +57,9 @@ class TransactionListFragment : Fragment() {
         val vmFactory = RepoViewModelFactory(repo)
 
         viewModel = ViewModelProvider(
-            this,
+            requireActivity(),
             vmFactory
-        ).get(TransactionListFragViewModel::class.java)
+        ).get(key, TransactionListFragViewModel::class.java)
 
         if(startTime!=null && endTime!=null && timeRange!=null)
         {
@@ -87,13 +89,13 @@ class TransactionListFragment : Fragment() {
         }
 
         viewModel.transactionList.observe(viewLifecycleOwner){
-            if(it!=null && it.isNotEmpty())
+            if(it!=null)
                 viewModel.onTransactionListChange(it)
         }
 
         //display transaction here
         viewModel.dataItemList.observe(viewLifecycleOwner) {
-            if(it!=null && it.isNotEmpty())
+            if(it!=null)
                 itemAdapter?.submitList(it)
         }
     }
