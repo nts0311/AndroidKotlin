@@ -47,7 +47,7 @@ class AddTransactionFragment : Fragment() {
 
         requireActivity().onBackPressedDispatcher.addCallback(this){
             //findNavController().navigate(R.id.action_addTransactionFragment_to_transactionsFragment)
-            findNavController().popBackStack()
+            //findNavController().popBackStack()
         }
 
         return binding.root
@@ -70,9 +70,9 @@ class AddTransactionFragment : Fragment() {
 
     private fun getArgs()
     {
-        val args = AddTransactionFragmentArgs.fromBundle(requireArguments())
+        /*//val args = AddTransactionFragmentArgs.fromBundle(requireArguments())
         transactionId = args.transactionId
-        walletId = args.walletId
+        walletId = args.walletId*/
 
         if(transactionId != 1L)
             viewModel.setTransactionId(transactionId)

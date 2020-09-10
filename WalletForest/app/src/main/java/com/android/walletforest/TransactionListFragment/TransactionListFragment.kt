@@ -11,7 +11,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
-import com.android.walletforest.TransactionsFragment.TransactionsFragmentDirections
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.model.Repository
 import kotlinx.android.synthetic.main.fragment_transaction_list.*
@@ -84,10 +83,7 @@ class TransactionListFragment : Fragment() {
 
         itemAdapter?.stateRestorationPolicy=RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         itemAdapter?.itemClickListener = {
-            findNavController().navigate(
-                TransactionsFragmentDirections
-                    .actionTransactionsFragmentToAddTransactionFragment(it.id, it.walletId)
-            )
+
         }
     }
 
