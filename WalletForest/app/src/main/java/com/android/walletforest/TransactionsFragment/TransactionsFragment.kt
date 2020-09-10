@@ -1,6 +1,7 @@
 package com.android.walletforest.TransactionsFragment
 
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.*
@@ -20,6 +21,7 @@ import com.android.walletforest.databinding.FragmentTransactionsBinding
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Repository
+import com.android.walletforest.select_category_activity.SelectCategoryActivity
 import com.android.walletforest.toEpoch
 import com.android.walletforest.toLocalDate
 import com.google.android.material.tabs.TabLayout
@@ -109,6 +111,12 @@ class TransactionsFragment : Fragment() {
                     item.title = getString(R.string.view_by) + " " + getString(R.string.category)
                 else
                     item.title = getString(R.string.view_by) + " " + getString(R.string.transaction)
+            }
+
+            R.id.edit_wallet_item ->
+            {
+                val intent = Intent(requireContext(), SelectCategoryActivity::class.java)
+                startActivity(intent)
             }
         }
 

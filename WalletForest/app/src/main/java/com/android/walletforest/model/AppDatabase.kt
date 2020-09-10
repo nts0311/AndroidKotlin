@@ -52,13 +52,13 @@ abstract class AppDatabase() : RoomDatabase() {
                                 Wallet(1,"Cash", R.drawable.ic_bk_cashbook, 100000))
 
                             database.categoryDao.insertCategory(
-                                Category(1,1,"Family",R.drawable.ic_category_family))
+                                Category(1,1,"Family", Constants.TYPE_EXPENSE,R.drawable.ic_category_family))
                             database.categoryDao.insertCategory(
-                                Category(2,2,"Food",R.drawable.ic_category_foodndrink))
+                                Category(2,2,"Food", Constants.TYPE_EXPENSE,R.drawable.ic_category_foodndrink))
                             database.categoryDao.insertCategory(
-                                Category(3,3,"Friend",R.drawable.ic_category_friendnlover))
+                                Category(3,3,"Friend", Constants.TYPE_EXPENSE,R.drawable.ic_category_friendnlover))
                             database.categoryDao.insertCategory(
-                                Category(4,4,"Education",R.drawable.ic_category_education))
+                                Category(4,4,"Education", Constants.TYPE_EXPENSE,R.drawable.ic_category_education))
 
                             database.transactionDao.insertTransaction(
                                 Transaction
