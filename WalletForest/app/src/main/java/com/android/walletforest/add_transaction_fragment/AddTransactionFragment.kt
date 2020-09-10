@@ -1,7 +1,10 @@
 package com.android.walletforest.add_transaction_fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -41,6 +44,11 @@ class AddTransactionFragment : Fragment() {
 
         getArgs()
         registerObservers()
+
+        requireActivity().onBackPressedDispatcher.addCallback(this){
+            //findNavController().navigate(R.id.action_addTransactionFragment_to_transactionsFragment)
+            findNavController().popBackStack()
+        }
 
         return binding.root
     }

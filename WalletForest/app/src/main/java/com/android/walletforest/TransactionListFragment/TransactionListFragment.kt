@@ -1,20 +1,16 @@
 package com.android.walletforest.TransactionListFragment
 
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.lifecycle.Observer
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
-import com.android.walletforest.TransactionsFragment.TabInfoUtils
 import com.android.walletforest.TransactionsFragment.TransactionsFragmentDirections
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.model.Repository
@@ -68,25 +64,30 @@ class TransactionListFragment : Fragment() {
             viewModel.setTimeRange(startTime!!, endTime!!, timeRange!!)
         }
 
-        //registerObservers()
-
         return inflater.inflate(R.layout.fragment_transaction_list, container, false)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         registerObservers()
-
         setUpRecycleView()
     }
 
     private fun setUpRecycleView()
     {
-        itemAdapter = DataItemAdapter(viewModel.currentViewMode, viewModel.timeRange, repo.categoryMap)
+        itemAdapter = DataItemAdapter(
+            viewModel.currentViewMode,
+            viewModel.timeRange,
+            repo.categoryMap
+        )
         transaction_list_rv.adapter=itemAdapter
+
+        itemAdapter?.stateRestorationPolicy=RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         itemAdapter?.itemClickListener = {
-            findNavController().navigate(TransactionsFragmentDirections
-                .actionTransactionsFragmentToAddTransactionFragment(it.id, it.walletId))
+            findNavController().navigate(
+                TransactionsFragmentDirections
+                    .actionTransactionsFragmentToAddTransactionFragment(it.id, it.walletId)
+            )
         }
     }
 
@@ -110,7 +111,6 @@ class TransactionListFragment : Fragment() {
             {
                 //copy to a brand new list to avoid ListAdapter not update the recyclerview
                 itemAdapter?.submitList(it.toList())
-
             }
 
         }

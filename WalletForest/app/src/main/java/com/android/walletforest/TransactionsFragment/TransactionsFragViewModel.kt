@@ -21,6 +21,7 @@ class TransactionsFragViewModel(private val repository: Repository) : ViewModel(
     var currentWallet: LiveData<Wallet> = repository.getFirstWallet()
     var categoryList = repository.getCategoriesLiveData()
     var walletList = repository.getWallets()
+    var tabLayoutPos = -1
 
     var startTime: Long = 0L
         private set

@@ -2,13 +2,18 @@ package com.android.walletforest.TransactionsFragment
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.*
 import android.widget.DatePicker
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
 import com.android.walletforest.databinding.FragmentTransactionsBinding
@@ -18,23 +23,33 @@ import com.android.walletforest.model.Repository
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_transactions.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 
 class TransactionsFragment : Fragment() {
 
-    lateinit var binding: FragmentTransactionsBinding
+    private lateinit var binding: FragmentTransactionsBinding
     lateinit var viewModel: TransactionsFragViewModel
     lateinit var viewPagerAdapter: TabFragmentStateAdapter
 
     var rangeSelectDialog: AlertDialog? = null
+
+    var state : Parcelable? = null
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelable("adapter", viewPagerAdapter.saveState())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
+
 
         binding = FragmentTransactionsBinding.inflate(inflater)
 
@@ -46,6 +61,9 @@ class TransactionsFragment : Fragment() {
             vmFactory
         ).get(TransactionsFragViewModel::class.java)
 
+        state = savedInstanceState?.getParcelable("adapter")
+
+        setUpViewPager()
         setupObservers()
 
         return binding.root
@@ -56,7 +74,7 @@ class TransactionsFragment : Fragment() {
         setHasOptionsMenu(true)
         (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
 
-        setUpViewPager()
+
         createDialogs()
     }
 
@@ -95,13 +113,27 @@ class TransactionsFragment : Fragment() {
         return true
     }
 
+    override fun onStop() {
+        super.onStop()
+        viewModel.tabLayoutPos = binding.mainViewPager.currentItem
+    }
+
     private fun setupObservers() {
         viewModel.tabInfoList.observe(viewLifecycleOwner)
         {
             if (it != null) {
                 viewPagerAdapter.tabInfoList = it
                 //set the viewpager to the current month, week,...
-                binding.mainViewPager.setCurrentItem(it.size - 2, true)
+
+                if (viewModel.tabLayoutPos != -1) {
+
+                    binding.mainViewPager.setCurrentItem(viewModel.tabLayoutPos, true)
+
+                } else {
+
+                    binding.mainViewPager.setCurrentItem(it.size - 2, true)
+
+                }
             }
         }
 
@@ -133,13 +165,15 @@ class TransactionsFragment : Fragment() {
 
         //dont use activity's fragManager here, it will result in crash
         viewPagerAdapter =
-            TabFragmentStateAdapter(childFragmentManager, requireActivity().lifecycle)
+            TabFragmentStateAdapter(childFragmentManager, lifecycle)
+
+        if(state!=null) viewPagerAdapter.restoreState(state!!)
 
         binding.apply {
             mainViewPager.adapter = viewPagerAdapter
             mainViewPager.offscreenPageLimit = 2
             tabLayout.tabMode = TabLayout.MODE_SCROLLABLE
-            tabLayout.tabGravity = TabLayout.GRAVITY_FILL
+            tabLayout.isSmoothScrollingEnabled = false
         }
 
         TabLayoutMediator(binding.tabLayout, binding.mainViewPager) { tab, position ->

@@ -11,7 +11,8 @@
         tools:layout="@layout/fragment_transactions" >
         <action
             android:id="@+id/action_transactionsFragment_to_addTransactionFragment"
-            app:destination="@id/addTransactionFragment" />
+            app:destination="@id/addTransactionFragment"
+            app:launchSingleTop="false" />
     </fragment>
     <fragment
         android:id="@+id/reportFragment"
@@ -34,14 +35,14 @@
         <argument
             android:name="walletId"
             app:argType="long" />
+        <action
+            android:id="@+id/action_addTransactionFragment_to_transactionsFragment"
+            app:launchSingleTop="false"
+            app:popUpTo="@id/transactionsFragment" />
     </fragment>
     <fragment
         android:id="@+id/transactionListFragment"
         android:name="com.android.walletforest.TransactionListFragment.TransactionListFragment"
         android:label="fragment_transaction_list"
-        tools:layout="@layout/fragment_transaction_list" >
-        <action
-            android:id="@+id/action_transactionListFragment_to_addTransactionFragment"
-            app:destination="@id/addTransactionFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_transaction_list" />
 </navigation>

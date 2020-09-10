@@ -19,8 +19,4 @@ class MainActivity : AppCompatActivity()
         bottomNavigationView.setupWithNavController(navController)
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = this.findNavController(R.id.nav_host_fragment)
-        return navController.navigateUp()
-    }
 }
