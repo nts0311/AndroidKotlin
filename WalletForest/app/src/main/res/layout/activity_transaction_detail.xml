@@ -11,7 +11,7 @@
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".add_transaction_fragment.AddTransactionFragment">
+        tools:context=".add_transaction_activity.AddTransactionFragment">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/add_tran_toolbar"

@@ -1,16 +1,16 @@
 package com.android.walletforest.TransactionListFragment
 
+import android.content.Intent
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
+import com.android.walletforest.add_transaction_activity.TransactionDetailActivity
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.model.Repository
 import kotlinx.android.synthetic.main.fragment_transaction_list.*
@@ -83,7 +83,10 @@ class TransactionListFragment : Fragment() {
 
         itemAdapter?.stateRestorationPolicy=RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         itemAdapter?.itemClickListener = {
-
+            val detailIntent = Intent(requireContext(), TransactionDetailActivity::class.java)
+            detailIntent.putExtra(TransactionDetailActivity.TRANSACTION_ID_PARAM, it.id)
+            detailIntent.putExtra(TransactionDetailActivity.WALLET_ID_PARAM, it.walletId)
+            startActivity(detailIntent)
         }
     }
 

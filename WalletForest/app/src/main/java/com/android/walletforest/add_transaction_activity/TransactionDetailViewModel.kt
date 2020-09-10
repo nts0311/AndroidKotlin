@@ -1,4 +1,4 @@
-package com.android.walletforest.add_transaction_fragment
+package com.android.walletforest.add_transaction_activity
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,7 +8,7 @@ import com.android.walletforest.model.Entities.Transaction
 import com.android.walletforest.model.Repository
 import kotlinx.coroutines.launch
 
-class AddTransactionFragViewModel(private val repository: Repository): ViewModel()
+class TransactionDetailViewModel(private val repository: Repository): ViewModel()
 {
     private val currentId=0L
     var transaction : LiveData<Transaction> = MutableLiveData()

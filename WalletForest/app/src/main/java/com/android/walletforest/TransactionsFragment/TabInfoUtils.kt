@@ -1,6 +1,8 @@
 package com.android.walletforest.TransactionsFragment
 
 import com.android.walletforest.enums.TimeRange
+import com.android.walletforest.toEpoch
+import com.android.walletforest.toLocalDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.DayOfWeek
@@ -39,22 +41,6 @@ class TabInfoUtils() {
         }
 
         return _tabInfoList
-    }
-
-    companion object {
-        fun toLocalDate(time: Long): LocalDate {
-            val calendar = Calendar.getInstance()
-            calendar.timeInMillis = time
-
-            return LocalDate.of(
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH) + 1,
-                calendar.get(Calendar.DAY_OF_MONTH)
-            )
-        }
-
-        fun toEpoch(ld: LocalDate): Long =
-            ld.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
     }
 
     private fun getWeekTitle(ld1: LocalDate, ld2: LocalDate): String {

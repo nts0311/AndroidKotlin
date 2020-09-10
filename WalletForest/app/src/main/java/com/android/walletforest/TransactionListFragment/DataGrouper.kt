@@ -4,6 +4,7 @@ import com.android.walletforest.TransactionsFragment.TabInfoUtils
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Entities.Transaction
+import com.android.walletforest.toLocalDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -28,15 +29,15 @@ class DataGrouper {
         if (viewType == ViewType.TRANSACTION) {
             when (timeRange) {
                 TimeRange.WEEK, TimeRange.MONTH -> group { dividerItem, transaction ->
-                    dividerItem.date.dayOfMonth == TabInfoUtils.toLocalDate(transaction.time).dayOfMonth
+                    dividerItem.date.dayOfMonth == toLocalDate(transaction.time).dayOfMonth
                 }
 
                 TimeRange.YEAR -> group { dividerItem, transaction ->
-                    dividerItem.date.monthValue == TabInfoUtils.toLocalDate(transaction.time).monthValue
+                    dividerItem.date.monthValue == toLocalDate(transaction.time).monthValue
                 }
 
                 TimeRange.CUSTOM -> group { dividerItem, transaction ->
-                    val transactionDate = TabInfoUtils.toLocalDate(transaction.time)
+                    val transactionDate = toLocalDate(transaction.time)
                     (dividerItem.date.monthValue == transactionDate.monthValue)
                             && (dividerItem.date.dayOfMonth == transactionDate.dayOfMonth)
                 }
@@ -92,7 +93,7 @@ class DataGrouper {
             var numOfTransaction = 0
 
             var currentDividerItem = DataItem.DividerItem(
-                TabInfoUtils.toLocalDate(transactions[0].time), transactions[0].categoryId,
+                toLocalDate(transactions[0].time), transactions[0].categoryId,
                 totalAmount, numOfTransaction
             )
 
@@ -117,7 +118,7 @@ class DataGrouper {
                     totalAmount = transaction.amount
 
                     val dividerItem = DataItem.DividerItem(
-                        TabInfoUtils.toLocalDate(transaction.time), transaction.categoryId,
+                        toLocalDate(transaction.time), transaction.categoryId,
                         totalAmount, numOfTransaction
                     )
 

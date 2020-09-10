@@ -20,6 +20,8 @@ import com.android.walletforest.databinding.FragmentTransactionsBinding
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Repository
+import com.android.walletforest.toEpoch
+import com.android.walletforest.toLocalDate
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.fragment_transactions.*
@@ -125,15 +127,8 @@ class TransactionsFragment : Fragment() {
                 viewPagerAdapter.tabInfoList = it
                 //set the viewpager to the current month, week,...
 
-                if (viewModel.tabLayoutPos != -1) {
+                binding.mainViewPager.setCurrentItem(it.size - 2, true)
 
-                    binding.mainViewPager.setCurrentItem(viewModel.tabLayoutPos, true)
-
-                } else {
-
-                    binding.mainViewPager.setCurrentItem(it.size - 2, true)
-
-                }
             }
         }
 
@@ -186,8 +181,8 @@ class TransactionsFragment : Fragment() {
     private fun showRangeSelectDialog() {
         rangeSelectDialog?.show()
 
-        val startDate = TabInfoUtils.toLocalDate(viewModel.startTime)
-        val endDate = TabInfoUtils.toLocalDate(viewModel.endTime)
+        val startDate = toLocalDate(viewModel.startTime)
+        val endDate = toLocalDate(viewModel.endTime)
 
         val startEdt = rangeSelectDialog?.findViewById<EditText>(R.id.start_time_edt)
         startEdt?.setText(dateToString(startDate))
@@ -199,14 +194,14 @@ class TransactionsFragment : Fragment() {
             { _, year, monthOfYear, dayOfMonth ->
                 val ld = LocalDate.of(year, monthOfYear + 1, dayOfMonth)
                 startEdt?.setText(dateToString(ld))
-                startEdt?.tag = TabInfoUtils.toEpoch(ld)
+                startEdt?.tag = toEpoch(ld)
             }
 
         val endDateSetListener: (DatePicker, Int, Int, Int) -> Unit =
             { _, year, monthOfYear, dayOfMonth ->
                 val ld = LocalDate.of(year, monthOfYear + 1, dayOfMonth)
                 endEdt?.setText(dateToString(ld))
-                endEdt?.tag = TabInfoUtils.toEpoch(ld)
+                endEdt?.tag = toEpoch(ld)
             }
 
         startEdt?.setOnClickListener {

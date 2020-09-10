@@ -9,6 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".add_transaction_activity.TransactionDetailActivity"></activity>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop">

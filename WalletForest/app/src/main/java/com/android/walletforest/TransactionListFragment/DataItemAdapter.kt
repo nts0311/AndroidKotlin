@@ -16,6 +16,7 @@ import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Entities.Category
 import com.android.walletforest.model.Entities.Transaction
+import com.android.walletforest.toLocalDate
 import java.time.format.DateTimeFormatter
 
 class DataItemDiffCallbacks : DiffUtil.ItemCallback<DataItem>() {
@@ -124,7 +125,7 @@ class TransactionItemViewHolder(var binding: ItemTransactionBinding) :
                 categoryImage.visibility = View.INVISIBLE
                 categoryText.visibility = View.INVISIBLE
 
-                val date = TabInfoUtils.toLocalDate(transaction.time)
+                val date = toLocalDate(transaction.time)
                 val formatter = DateTimeFormatter.ofPattern("MMMM yyyy, EEEE")
 
                 dateText.text = formatter.format(date)

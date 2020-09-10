@@ -13,6 +13,8 @@ import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Entities.Category
 import com.android.walletforest.model.Entities.Transaction
+import com.android.walletforest.toEpoch
+import com.android.walletforest.toLocalDate
 import kotlinx.coroutines.async
 import java.time.LocalDate
 
@@ -42,9 +44,9 @@ class TransactionsFragViewModel(private val repository: Repository) : ViewModel(
 
     private fun initTimeRange() {
 
-        val ld = TabInfoUtils.toLocalDate(endTime)
+        val ld = toLocalDate(endTime)
 
-        startTime = TabInfoUtils.toEpoch(
+        startTime = toEpoch(
             LocalDate.of(ld.year, ld.monthValue, 1)
                 .minusMonths(18)
         )
