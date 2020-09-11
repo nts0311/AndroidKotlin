@@ -12,6 +12,8 @@ import com.android.walletforest.model.Entities.Category
 
 class CategoryAdapter() : RecyclerView.Adapter<CategoryViewHolder>() {
 
+    var categoryClickListener: (category: Category) -> Unit = {}
+
     var categories: List<Category> = listOf()
         set(value) {
             field = value
@@ -21,7 +23,7 @@ class CategoryAdapter() : RecyclerView.Adapter<CategoryViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val root = inflater.inflate(R.layout.item_category, parent, false)
-        return CategoryViewHolder(root)
+        return CategoryViewHolder(root, categoryClickListener)
     }
 
     override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
@@ -31,11 +33,18 @@ class CategoryAdapter() : RecyclerView.Adapter<CategoryViewHolder>() {
     override fun getItemCount(): Int = categories.size
 }
 
-class CategoryViewHolder(private val root: View) : RecyclerView.ViewHolder(root) {
+class CategoryViewHolder(
+    private val root: View,
+    private val categoryClickListener: (category: Category) -> Unit
+) : RecyclerView.ViewHolder(root) {
     private val categoryImg = root.findViewById<ImageView>(R.id.category_img)
     private val categoryText = root.findViewById<TextView>(R.id.category_text)
 
     fun bind(category: Category) {
+        root.setOnClickListener {
+            categoryClickListener(category)
+        }
+
         categoryImg.setImageResource(category.imageId)
         categoryText.text = category.name
         if (category.parentId != category.id) {
@@ -44,7 +53,7 @@ class CategoryViewHolder(private val root: View) : RecyclerView.ViewHolder(root)
                 ConstraintLayout.LayoutParams.WRAP_CONTENT
             )
 
-            params.setMargins(16, 0, 0, 0)
+            params.setMargins(48, 0, 0, 0)
             root.layoutParams = params
         }
     }

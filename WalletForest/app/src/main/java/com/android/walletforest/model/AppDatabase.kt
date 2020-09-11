@@ -54,11 +54,11 @@ abstract class AppDatabase() : RoomDatabase() {
                             database.categoryDao.insertCategory(
                                 Category(1,1,"Family", Constants.TYPE_EXPENSE,R.drawable.ic_category_family))
                             database.categoryDao.insertCategory(
-                                Category(2,2,"Food", Constants.TYPE_EXPENSE,R.drawable.ic_category_foodndrink))
+                                Category(2,1,"Food", Constants.TYPE_EXPENSE,R.drawable.ic_category_foodndrink))
                             database.categoryDao.insertCategory(
                                 Category(3,3,"Friend", Constants.TYPE_EXPENSE,R.drawable.ic_category_friendnlover))
                             database.categoryDao.insertCategory(
-                                Category(4,4,"Education", Constants.TYPE_EXPENSE,R.drawable.ic_category_education))
+                                Category(4,1,"Education", Constants.TYPE_INCOME,R.drawable.ic_category_education))
 
                             database.transactionDao.insertTransaction(
                                 Transaction

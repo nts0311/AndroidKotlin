@@ -53,7 +53,7 @@ class TabInfoUtils() {
 
     private fun funAddFutureTab(currentTimeTitle: String, startTime: Long) {
         _tabInfoList[_tabInfoList.size - 1].tabTitle = currentTimeTitle
-        _tabInfoList.add(TabInfo(walletId, startTime, 0L, "Future"))
+        _tabInfoList.add(TabInfo(walletId, startTime, Long.MAX_VALUE, "Future"))
     }
 
     private suspend fun getTabInfoByWeek(start: LocalDate, end: LocalDate) {

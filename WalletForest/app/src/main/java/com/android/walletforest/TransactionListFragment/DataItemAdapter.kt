@@ -90,6 +90,9 @@ class DataItemAdapter(
 class TransactionItemViewHolder(var binding: ItemTransactionBinding) :
     RecyclerView.ViewHolder(binding.root) {
 
+    private val dateFormatter = DateTimeFormatter.ofPattern("MMMM yyyy, EEEE")
+    val colorRed = ContextCompat.getColor(binding.root.context, R.color.expense_text)
+    val colorBlue = ContextCompat.getColor(binding.root.context, R.color.income_text)
 
     fun bind(
         transaction: Transaction,
@@ -101,9 +104,9 @@ class TransactionItemViewHolder(var binding: ItemTransactionBinding) :
         binding.root.setOnClickListener { itemClickListener(transaction) }
 
         val color = if (transaction.type == Constants.TYPE_EXPENSE)
-            ContextCompat.getColor(binding.root.context, R.color.expense_text)
+            colorRed
         else
-            ContextCompat.getColor(binding.root.context, R.color.income_text)
+            colorBlue
 
         binding.amountText.setTextColor(color)
         binding.amountText.text = transaction.amount.toString()
@@ -126,9 +129,8 @@ class TransactionItemViewHolder(var binding: ItemTransactionBinding) :
                 categoryText.visibility = View.INVISIBLE
 
                 val date = toLocalDate(transaction.time)
-                val formatter = DateTimeFormatter.ofPattern("MMMM yyyy, EEEE")
 
-                dateText.text = formatter.format(date)
+                dateText.text = dateFormatter.format(date)
                 dateText.visibility = View.VISIBLE
 
                 dayOfMonthText.text = date.dayOfMonth.toString()
@@ -152,6 +154,11 @@ class TransactionItemViewHolder(var binding: ItemTransactionBinding) :
 
 class DividerItemViewHolder(var binding: ItemDividerBinding) :
     RecyclerView.ViewHolder(binding.root) {
+
+    private val dayOfWeekFormatter = DateTimeFormatter.ofPattern("EEEE")
+    private val monthYearFormatter = DateTimeFormatter.ofPattern("MMMM yyyy")
+    private val dayOrMonthTextFormatter = DateTimeFormatter.ofPattern("MMM")
+
     fun bind(
         dividerItem: DataItem.DividerItem,
         viewMode: ViewType,
@@ -184,17 +191,14 @@ class DividerItemViewHolder(var binding: ItemDividerBinding) :
 
             binding.dayOrMonthText.text = dividerItem.date.dayOfMonth.toString()
 
-            var formatter = DateTimeFormatter.ofPattern("EEEE")
-            binding.dayOfWeekText.text = formatter.format(dividerItem.date)
+            binding.dayOfWeekText.text = dayOfWeekFormatter.format(dividerItem.date)
 
-            formatter = DateTimeFormatter.ofPattern("MMMM yyyy")
-            binding.monthYearText.text = formatter.format(dividerItem.date)
+            binding.monthYearText.text = monthYearFormatter.format(dividerItem.date)
 
         } else if (timeRange == TimeRange.YEAR) {
             binding.dayOfWeekText.visibility = View.INVISIBLE
 
-            val formatter = DateTimeFormatter.ofPattern("MMM")
-            binding.dayOrMonthText.text = formatter.format(dividerItem.date)
+            binding.dayOrMonthText.text = dayOrMonthTextFormatter.format(dividerItem.date)
 
             binding.monthYearText.text = dividerItem.date.year.toString()
         }

@@ -13,7 +13,7 @@ interface CategoryDao {
     @Query("SELECT * FROM category")
     fun getCategories():LiveData<List<Category>>
 
-    @Query("SELECT * FROM category WHERE type = :type")
+    @Query("SELECT * FROM category WHERE type = :type ORDER BY parentId ASC, id ASC")
     fun getCategoriesByType(type: String): LiveData<List<Category>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

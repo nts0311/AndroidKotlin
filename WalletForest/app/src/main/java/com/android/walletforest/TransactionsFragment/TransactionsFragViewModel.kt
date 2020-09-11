@@ -50,9 +50,7 @@ class TransactionsFragViewModel(private val repository: Repository) : ViewModel(
             LocalDate.of(ld.year, ld.monthValue, 1)
                 .minusMonths(18)
         )
-
     }
-
 
     fun onCurrentWalletChange() {
         getTabInfoList()

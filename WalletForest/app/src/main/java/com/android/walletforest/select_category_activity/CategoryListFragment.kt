@@ -6,10 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
 import com.android.walletforest.enums.Constants
+import com.android.walletforest.model.Entities.Category
 import com.android.walletforest.model.Repository
+import kotlinx.android.synthetic.main.fragment_category_list.*
+import kotlinx.android.synthetic.main.fragment_transaction_list.*
 
 
 private const val ARG_CATEGORY_TYPE = "category_type"
@@ -19,6 +23,9 @@ class CategoryListFragment : Fragment() {
 
     private var categoryType: String? = Constants.TYPE_EXPENSE
     private lateinit var viewModel: CategorySelectFragViewModel
+    private var adapter = CategoryAdapter()
+
+    var categoryClickListener: (category: Category) -> Unit = {}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,26 +44,31 @@ class CategoryListFragment : Fragment() {
         viewModel = ViewModelProvider(requireActivity(), vmFactory)
             .get(categoryType!!, CategorySelectFragViewModel::class.java)
 
+        viewModel.setCategoryType(categoryType!!)
+
         return inflater.inflate(R.layout.fragment_category_list, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
+        setUpRecycleView()
+        registerObservers()
     }
 
-    fun registerObservers()
+    private fun registerObservers()
     {
         viewModel.categories.observe(viewLifecycleOwner)
         {
-
+            adapter.categories = it
         }
     }
 
-    fun setUpRecycleView()
+    private fun setUpRecycleView()
     {
-
+        category_rv.adapter = adapter
+        adapter.categoryClickListener = categoryClickListener
+        category_rv.layoutManager = LinearLayoutManager(requireContext())
     }
 
     companion object {
