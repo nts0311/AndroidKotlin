@@ -41,8 +41,6 @@ class TransactionsFragment : Fragment() {
 
     var rangeSelectDialog: AlertDialog? = null
 
-    var state : Parcelable? = null
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putParcelable("adapter", viewPagerAdapter.saveState())
@@ -65,7 +63,7 @@ class TransactionsFragment : Fragment() {
             vmFactory
         ).get(TransactionsFragViewModel::class.java)
 
-        state = savedInstanceState?.getParcelable("adapter")
+
 
         setUpViewPager()
         setupObservers()
@@ -134,9 +132,7 @@ class TransactionsFragment : Fragment() {
             if (it != null) {
                 viewPagerAdapter.tabInfoList = it
                 //set the viewpager to the current month, week,...
-
                 binding.mainViewPager.setCurrentItem(it.size - 2, true)
-
             }
         }
 
@@ -170,13 +166,10 @@ class TransactionsFragment : Fragment() {
         viewPagerAdapter =
             TabFragmentStateAdapter(childFragmentManager, lifecycle)
 
-        if(state!=null) viewPagerAdapter.restoreState(state!!)
-
         binding.apply {
             mainViewPager.adapter = viewPagerAdapter
             mainViewPager.offscreenPageLimit = 2
             tabLayout.tabMode = TabLayout.MODE_SCROLLABLE
-            tabLayout.isSmoothScrollingEnabled = false
         }
 
         TabLayoutMediator(binding.tabLayout, binding.mainViewPager) { tab, position ->

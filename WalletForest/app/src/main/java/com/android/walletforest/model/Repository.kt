@@ -25,6 +25,13 @@ class Repository private constructor(appContext: Context) {
 
     fun getWallets() = appDatabase.walletDao.getWallets()
 
+    fun updateWalletsMap(wallets: List<Wallet>) {
+        for (wallet in wallets) {
+            if (!_walletsMap.containsKey(wallet.id))
+                _walletsMap[wallet.id] = wallet
+        }
+    }
+
     fun getTransaction(id: Long) = appDatabase.transactionDao.getTransaction(id)
 
     suspend fun updateTransaction(transaction: Transaction)
@@ -57,12 +64,7 @@ class Repository private constructor(appContext: Context) {
         }
     }
 
-    fun updateWalletsMap(wallets: List<Wallet>) {
-        for (wallet in wallets) {
-            if (!_walletsMap.containsKey(wallet.id))
-                _walletsMap[wallet.id] = wallet
-        }
-    }
+    fun getCategoriesByType(type: String) = appDatabase.categoryDao.getCategoriesByType(type)
 
     companion object {
         private var instance: Repository? = null
