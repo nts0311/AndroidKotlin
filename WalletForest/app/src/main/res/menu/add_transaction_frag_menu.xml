@@ -3,13 +3,13 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/item_save_transaction"
-        android:icon="@drawable/ic_save_black_18dp"
-        android:iconTint="#000000"
+        android:icon="@drawable/ic_bk_delete"
         android:title="Item"
         app:showAsAction="always" />
     <item
-        android:icon="@drawable/ic_bk_delete"
+        android:id="@+id/item_save_transaction"
+        android:icon="@drawable/ic_save_black_18dp"
+        android:iconTint="#000000"
         android:title="Item"
         app:showAsAction="always" />
 </menu>

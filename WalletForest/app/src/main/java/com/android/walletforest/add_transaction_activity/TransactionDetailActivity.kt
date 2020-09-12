@@ -15,6 +15,7 @@ import com.android.walletforest.TransactionsFragment.TabInfoUtils
 import com.android.walletforest.databinding.ActivityTransactionDetailBinding
 import com.android.walletforest.dateToString
 import com.android.walletforest.enums.Constants
+import com.android.walletforest.model.Entities.Category
 import com.android.walletforest.model.Repository
 import com.android.walletforest.select_category_activity.RESULT_CATEGORY_ID
 import com.android.walletforest.select_category_activity.SelectCategoryActivity
@@ -51,24 +52,13 @@ class TransactionDetailActivity : AppCompatActivity() {
         registerClickListener()
     }
 
-    private fun registerClickListener() {
-        val clickListener: (View) -> Unit = {
-            val selectCategory = Intent(this, SelectCategoryActivity::class.java)
-            startActivityForResult(selectCategory, LAUNCH_CATEGORY_SELECT_ACTIVITY)
-        }
-        binding.categoryImg.setOnClickListener(clickListener)
-        binding.categoryTxt.setOnClickListener(clickListener)
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if(requestCode == LAUNCH_CATEGORY_SELECT_ACTIVITY)
-        {
-            if(resultCode == RESULT_OK)
-            {
-                val categoryId=data?.getLongExtra(RESULT_CATEGORY_ID, 1)
-                Toast.makeText(this, categoryId.toString(), Toast.LENGTH_SHORT).show()
+        if (requestCode == LAUNCH_CATEGORY_SELECT_ACTIVITY) {
+            if (resultCode == RESULT_OK) {
+                val categoryId = data?.getLongExtra(RESULT_CATEGORY_ID, 1)
+                setCategory(categoryId!!)
             }
         }
     }
@@ -76,6 +66,17 @@ class TransactionDetailActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.add_transaction_frag_menu, menu)
         return true
+    }
+
+    private fun registerClickListener() {
+
+        //select category
+        val clickListener: (View) -> Unit = {
+            val selectCategory = Intent(this, SelectCategoryActivity::class.java)
+            startActivityForResult(selectCategory, LAUNCH_CATEGORY_SELECT_ACTIVITY)
+        }
+        binding.categoryImg.setOnClickListener(clickListener)
+        binding.categoryTxt.setOnClickListener(clickListener)
     }
 
     private fun getArgs() {
@@ -86,6 +87,14 @@ class TransactionDetailActivity : AppCompatActivity() {
             viewModel.setTransactionId(transactionId)
     }
 
+    private fun setCategory(categoryId: Long) {
+        val category = viewModel.categories[categoryId]
+        binding.categoryImg.setImageResource(category!!.imageId)
+        binding.categoryTxt.text = category.name
+    }
+
+    fun dateToFullString(ld: LocalDate): String =
+        DateTimeFormatter.ofPattern("EEEE, dd/MM/yyyy").format(ld)
 
     private fun registerObservers() {
         if (transactionId != -1L) {
@@ -94,23 +103,24 @@ class TransactionDetailActivity : AppCompatActivity() {
                 if (it == null) return@observe
 
                 //category
-                val category = viewModel.categories[it.categoryId]
-                binding.categoryImg.setImageResource(category!!.imageId)
+                setCategory(it.categoryId)
 
                 //amount text
-                binding.amountTxt.text = it.amount.toString()
+                binding.amountTxt.setText(it.amount.toString())
                 val color = if (it.type == Constants.TYPE_EXPENSE)
                     ContextCompat.getColor(binding.root.context, R.color.expense_text)
                 else
                     ContextCompat.getColor(binding.root.context, R.color.income_text)
                 binding.amountTxt.setTextColor(color)
-                binding.categoryTxt.text = category.name
 
                 //date
-                binding.dateTxt.text = dateToString(toLocalDate(it.time))
+                binding.dateTxt.text = dateToFullString(toLocalDate(it.time))
 
                 //wallet name
                 binding.walletNameTxt.text = viewModel.wallets[it.walletId]?.name
+
+                //note
+                binding.noteEdt.setText(it.note)
             }
         }
     }

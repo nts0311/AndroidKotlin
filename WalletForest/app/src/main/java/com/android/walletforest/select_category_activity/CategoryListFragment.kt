@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
@@ -14,6 +15,10 @@ import com.android.walletforest.model.Entities.Category
 import com.android.walletforest.model.Repository
 import kotlinx.android.synthetic.main.fragment_category_list.*
 import kotlinx.android.synthetic.main.fragment_transaction_list.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 private const val ARG_CATEGORY_TYPE = "category_type"
@@ -24,6 +29,9 @@ class CategoryListFragment : Fragment() {
     private var categoryType: String? = Constants.TYPE_EXPENSE
     private lateinit var viewModel: CategorySelectFragViewModel
     private var adapter = CategoryAdapter()
+    private var currentList: List<Category> = listOf()
+    private var filteredList: List<Category> = listOf()
+    private var filterListJob: Job? = null
 
     var categoryClickListener: (category: Category) -> Unit = {}
 
@@ -56,16 +64,35 @@ class CategoryListFragment : Fragment() {
         registerObservers()
     }
 
-    private fun registerObservers()
-    {
+    private fun registerObservers() {
         viewModel.categories.observe(viewLifecycleOwner)
         {
             adapter.categories = it
+            currentList = it
+        }
+
+        viewModel.searchQuery.observe(viewLifecycleOwner) {
+            if (it == "")
+                adapter.categories = currentList
+            else
+                filterCategoryList(it)
         }
     }
 
-    private fun setUpRecycleView()
-    {
+    private fun filterCategoryList(query: String) {
+        filterListJob?.cancel()
+        filterListJob = lifecycleScope.launch {
+            withContext(Dispatchers.Default)
+            {
+                filteredList =
+                    currentList.filter { category -> category.name.contains(query, true) }
+            }
+
+            adapter.categories = filteredList
+        }
+    }
+
+    private fun setUpRecycleView() {
         category_rv.adapter = adapter
         adapter.categoryClickListener = categoryClickListener
         category_rv.layoutManager = LinearLayoutManager(requireContext())

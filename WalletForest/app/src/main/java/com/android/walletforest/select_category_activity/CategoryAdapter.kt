@@ -47,14 +47,17 @@ class CategoryViewHolder(
 
         categoryImg.setImageResource(category.imageId)
         categoryText.text = category.name
-        if (category.parentId != category.id) {
-            val params = ConstraintLayout.LayoutParams(
-                ConstraintLayout.LayoutParams.MATCH_PARENT,
-                ConstraintLayout.LayoutParams.WRAP_CONTENT
-            )
 
+        val params = ConstraintLayout.LayoutParams(
+            ConstraintLayout.LayoutParams.MATCH_PARENT,
+            ConstraintLayout.LayoutParams.WRAP_CONTENT
+        )
+
+        if (category.parentId != category.id)
             params.setMargins(48, 0, 0, 0)
-            root.layoutParams = params
-        }
+        else
+            params.setMargins(0,0,0,0)
+
+        root.layoutParams = params
     }
 }
