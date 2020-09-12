@@ -13,8 +13,15 @@
         android:title="@string/report_frag_title"
         app:showAsAction="always" />
     <item
+        android:title=" "
+        app:showAsAction="always" />
+    <item
         android:id="@+id/planningFragment"
         android:icon="@drawable/ic_w_budget"
         android:title="@string/planning_frag_title"
+        app:showAsAction="always" />
+    <item
+        android:icon="@drawable/baseline_account_box_black_18dp"
+        android:title="Account"
         app:showAsAction="always" />
 </menu>

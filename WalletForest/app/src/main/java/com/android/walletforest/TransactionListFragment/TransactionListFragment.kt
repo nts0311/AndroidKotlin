@@ -85,7 +85,6 @@ class TransactionListFragment : Fragment() {
         itemAdapter?.itemClickListener = {
             val detailIntent = Intent(requireContext(), TransactionDetailActivity::class.java)
             detailIntent.putExtra(TransactionDetailActivity.TRANSACTION_ID_PARAM, it.id)
-            detailIntent.putExtra(TransactionDetailActivity.WALLET_ID_PARAM, it.walletId)
             startActivity(detailIntent)
         }
     }
