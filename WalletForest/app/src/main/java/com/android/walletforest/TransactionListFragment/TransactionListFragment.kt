@@ -2,6 +2,7 @@ package com.android.walletforest.TransactionListFragment
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -105,7 +106,6 @@ class TransactionListFragment : Fragment() {
                 //copy to a brand new list to avoid ListAdapter not update the recyclerview
                 itemAdapter?.submitList(it.toList())
             }
-
         }
     }
 

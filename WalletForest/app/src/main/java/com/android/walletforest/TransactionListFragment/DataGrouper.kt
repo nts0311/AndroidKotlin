@@ -1,12 +1,15 @@
 package com.android.walletforest.TransactionListFragment
 
 import com.android.walletforest.TransactionsFragment.TabInfoUtils
+import com.android.walletforest.enums.Constants
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Entities.Transaction
 import com.android.walletforest.toLocalDate
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
 
 
 class DataGrouper {
@@ -21,10 +24,14 @@ class DataGrouper {
         timeRange: TimeRange,
         viewType: ViewType
     ): List<DataItem> {
+
         this.transactions = transactions
         this.viewType = viewType
 
         if (transactions.isEmpty()) return mutableListOf()
+
+        if (result.isNotEmpty())
+            result.clear()
 
         if (viewType == ViewType.TRANSACTION) {
             when (timeRange) {
@@ -61,11 +68,12 @@ class DataGrouper {
     }
 
     private suspend fun group(belongToGroup: (DataItem.DividerItem, Transaction) -> Boolean) {
-        if(transactions.isEmpty()) return
+        if (transactions.isEmpty()) return
 
         withContext(Dispatchers.Default)
         {
-            result.clear()
+            if (result.isNotEmpty())
+                result.clear()
 
             transactions = if (viewType == ViewType.TRANSACTION) {
                 transactions.sortedWith { t1: Transaction, t2: Transaction ->
@@ -100,10 +108,19 @@ class DataGrouper {
             result.add(currentDividerItem)
 
             for (transaction in transactions) {
+
+                //check if the coroutine is canceled, stop the work immediately to prevent cases like
+                //rotating the device and it adds some excited transaction to the list
+                yield()
+
                 if (belongToGroup(currentDividerItem, transaction)) {
                     result.add(DataItem.TransactionItem(transaction))
 
-                    totalAmount += transaction.amount
+                    if (transaction.type == Constants.TYPE_EXPENSE)
+                        totalAmount -= transaction.amount
+                    else
+                        totalAmount += transaction.amount
+
                     numOfTransaction++
 
                     if (transactions.last() === transaction) {
@@ -115,7 +132,12 @@ class DataGrouper {
                     currentDividerItem.totalAmount = totalAmount
 
                     numOfTransaction = 1
-                    totalAmount = transaction.amount
+
+                    totalAmount = if (transaction.type == Constants.TYPE_EXPENSE)
+                        -transaction.amount
+                    else
+                        transaction.amount
+
 
                     val dividerItem = DataItem.DividerItem(
                         toLocalDate(transaction.time), transaction.categoryId,
