@@ -28,8 +28,8 @@ class TransactionListFragment : Fragment() {
     private var walletId: Long? = null
     private var timeRange: String? = null
     private var itemAdapter: DataItemAdapter? = null
-    private lateinit var repo : Repository
-    var key=""
+    private lateinit var repo: Repository
+    var key = ""
 
     private lateinit var viewModel: TransactionListFragViewModel
 
@@ -40,7 +40,7 @@ class TransactionListFragment : Fragment() {
             endTime = it.getLong(END_TIME_PARAM)
             walletId = it.getLong(WALLET_ID_PARAM)
             timeRange = it.getString(TIME_RANGE_PARAM, TimeRange.MONTH.value)
-            key="$startTime - $endTime"
+            key = "$startTime - $endTime"
         }
     }
 
@@ -58,8 +58,7 @@ class TransactionListFragment : Fragment() {
             vmFactory
         ).get(key, TransactionListFragViewModel::class.java)
 
-        if(startTime!=null && endTime!=null && timeRange!=null)
-        {
+        if (startTime != null && endTime != null && timeRange != null) {
             viewModel.setTimeRange(startTime!!, endTime!!, timeRange!!)
         }
 
@@ -72,16 +71,13 @@ class TransactionListFragment : Fragment() {
         setUpRecycleView()
     }
 
-    private fun setUpRecycleView()
-    {
+    private fun setUpRecycleView() {
         itemAdapter = DataItemAdapter(
             viewModel.currentViewMode,
             viewModel.timeRange,
             repo.categoryMap
         )
-        transaction_list_rv.adapter=itemAdapter
-
-        itemAdapter?.stateRestorationPolicy=RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        transaction_list_rv.adapter = itemAdapter
         itemAdapter?.itemClickListener = {
             val detailIntent = Intent(requireContext(), TransactionDetailActivity::class.java)
             detailIntent.putExtra(TransactionDetailActivity.TRANSACTION_ID_PARAM, it.id)
@@ -94,19 +90,18 @@ class TransactionListFragment : Fragment() {
         {
             if (it != null) {
                 viewModel.switchViewMode(it)
-                itemAdapter?.viewMode=it
+                itemAdapter?.viewMode = it
             }
         }
 
-        viewModel.transactionList.observe(viewLifecycleOwner){
-            if(it!=null)
+        viewModel.transactionList.observe(viewLifecycleOwner) {
+            if (it != null)
                 viewModel.onTransactionListChange(it)
         }
 
         //display transaction here
         viewModel.dataItemList.observe(viewLifecycleOwner) {
-            if(it!=null)
-            {
+            if (it != null) {
                 //copy to a brand new list to avoid ListAdapter not update the recyclerview
                 itemAdapter?.submitList(it.toList())
             }

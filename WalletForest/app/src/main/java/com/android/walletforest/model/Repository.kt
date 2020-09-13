@@ -3,16 +3,20 @@ package com.android.walletforest.model
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.android.walletforest.TransactionsFragment.TabInfo
+import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Entities.Category
 import com.android.walletforest.model.Entities.Transaction
 import com.android.walletforest.model.Entities.Wallet
+import java.sql.Time
 
 class Repository private constructor(appContext: Context) {
     private val appDatabase = AppDatabase.getInstance(appContext)
 
     var viewMode = MutableLiveData(ViewType.TRANSACTION)
 
+    //caching list of transaction for each fragment, avoiding database query
     private var fetchedRange: MutableMap<String, LiveData<List<Transaction>>> = mutableMapOf()
 
     private var _categoriesMap: MutableMap<Long, Category> = mutableMapOf()
@@ -20,6 +24,24 @@ class Repository private constructor(appContext: Context) {
 
     private var _walletsMap: MutableMap<Long, Wallet> = mutableMapOf()
     var walletMap: Map<Long, Wallet> = _walletsMap
+
+    //tabInfoList: List of Tab with period for each fragment in viewpager to correctly fetch transactions
+    private var _tabInfoList = MutableLiveData<List<TabInfo>>()
+    var tabInfoList : LiveData<List<TabInfo>> = _tabInfoList
+
+    fun setTabInfoList(list : List<TabInfo>)
+    {
+        _tabInfoList.value = list
+    }
+
+    //timeRange: current timeRange
+    private var _timeRange = MutableLiveData<TimeRange>()
+    var timeRange : LiveData<TimeRange> = _timeRange
+
+    fun setTimeRange(timeRange: TimeRange)
+    {
+        _timeRange.value = timeRange
+    }
 
     fun getFirstWallet() = appDatabase.walletDao.getWallet()
 

@@ -12,7 +12,7 @@
         <activity android:name=".select_category_activity.SelectCategoryActivity"></activity>
         <activity android:name=".add_transaction_activity.TransactionDetailActivity" />
         <activity
-            android:name=".MainActivity"
+            android:name=".main_activity.MainActivity"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
