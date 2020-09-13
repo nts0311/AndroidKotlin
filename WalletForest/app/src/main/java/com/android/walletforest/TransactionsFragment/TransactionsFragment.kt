@@ -12,6 +12,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -65,10 +66,13 @@ class TransactionsFragment : Fragment() {
             vmFactory
         ).get(TransactionsFragViewModel::class.java)
 
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         setUpViewPager()
         setupObservers()
-
-        return binding.root
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -102,12 +106,21 @@ class TransactionsFragment : Fragment() {
         //dont use activity's fragManager here, it will result in crash
 
         val tabLayout = (requireActivity() as MainActivity).getTabLayout()
+
+
         viewPagerAdapter =
             TabFragmentStateAdapter(childFragmentManager, lifecycle)
 
         binding.apply {
             mainViewPager.adapter = viewPagerAdapter
             mainViewPager.offscreenPageLimit = 2
+
+            //fix the weird error of viewpager2, where switch to another time range and back to month
+            //caused it to shrink, no idea why lol
+            mainViewPager.updateLayoutParams {
+                this.height = ViewGroup.LayoutParams.MATCH_PARENT
+            }
+
             tabLayout.tabMode = TabLayout.MODE_SCROLLABLE
         }
 

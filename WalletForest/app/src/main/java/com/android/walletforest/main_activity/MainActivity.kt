@@ -164,9 +164,11 @@ class MainActivity : AppCompatActivity() {
 
         val startEdt = rangeSelectDialog?.findViewById<EditText>(R.id.start_time_edt)
         startEdt?.setText(dateToString(startDate))
+        startEdt?.tag = toEpoch(startDate)
 
         val endEdt = rangeSelectDialog?.findViewById<EditText>(R.id.end_time_edt)
         endEdt?.setText(dateToString(endDate))
+        endEdt?.tag = toEpoch(endDate)
 
         val startDateSetListener: (DatePicker, Int, Int, Int) -> Unit =
             { _, year, monthOfYear, dayOfMonth ->
