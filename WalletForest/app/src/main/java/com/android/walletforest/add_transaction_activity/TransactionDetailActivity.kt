@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.DatePicker
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
@@ -25,6 +26,7 @@ class TransactionDetailActivity : AppCompatActivity() {
 
     companion object {
         val TRANSACTION_ID_PARAM = "transaction_id"
+        val WALLET_ID_PARAM = "wallet_id"
     }
 
     private val LAUNCH_CATEGORY_SELECT_ACTIVITY = 1
@@ -32,6 +34,7 @@ class TransactionDetailActivity : AppCompatActivity() {
     private lateinit var binding: ActivityTransactionDetailBinding
     private lateinit var viewModel: TransactionDetailViewModel
     private var transactionId = -1L
+    private var walletId = -1L
     private var currentTransaction: Transaction? = null
     private var transactionDate: Long = 0L
     private var transactionCategoryId = -1L
@@ -88,6 +91,19 @@ class TransactionDetailActivity : AppCompatActivity() {
     }
 
     private fun saveItemClick() {
+
+        if (binding.amountTxt.text.isNullOrBlank()) {
+            Toast.makeText(this, getString(R.string.enter_amount_reminder), Toast.LENGTH_SHORT)
+                .show()
+            return
+        }
+
+        if (transactionCategoryId == -1L) {
+            Toast.makeText(this, getString(R.string.enter_cate_reminder), Toast.LENGTH_SHORT)
+                .show()
+            return
+        }
+
         //save transaction if edited
         if (transactionId != -1L) {
 
@@ -98,19 +114,34 @@ class TransactionDetailActivity : AppCompatActivity() {
                 amount = binding.amountTxt.text.toString().toLong()
                 note = binding.noteEdt.text.toString()
                 time = transactionDate
+                type = viewModel.categories[transactionCategoryId]?.type!!
             }
 
             viewModel.updateTransaction(newTransaction!!)
-            finish()
+
         }
         //create a new transaction
         else {
-
+            val newTransaction = Transaction(
+                0,
+                transactionCategoryId,
+                walletId,
+                viewModel.categories[transactionCategoryId]?.type!!,
+                binding.amountTxt.text.toString().toLong(),
+                binding.noteEdt.text.toString(),
+                transactionDate
+            )
+            viewModel.insertTransaction(newTransaction)
         }
+
+        finish()
     }
 
     private fun deleteItemClick() {
+        if (currentTransaction == null) return
 
+        viewModel.deleteTransaction(currentTransaction!!)
+        finish()
     }
 
     private fun registerClickListener() {
@@ -120,7 +151,6 @@ class TransactionDetailActivity : AppCompatActivity() {
             val selectCategory = Intent(this, SelectCategoryActivity::class.java)
             startActivityForResult(selectCategory, LAUNCH_CATEGORY_SELECT_ACTIVITY)
         }
-        binding.categoryImg.setOnClickListener(clickListener)
         binding.categoryTxt.setOnClickListener(clickListener)
 
         //date picker
@@ -133,7 +163,7 @@ class TransactionDetailActivity : AppCompatActivity() {
 
         binding.dateTxt.setOnClickListener {
 
-            val ld= toLocalDate(currentTransaction?.time!!)
+            val ld = toLocalDate(transactionDate)
 
             DatePickerDialog(
                 this, dateSetListener,
@@ -144,9 +174,17 @@ class TransactionDetailActivity : AppCompatActivity() {
 
     private fun getArgs() {
         transactionId = intent.getLongExtra(TRANSACTION_ID_PARAM, -1)
+        walletId = intent.getLongExtra(WALLET_ID_PARAM, -1)
 
         if (transactionId != -1L)
             viewModel.setTransactionId(transactionId)
+
+        if (walletId != -1L) {
+            binding.walletNameTxt.text = viewModel.wallets[walletId]?.name
+            binding.dateTxt.text = dateToFullString(LocalDate.now())
+            transactionDate = toEpoch(LocalDate.now())
+        }
+
     }
 
     private fun setCategory(categoryId: Long) {

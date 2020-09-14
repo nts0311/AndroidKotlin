@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.android.walletforest.*
 import com.android.walletforest.TransactionsFragment.TransactionsFragment
+import com.android.walletforest.add_transaction_activity.TransactionDetailActivity
 import com.android.walletforest.databinding.ActivityMainBinding
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
@@ -33,7 +34,7 @@ class MainActivity : AppCompatActivity() {
     private var activeFragment: Fragment = fragmentTransactions
     private var rangeSelectDialog: AlertDialog? = null
 
-    private lateinit var binding : ActivityMainBinding
+    private lateinit var binding: ActivityMainBinding
 
     private lateinit var viewModel: MainActivityViewModel
 
@@ -63,6 +64,14 @@ class MainActivity : AppCompatActivity() {
         registerObservers()
         createDialogs()
         setSupportActionBar(binding.toolbar)
+        binding.addTransactionFab.setOnClickListener {
+            val addTransaction = Intent(this@MainActivity, TransactionDetailActivity::class.java)
+            addTransaction.putExtra(
+                TransactionDetailActivity.WALLET_ID_PARAM,
+                viewModel.currentWallet.value?.id
+            )
+            startActivity(addTransaction)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -93,8 +102,7 @@ class MainActivity : AppCompatActivity() {
                     item.title = getString(R.string.view_by) + " " + getString(R.string.transaction)
             }
 
-            R.id.edit_wallet_item ->
-            {
+            R.id.edit_wallet_item -> {
 
             }
         }
@@ -223,5 +231,5 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun getTabLayout() : TabLayout = binding.tabLayout
+    fun getTabLayout(): TabLayout = binding.tabLayout
 }

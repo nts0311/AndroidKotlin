@@ -33,4 +33,11 @@
     <string name="expense">Expense</string>
     <string name="income">Income</string>
 
+    <string name="pick_cate_hint">Pick a category</string>
+    <string name="enter_amount_hint">Enter amount</string>
+    <string name="enter_note_hint">Write note</string>
+
+    <string name="enter_amount_reminder">Please enter amount</string>
+    <string name="enter_cate_reminder">Please pick a category</string>
+
 </resources>

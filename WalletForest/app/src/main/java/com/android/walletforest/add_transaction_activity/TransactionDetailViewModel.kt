@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.walletforest.model.Entities.Transaction
 import com.android.walletforest.model.Repository
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class TransactionDetailViewModel(private val repository: Repository) : ViewModel() {
@@ -23,14 +24,21 @@ class TransactionDetailViewModel(private val repository: Repository) : ViewModel
         if (transaction == this.transaction.value)
             return
 
-        viewModelScope.launch {
+        GlobalScope.launch {
             repository.updateTransaction(transaction)
         }
     }
 
     fun insertTransaction(transaction: Transaction) {
-        viewModelScope.launch {
+        GlobalScope.launch {
             repository.insertTransaction(transaction)
+        }
+    }
+
+    fun deleteTransaction(transaction: Transaction)
+    {
+        GlobalScope.launch {
+            repository.deleteTransaction(transaction)
         }
     }
 }

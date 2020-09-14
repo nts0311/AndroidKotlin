@@ -66,6 +66,11 @@ class Repository private constructor(appContext: Context) {
         appDatabase.transactionDao.insertTransaction(transaction)
     }
 
+    suspend fun deleteTransaction(transaction: Transaction)
+    {
+        appDatabase.transactionDao.deleteTransaction(transaction)
+    }
+
     fun getTransactionsBetweenRange(start: Long, end: Long): LiveData<List<Transaction>> {
         val key = "$start-$end"
         return if (fetchedRange.containsKey(key))
