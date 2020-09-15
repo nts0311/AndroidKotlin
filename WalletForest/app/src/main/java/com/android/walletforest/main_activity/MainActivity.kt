@@ -4,7 +4,6 @@ import android.app.DatePickerDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.DatePicker
@@ -15,16 +14,14 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.android.walletforest.*
 import com.android.walletforest.TransactionsFragment.TransactionsFragment
-import com.android.walletforest.add_transaction_activity.TransactionDetailActivity
+import com.android.walletforest.transaction_detail_activity.TransactionDetailActivity
 import com.android.walletforest.databinding.ActivityMainBinding
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Repository
-import com.android.walletforest.select_category_activity.SelectCategoryActivity
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.activity_main.*
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 
 class MainActivity : AppCompatActivity() {
@@ -64,14 +61,7 @@ class MainActivity : AppCompatActivity() {
         registerObservers()
         createDialogs()
         setSupportActionBar(binding.toolbar)
-        binding.addTransactionFab.setOnClickListener {
-            val addTransaction = Intent(this@MainActivity, TransactionDetailActivity::class.java)
-            addTransaction.putExtra(
-                TransactionDetailActivity.WALLET_ID_PARAM,
-                viewModel.currentWallet.value?.id
-            )
-            startActivity(addTransaction)
-        }
+        registerClickListener()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -139,6 +129,24 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun registerClickListener()
+    {
+        //add transaction
+        binding.addTransactionFab.setOnClickListener {
+            val addTransaction = Intent(this@MainActivity, TransactionDetailActivity::class.java)
+            addTransaction.putExtra(
+                TransactionDetailActivity.WALLET_ID_PARAM,
+                viewModel.currentWallet.value?.id
+            )
+            startActivity(addTransaction)
+        }
+
+        //select wallet
+        binding.walletImg.setOnClickListener {
+
+        }
+    }
+
     private fun registerObservers() {
         viewModel.categoryList.observe(this)
         {
@@ -151,6 +159,19 @@ class MainActivity : AppCompatActivity() {
         {
             if (it != null) {
                 viewModel.updateWallets(it)
+
+                if(!viewModel.initFirstWallet)
+                {
+                    if(it.isNotEmpty())
+                    {
+                        viewModel.selectWallet(it[0].id)
+                        viewModel.initFirstWallet = true
+                    }
+                    else
+                    {
+                        //ask user to the create wallet
+                    }
+                }
             }
         }
 

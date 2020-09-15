@@ -3,13 +3,16 @@ package com.android.walletforest.model
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.android.walletforest.TransactionsFragment.TabInfo
+import androidx.lifecycle.Transformations
+import com.android.walletforest.R
+import com.android.walletforest.main_activity.TabInfo
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Entities.Category
 import com.android.walletforest.model.Entities.Transaction
 import com.android.walletforest.model.Entities.Wallet
-import java.sql.Time
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class Repository private constructor(appContext: Context) {
     private val appDatabase = AppDatabase.getInstance(appContext)
@@ -29,9 +32,21 @@ class Repository private constructor(appContext: Context) {
     private var _tabInfoList = MutableLiveData<List<TabInfo>>()
     var tabInfoList : LiveData<List<TabInfo>> = _tabInfoList
 
+    //current wallet
+    private var _currentWalletId : MutableLiveData<Long> = MutableLiveData()
+    var currentWallet : LiveData<Wallet> = Transformations.switchMap(_currentWalletId)
+    {
+        appDatabase.walletDao.getWalletById(it)
+    }
+
     fun setTabInfoList(list : List<TabInfo>)
     {
         _tabInfoList.value = list
+    }
+
+    fun setCurrentWallet(walletId: Long)
+    {
+        _currentWalletId.value = walletId
     }
 
     //timeRange: current timeRange
@@ -43,7 +58,12 @@ class Repository private constructor(appContext: Context) {
         _timeRange.value = timeRange
     }
 
-    fun getFirstWallet() = appDatabase.walletDao.getWallet()
+    suspend fun updateWallet(wallet: Wallet)
+    {
+        appDatabase.walletDao.updateWallet(wallet)
+    }
+
+    //fun getFirstWallet() = appDatabase.walletDao.getWallet()
 
     fun getWallets() = appDatabase.walletDao.getWallets()
 

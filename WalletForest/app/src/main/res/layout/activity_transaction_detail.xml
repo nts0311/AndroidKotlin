@@ -34,7 +34,7 @@
             android:background="@color/white"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            tools:context=".add_transaction_activity.AddTransactionFragment">
+            tools:context=".transaction_detail_activity.AddTransactionFragment">
 
             <ImageView
                 android:id="@+id/category_img"

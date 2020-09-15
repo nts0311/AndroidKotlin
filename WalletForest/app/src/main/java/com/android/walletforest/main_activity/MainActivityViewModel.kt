@@ -1,11 +1,8 @@
 package com.android.walletforest.main_activity
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.android.walletforest.TransactionsFragment.TabInfo
-import com.android.walletforest.TransactionsFragment.TabInfoUtils
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Entities.Category
@@ -17,8 +14,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-class MainActivityViewModel(private val repository: Repository) : ViewModel()
-{
+class MainActivityViewModel(private val repository: Repository) : ViewModel() {
     var categoryList = repository.getCategoriesLiveData()
     var walletList = repository.getWallets()
 
@@ -27,10 +23,12 @@ class MainActivityViewModel(private val repository: Repository) : ViewModel()
     var endTime: Long = System.currentTimeMillis()
         private set
 
-    var currentWallet: LiveData<Wallet> = repository.getFirstWallet()
+    var currentWallet: LiveData<Wallet> = repository.currentWallet
 
     private val tabInfoUtils = TabInfoUtils()
     private var timeRange = TimeRange.MONTH
+
+    var initFirstWallet=false
 
     init {
         initTimeRange()
@@ -54,6 +52,10 @@ class MainActivityViewModel(private val repository: Repository) : ViewModel()
         repository.updateWalletsMap(wallets)
     }
 
+    fun selectWallet(walletId: Long) {
+        repository.setCurrentWallet(walletId)
+    }
+
     fun onSelectCustomTimeRange(start: Long, end: Long) {
         if (startTime == start && endTime == end)
             return
@@ -69,14 +71,13 @@ class MainActivityViewModel(private val repository: Repository) : ViewModel()
         if (timeRange.value == this.timeRange.value)
             return
 
-        if (this.timeRange == TimeRange.CUSTOM && timeRange!=TimeRange.CUSTOM)
+        if (this.timeRange == TimeRange.CUSTOM && timeRange != TimeRange.CUSTOM)
             initTimeRange()
 
         this.timeRange = timeRange
         repository.setTimeRange(timeRange)
         getTabInfoList()
     }
-
 
 
     private fun getTabInfoList() {

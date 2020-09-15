@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.android.walletforest.R
-import com.android.walletforest.TransactionsFragment.TabInfoUtils
 import com.android.walletforest.databinding.ItemDividerBinding
 import com.android.walletforest.databinding.ItemTransactionBinding
 import com.android.walletforest.enums.Constants

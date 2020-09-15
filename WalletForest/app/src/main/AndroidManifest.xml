@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".select_category_activity.SelectCategoryActivity"></activity>
-        <activity android:name=".add_transaction_activity.TransactionDetailActivity" />
+        <activity android:name=".transaction_detail_activity.TransactionDetailActivity" />
         <activity
             android:name=".main_activity.MainActivity"
             android:launchMode="singleTop">

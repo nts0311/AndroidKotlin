@@ -1,13 +1,11 @@
 package com.android.walletforest.TransactionListFragment
 
-import com.android.walletforest.TransactionsFragment.TabInfoUtils
 import com.android.walletforest.enums.Constants
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Entities.Transaction
 import com.android.walletforest.toLocalDate
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
 

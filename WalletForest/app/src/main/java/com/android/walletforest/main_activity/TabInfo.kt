@@ -1,4 +1,4 @@
-package com.android.walletforest.TransactionsFragment
+package com.android.walletforest.main_activity
 
 class TabInfo(
     var walletId: Long,

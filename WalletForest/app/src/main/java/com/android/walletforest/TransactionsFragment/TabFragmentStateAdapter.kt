@@ -6,6 +6,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.android.walletforest.TransactionListFragment.TransactionListFragment
 import com.android.walletforest.enums.TimeRange
+import com.android.walletforest.main_activity.TabInfo
 
 class TabFragmentStateAdapter(fragmentManager: FragmentManager, lifecycle: Lifecycle) :
     FragmentStateAdapter(fragmentManager, lifecycle) {

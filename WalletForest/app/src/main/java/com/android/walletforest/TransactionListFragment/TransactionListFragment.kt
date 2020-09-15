@@ -2,16 +2,14 @@ package com.android.walletforest.TransactionListFragment
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.RecyclerView
 import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
-import com.android.walletforest.add_transaction_activity.TransactionDetailActivity
+import com.android.walletforest.transaction_detail_activity.TransactionDetailActivity
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.model.Repository
 import kotlinx.android.synthetic.main.fragment_transaction_list.*

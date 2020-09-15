@@ -1,15 +1,14 @@
-package com.android.walletforest.TransactionsFragment
+package com.android.walletforest.main_activity
 
 import com.android.walletforest.enums.TimeRange
+import com.android.walletforest.main_activity.TabInfo
 import com.android.walletforest.toEpoch
 import com.android.walletforest.toLocalDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.ZoneId
 import java.time.temporal.ChronoUnit
-import java.util.*
 
 class TabInfoUtils() {
 

@@ -1,4 +1,4 @@
-package com.android.walletforest.add_transaction_activity
+package com.android.walletforest.transaction_detail_activity
 
 import android.app.DatePickerDialog
 import android.content.Intent
@@ -117,7 +117,7 @@ class TransactionDetailActivity : AppCompatActivity() {
                 type = viewModel.categories[transactionCategoryId]?.type!!
             }
 
-            viewModel.updateTransaction(newTransaction!!)
+            viewModel.updateTransaction(newTransaction!!, currentTransaction?.amount!!)
 
         }
         //create a new transaction
