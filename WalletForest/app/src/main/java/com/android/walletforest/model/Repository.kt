@@ -4,23 +4,23 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import com.android.walletforest.R
 import com.android.walletforest.main_activity.TabInfo
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Entities.Category
 import com.android.walletforest.model.Entities.Transaction
 import com.android.walletforest.model.Entities.Wallet
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class Repository private constructor(appContext: Context) {
     private val appDatabase = AppDatabase.getInstance(appContext)
 
     var viewMode = MutableLiveData(ViewType.TRANSACTION)
 
-    //caching list of transaction for each fragment, avoiding database query
-    private var fetchedRange: MutableMap<String, LiveData<List<Transaction>>> = mutableMapOf()
+    //caching list of transactions of each wallet, avoiding database query
+    //the map contains pairs of walletId and a sub-map for caching transactions list of that wallet
+    //The sub-map contains lists of transactions, which is access by the range of that list
+    private var fetchedRange: MutableMap<Long, MutableMap<String, LiveData<List<Transaction>>>> =
+        mutableMapOf()
 
     private var _categoriesMap: MutableMap<Long, Category> = mutableMapOf()
     var categoryMap: Map<Long, Category> = _categoriesMap
@@ -30,37 +30,33 @@ class Repository private constructor(appContext: Context) {
 
     //tabInfoList: List of Tab with period for each fragment in viewpager to correctly fetch transactions
     private var _tabInfoList = MutableLiveData<List<TabInfo>>()
-    var tabInfoList : LiveData<List<TabInfo>> = _tabInfoList
+    var tabInfoList: LiveData<List<TabInfo>> = _tabInfoList
 
     //current wallet
-    private var _currentWalletId : MutableLiveData<Long> = MutableLiveData()
-    var currentWallet : LiveData<Wallet> = Transformations.switchMap(_currentWalletId)
+    private var _currentWalletId: MutableLiveData<Long> = MutableLiveData()
+    var currentWallet: LiveData<Wallet> = Transformations.switchMap(_currentWalletId)
     {
         appDatabase.walletDao.getWalletById(it)
     }
 
 
-    fun setTabInfoList(list : List<TabInfo>)
-    {
+    fun setTabInfoList(list: List<TabInfo>) {
         _tabInfoList.value = list
     }
 
-    fun setCurrentWallet(walletId: Long)
-    {
+    fun setCurrentWallet(walletId: Long) {
         _currentWalletId.value = walletId
     }
 
     //timeRange: current timeRange
     private var _timeRange = MutableLiveData<TimeRange>()
-    var timeRange : LiveData<TimeRange> = _timeRange
+    var timeRange: LiveData<TimeRange> = _timeRange
 
-    fun setTimeRange(timeRange: TimeRange)
-    {
+    fun setTimeRange(timeRange: TimeRange) {
         _timeRange.value = timeRange
     }
 
-    suspend fun updateWallet(wallet: Wallet)
-    {
+    suspend fun updateWallet(wallet: Wallet) {
         appDatabase.walletDao.updateWallet(wallet)
     }
 
@@ -77,29 +73,48 @@ class Repository private constructor(appContext: Context) {
 
     fun getTransaction(id: Long) = appDatabase.transactionDao.getTransaction(id)
 
-    suspend fun updateTransaction(transaction: Transaction)
-    {
+    suspend fun updateTransaction(transaction: Transaction) {
         appDatabase.transactionDao.updateTransaction(transaction)
     }
 
-    suspend fun insertTransaction(transaction: Transaction)
-    {
+    suspend fun insertTransaction(transaction: Transaction) {
         appDatabase.transactionDao.insertTransaction(transaction)
     }
 
-    suspend fun deleteTransaction(transaction: Transaction)
-    {
+    suspend fun deleteTransaction(transaction: Transaction) {
         appDatabase.transactionDao.deleteTransaction(transaction)
     }
 
-    fun getTransactionsBetweenRange(start: Long, end: Long): LiveData<List<Transaction>> {
-        val key = "$start-$end"
-        return if (fetchedRange.containsKey(key))
-            fetchedRange[key]!!
+    //Get the list of transactions in a specific wallet and specific period
+    //If the list is not cached, fetch the list from database and cache it
+    fun getTransactionsBetweenRange(
+        start: Long,
+        end: Long,
+        walletId: Long
+    ): LiveData<List<Transaction>> {
+        val rangeKey = "$start-$end"
+
+        //check if the list of transactions with the above time range is cached
+        if (fetchedRange.containsKey(walletId)) {
+            val cachedDataOfWallet = fetchedRange[walletId]
+            return if (cachedDataOfWallet?.containsKey(rangeKey)!!)
+                cachedDataOfWallet[rangeKey]!!
+            else {
+                //if not cached yet, fetch from the db and cache it
+                val transactions =
+                    appDatabase.transactionDao.getTransactionsBetweenRange(start, end, walletId)
+                cachedDataOfWallet[rangeKey] = transactions
+                transactions
+            }
+        }
+        //if the map doesn't contain cached lists of the wallet, create the sub-map for
+        //that wallet and cache data
         else {
-            val transactions = appDatabase.transactionDao.getTransactionsBetweenRange(start, end)
-            fetchedRange[key] = transactions
-            transactions
+            fetchedRange[walletId] = mutableMapOf()
+            val transactions =
+                appDatabase.transactionDao.getTransactionsBetweenRange(start, end, walletId)
+            fetchedRange[walletId]!![rangeKey] = transactions
+            return transactions
         }
     }
 

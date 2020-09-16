@@ -58,7 +58,7 @@ class TransactionListFragment : Fragment() {
         ).get(key, TransactionListFragViewModel::class.java)
 
         if (startTime != null && endTime != null && timeRange != null) {
-            viewModel.setTimeRange(startTime!!, endTime!!, timeRange!!)
+            viewModel.setTimeRange(startTime!!, endTime!!, timeRange!!, walletId!!)
         }
 
         return inflater.inflate(R.layout.fragment_transaction_list, container, false)

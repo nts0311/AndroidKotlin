@@ -9,10 +9,14 @@ import kotlinx.coroutines.flow.Flow
 interface TransactionDao {
 
     @Query("SELECT * FROM transactions WHERE id = :id")
-    fun getTransaction(id:Long):LiveData<Transaction>
+    fun getTransaction(id: Long): LiveData<Transaction>
 
-    @Query("SELECT * FROM transactions WHERE time >= :start AND time <= :end")
-    fun getTransactionsBetweenRange(start: Long, end: Long): LiveData<List<Transaction>>
+    @Query("SELECT * FROM transactions WHERE (time >= :start AND time <= :end) AND (walletId = :walletId)")
+    fun getTransactionsBetweenRange(
+        start: Long,
+        end: Long,
+        walletId: Long
+    ): LiveData<List<Transaction>>
 
     @Update
     suspend fun updateTransaction(transaction: Transaction)

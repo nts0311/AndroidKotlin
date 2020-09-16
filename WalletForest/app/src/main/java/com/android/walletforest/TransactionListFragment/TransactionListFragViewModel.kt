@@ -15,6 +15,7 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
 
     private var startTime: Long = 0L
     private var endTime: Long = 0L
+    private var walletId: Long =-1
     var timeRange = TimeRange.MONTH
     var currentViewMode = ViewType.TRANSACTION
     private var dataGrouper = DataGrouper()
@@ -54,7 +55,7 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
         groupDataJob?.cancel()
     }
 
-    fun setTimeRange(start: Long, end: Long, range: String) {
+    fun setTimeRange(start: Long, end: Long, range: String, walletId:Long) {
 
         if(startTime == start && endTime == end)
             return
@@ -63,6 +64,6 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
         endTime = end
         timeRange = TimeRange.valueOf(range)
 
-        transactionList = repo.getTransactionsBetweenRange(start, end)
+        transactionList = repo.getTransactionsBetweenRange(start, end, walletId)
     }
 }
