@@ -1,15 +1,13 @@
 package com.android.walletforest.TransactionsFragment
 
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.android.walletforest.TransactionListFragment.TransactionListFragment
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.main_activity.TabInfo
 
-class TabFragmentStateAdapter(fragmentManager: FragmentManager, lifecycle: Lifecycle) :
-    FragmentStateAdapter(fragmentManager, lifecycle) {
+class TabFragmentStateAdapter(fragment : Fragment) :
+    FragmentStateAdapter(fragment) {
 
     var tabInfoList: List<TabInfo> = listOf()
         set(value) {
@@ -23,7 +21,6 @@ class TabFragmentStateAdapter(fragmentManager: FragmentManager, lifecycle: Lifec
         }
 
     override fun getItemCount(): Int = tabInfoList.size
-
 
     override fun createFragment(position: Int): Fragment {
         val tabInfo = tabInfoList[position]

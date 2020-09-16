@@ -20,7 +20,7 @@ class TransactionDetailViewModel(private val repository: Repository) : ViewModel
         transaction = repository.getTransaction(id)
     }
 
-    fun updateTransaction(transaction: Transaction, oldAmount:Long) {
+    fun updateTransaction(transaction: Transaction, oldAmount: Long) {
         if (transaction == this.transaction.value)
             return
 
@@ -29,10 +29,18 @@ class TransactionDetailViewModel(private val repository: Repository) : ViewModel
             repository.updateTransaction(transaction)
 
             if (currentWallet != null) {
-                if (transaction.type == Constants.TYPE_EXPENSE)
-                    currentWallet.amount += (oldAmount - transaction.amount)
-                else
-                    currentWallet.amount -= (oldAmount - transaction.amount)
+
+                if (transaction.type == this@TransactionDetailViewModel.transaction.value?.type) {
+                    if (transaction.type == Constants.TYPE_EXPENSE)
+                        currentWallet.amount += (oldAmount - transaction.amount)
+                    else
+                        currentWallet.amount -= (oldAmount - transaction.amount)
+                } else {
+                    if (transaction.type == Constants.TYPE_EXPENSE)
+                        currentWallet.amount -= (oldAmount + transaction.amount)
+                    else
+                        currentWallet.amount += (oldAmount + transaction.amount)
+                }
 
                 repository.updateWallet(currentWallet)
             }

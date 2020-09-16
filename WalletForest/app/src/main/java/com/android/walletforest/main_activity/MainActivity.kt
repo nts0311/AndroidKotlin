@@ -57,10 +57,10 @@ class MainActivity : AppCompatActivity() {
         val vmFactory = RepoViewModelFactory(Repository.getInstance(this.applicationContext))
         viewModel = ViewModelProvider(this, vmFactory).get(MainActivityViewModel::class.java)
 
+        setSupportActionBar(binding.toolbar)
         setUpBottomNav()
         registerObservers()
         createDialogs()
-        setSupportActionBar(binding.toolbar)
         registerClickListener()
     }
 
@@ -240,11 +240,11 @@ class MainActivity : AppCompatActivity() {
             val endEdt = dialogView.findViewById<EditText>(R.id.end_time_edt)
 
             setView(dialogView)
-            setPositiveButton(R.string.select_time) { dialog, id ->
+            setPositiveButton(R.string.select_time) { _, _ ->
                 viewModel.onSelectCustomTimeRange(startEdt.tag as Long, endEdt.tag as Long)
             }
 
-            setNegativeButton(R.string.cancel) { dialog, id ->
+            setNegativeButton(R.string.cancel) { dialog, _ ->
                 dialog.cancel()
             }
 

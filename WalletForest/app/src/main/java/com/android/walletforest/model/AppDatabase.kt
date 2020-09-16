@@ -104,14 +104,14 @@ abstract class AppDatabase() : RoomDatabase() {
 
                             database.transactionDao.insertTransaction(
                                 Transaction
-                                    (8, 4, 1, Constants.TYPE_EXPENSE, 8, "aaa", 1599955200000)
+                                    (8, 4, 1, Constants.TYPE_INCOME, 8, "aaa", 1599955200000)
                             )
 
 
                             //24-9
                             database.transactionDao.insertTransaction(
                                 Transaction
-                                    (9, 4, 1, Constants.TYPE_EXPENSE, 9, "aaa", 1600905600000)
+                                    (9, 4, 1, Constants.TYPE_INCOME, 9, "aaa", 1600905600000)
                             )
 
                             //2-9

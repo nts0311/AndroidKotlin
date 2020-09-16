@@ -1,47 +1,30 @@
 package com.android.walletforest.TransactionsFragment
 
-import android.app.DatePickerDialog
-import android.content.Intent
 import android.os.Bundle
-import android.os.Parcelable
-import android.util.Log
 import android.view.*
-import android.widget.DatePicker
-import android.widget.EditText
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.RecyclerView
 import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
 import com.android.walletforest.databinding.FragmentTransactionsBinding
 import com.android.walletforest.enums.TimeRange
-import com.android.walletforest.enums.ViewType
 import com.android.walletforest.main_activity.MainActivity
 import com.android.walletforest.model.Repository
-import com.android.walletforest.select_category_activity.SelectCategoryActivity
-import com.android.walletforest.toEpoch
-import com.android.walletforest.toLocalDate
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.android.synthetic.main.fragment_transactions.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 
 class TransactionsFragment : Fragment() {
-
     private lateinit var binding: FragmentTransactionsBinding
     lateinit var viewModel: TransactionsFragViewModel
     lateinit var viewPagerAdapter: TabFragmentStateAdapter
-
+    private lateinit var tabLayout: TabLayout
+    private var pagerPos = -1
 
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -91,29 +74,36 @@ class TransactionsFragment : Fragment() {
         {
             if (it != null) {
                 viewPagerAdapter.tabInfoList = it
+
                 //set the viewpager to the current month, week,...
-                binding.mainViewPager.setCurrentItem(it.size - 2, true)
+                pagerPos = it.size - 2
+                if (viewModel.tabLayoutPos != -1)
+                    pagerPos = viewModel.tabLayoutPos
+
+                if (it.size > 2)
+                    binding.mainViewPager.currentItem = pagerPos
+                else
+                    binding.mainViewPager.currentItem = 0
             }
         }
 
-        viewModel.timeRange.observe(viewLifecycleOwner){
+        viewModel.timeRange.observe(viewLifecycleOwner) {
             viewPagerAdapter.timeRange = it
         }
     }
 
     private fun setUpViewPager() {
-
-        //dont use activity's fragManager here, it will result in crash
-
-        val tabLayout = (requireActivity() as MainActivity).getTabLayout()
-
-
+        tabLayout = (requireActivity() as MainActivity).getTabLayout()
         viewPagerAdapter =
-            TabFragmentStateAdapter(childFragmentManager, lifecycle)
+            TabFragmentStateAdapter(this)
 
         binding.apply {
             mainViewPager.adapter = viewPagerAdapter
             mainViewPager.offscreenPageLimit = 2
+
+            TabLayoutMediator(tabLayout, binding.mainViewPager, true) { tab, position ->
+                tab.text = viewPagerAdapter.tabInfoList[position].tabTitle
+            }.attach()
 
             //fix the weird error of viewpager2, where switch to another time range and back to month
             //caused it to shrink, no idea why lol
@@ -121,13 +111,7 @@ class TransactionsFragment : Fragment() {
                 this.height = ViewGroup.LayoutParams.MATCH_PARENT
             }
 
-            tabLayout.tabMode = TabLayout.MODE_SCROLLABLE
+            tabLayout.tabMode = TabLayout.MODE_AUTO
         }
-
-        TabLayoutMediator(tabLayout, binding.mainViewPager) { tab, position ->
-            tab.text = viewPagerAdapter.tabInfoList[position].tabTitle
-        }.attach()
     }
-
-
 }

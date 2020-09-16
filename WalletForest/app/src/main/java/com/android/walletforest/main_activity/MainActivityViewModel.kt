@@ -63,6 +63,7 @@ class MainActivityViewModel(private val repository: Repository) : ViewModel() {
         startTime = start
         endTime = end
         timeRange = TimeRange.CUSTOM
+        repository.setTimeRange(TimeRange.CUSTOM)
         getTabInfoList()
     }
 
