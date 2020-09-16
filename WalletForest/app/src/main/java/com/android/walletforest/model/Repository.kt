@@ -17,10 +17,7 @@ class Repository private constructor(appContext: Context) {
     var viewMode = MutableLiveData(ViewType.TRANSACTION)
 
     //caching list of transactions of each wallet, avoiding database query
-    //the map contains pairs of walletId and a sub-map for caching transactions list of that wallet
-    //The sub-map contains lists of transactions, which is access by the range of that list
-    private var fetchedRange: MutableMap<Long, MutableMap<String, LiveData<List<Transaction>>>> =
-        mutableMapOf()
+    private var fetchedRange: MutableMap<String, LiveData<List<Transaction>>> = mutableMapOf()
 
     private var _categoriesMap: MutableMap<Long, Category> = mutableMapOf()
     var categoryMap: Map<Long, Category> = _categoriesMap
@@ -92,29 +89,14 @@ class Repository private constructor(appContext: Context) {
         end: Long,
         walletId: Long
     ): LiveData<List<Transaction>> {
-        val rangeKey = "$start-$end"
-
-        //check if the list of transactions with the above time range is cached
-        if (fetchedRange.containsKey(walletId)) {
-            val cachedDataOfWallet = fetchedRange[walletId]
-            return if (cachedDataOfWallet?.containsKey(rangeKey)!!)
-                cachedDataOfWallet[rangeKey]!!
-            else {
-                //if not cached yet, fetch from the db and cache it
-                val transactions =
-                    appDatabase.transactionDao.getTransactionsBetweenRange(start, end, walletId)
-                cachedDataOfWallet[rangeKey] = transactions
-                transactions
-            }
-        }
-        //if the map doesn't contain cached lists of the wallet, create the sub-map for
-        //that wallet and cache data
+        val key = "$walletId-$start-$end"
+        return if (fetchedRange.containsKey(key))
+            fetchedRange[key]!!
         else {
-            fetchedRange[walletId] = mutableMapOf()
             val transactions =
                 appDatabase.transactionDao.getTransactionsBetweenRange(start, end, walletId)
-            fetchedRange[walletId]!![rangeKey] = transactions
-            return transactions
+            fetchedRange[key] = transactions
+            transactions
         }
     }
 
