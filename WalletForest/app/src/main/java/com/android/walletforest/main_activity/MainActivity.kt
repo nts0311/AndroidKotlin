@@ -129,8 +129,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun registerClickListener()
-    {
+    private fun registerClickListener() {
         //add transaction
         binding.addTransactionFab.setOnClickListener {
             val addTransaction = Intent(this@MainActivity, TransactionDetailActivity::class.java)
@@ -160,15 +159,11 @@ class MainActivity : AppCompatActivity() {
             if (it != null) {
                 viewModel.updateWallets(it)
 
-                if(!viewModel.initFirstWallet)
-                {
-                    if(it.isNotEmpty())
-                    {
+                if (!viewModel.initFirstWallet) {
+                    if (it.isNotEmpty()) {
                         viewModel.selectWallet(it[0].id)
                         viewModel.initFirstWallet = true
-                    }
-                    else
-                    {
+                    } else {
                         //ask user to the create wallet
                     }
                 }
@@ -180,7 +175,9 @@ class MainActivity : AppCompatActivity() {
             if (it != null) {
                 binding.walletName.text = it.name
                 binding.walletBalance.text = it.amount.toString()
-                viewModel.onCurrentWalletChange()
+
+                if (it.id != viewModel.previousWalletId)
+                    viewModel.onNewWalletSelected(it)
             }
         }
     }

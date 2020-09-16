@@ -25,6 +25,7 @@ class TransactionsFragment : Fragment() {
     lateinit var viewPagerAdapter: TabFragmentStateAdapter
     private lateinit var tabLayout: TabLayout
     private var pagerPos = -1
+    private lateinit var repo:Repository
 
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -41,7 +42,7 @@ class TransactionsFragment : Fragment() {
 
         binding = FragmentTransactionsBinding.inflate(inflater)
 
-        val repo = Repository.getInstance(requireContext().applicationContext)
+        repo = Repository.getInstance(requireContext().applicationContext)
         val vmFactory = RepoViewModelFactory(repo)
 
         viewModel = ViewModelProvider(
@@ -82,6 +83,7 @@ class TransactionsFragment : Fragment() {
 
                 if (it.size > 2)
                     binding.mainViewPager.currentItem = pagerPos
+                //tabLayout.selectTab(tabLayout.getTabAt(pagerPos))
                 else
                     binding.mainViewPager.currentItem = 0
             }

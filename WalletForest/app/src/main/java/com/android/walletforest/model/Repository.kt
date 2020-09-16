@@ -39,6 +39,7 @@ class Repository private constructor(appContext: Context) {
         appDatabase.walletDao.getWalletById(it)
     }
 
+
     fun setTabInfoList(list : List<TabInfo>)
     {
         _tabInfoList.value = list
