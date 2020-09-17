@@ -25,12 +25,11 @@ class MainActivityViewModel(private val repository: Repository) : ViewModel() {
 
     var currentWallet: LiveData<Wallet> = repository.currentWallet
 
-
-    var previousWalletId = -1L
-
     private val tabInfoUtils = TabInfoUtils()
     private var timeRange = TimeRange.MONTH
 
+    //determine if the tabs has been initialized and displayed
+    var initTabs = false
     var initFirstWallet = false
 
     init {
@@ -84,7 +83,7 @@ class MainActivityViewModel(private val repository: Repository) : ViewModel() {
     }
 
 
-    private fun getTabInfoList() {
+    fun getTabInfoList() {
         if (currentWallet.value == null)
             return
 
@@ -96,11 +95,6 @@ class MainActivityViewModel(private val repository: Repository) : ViewModel() {
             }
             repository.setTabInfoList(result.await())
         }
-    }
-
-    fun onNewWalletSelected(newWallet: Wallet) {
-        getTabInfoList()
-        previousWalletId = newWallet.id
     }
 
     fun switchViewMode(): ViewType {

@@ -105,6 +105,13 @@ class TransactionListFragment : Fragment() {
                 itemAdapter?.submitList(it.toList())
             }
         }
+
+        viewModel.currentWallet.observe(viewLifecycleOwner){
+            if(it!=null)
+            {
+                viewModel.setTimeRange(startTime!!, endTime!!, timeRange!!, it.id)
+            }
+        }
     }
 
     companion object {

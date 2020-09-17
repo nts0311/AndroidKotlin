@@ -154,6 +154,20 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        viewModel.currentWallet.observe(this)
+        {
+            if (it != null) {
+                binding.walletName.text = it.name
+                binding.walletBalance.text = it.amount.toString()
+
+                if (!viewModel.initTabs) {
+                    viewModel.initTabs = true
+                    viewModel.getTabInfoList()
+                }
+
+            }
+        }
+
         viewModel.walletList.observe(this)
         {
             if (it != null) {
@@ -163,6 +177,7 @@ class MainActivity : AppCompatActivity() {
                     if (it.isNotEmpty()) {
                         viewModel.selectWallet(it[0].id)
                         viewModel.initFirstWallet = true
+
                     } else {
                         //ask user to the create wallet
                     }
@@ -170,16 +185,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.currentWallet.observe(this)
-        {
-            if (it != null) {
-                binding.walletName.text = it.name
-                binding.walletBalance.text = it.amount.toString()
 
-                if (it.id != viewModel.previousWalletId)
-                    viewModel.onNewWalletSelected(it)
-            }
-        }
     }
 
     private fun showRangeSelectDialog() {
