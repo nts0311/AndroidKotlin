@@ -9,11 +9,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".select_wallet_activity.SelectWalletActivity"></activity>
         <activity
             android:name=".select_category_activity.SelectCategoryActivity"
-            android:launchMode="singleTask">
-
-        </activity>
+            android:launchMode="singleTask"></activity>
         <activity
             android:name=".transaction_detail_activity.TransactionDetailActivity"
             android:launchMode="singleTask" />

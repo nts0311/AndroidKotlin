@@ -49,7 +49,7 @@ abstract class AppDatabase() : RoomDatabase() {
 
                         scope.launch {
                             database.walletDao.insertWallet(
-                                Wallet(1,"Cash", R.drawable.ic_bk_cashbook, 100000))
+                                Wallet(1,"Cash", R.drawable.icon, 100000))
 
                             database.categoryDao.insertCategory(
                                 Category(1,1,"Family", Constants.TYPE_EXPENSE,R.drawable.ic_category_family))

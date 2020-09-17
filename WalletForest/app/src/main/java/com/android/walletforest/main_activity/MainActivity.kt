@@ -19,12 +19,17 @@ import com.android.walletforest.databinding.ActivityMainBinding
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Repository
+import com.android.walletforest.select_wallet_activity.RESULT_WALLET_ID
+import com.android.walletforest.select_wallet_activity.SelectWalletActivity
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.activity_main.*
 import java.time.LocalDate
 
 
 class MainActivity : AppCompatActivity() {
+
+    private val LAUNCH_WALLET_SELECT_ACTIVITY = 1
+
     private val fragmentTransactions = TransactionsFragment()
     private val fragmentReport = ReportFragment()
     private val fragmentPlanning = PlanningFragment()
@@ -100,6 +105,20 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == LAUNCH_WALLET_SELECT_ACTIVITY) {
+            if (resultCode == RESULT_OK) {
+                val newWalletId = data?.getLongExtra(RESULT_WALLET_ID, 1)
+                if (newWalletId != null) {
+                    if (newWalletId != viewModel.currentWallet.value?.id)
+                        viewModel.selectWallet(newWalletId)
+                }
+            }
+        }
+    }
+
     private fun setUpBottomNav() {
         bottomNavigationView.setOnNavigationItemSelectedListener {
             when (it.itemId) {
@@ -142,7 +161,8 @@ class MainActivity : AppCompatActivity() {
 
         //select wallet
         binding.walletImg.setOnClickListener {
-
+            val selectWalletActivity = Intent(this@MainActivity, SelectWalletActivity::class.java)
+            startActivityForResult(selectWalletActivity, LAUNCH_WALLET_SELECT_ACTIVITY)
         }
     }
 

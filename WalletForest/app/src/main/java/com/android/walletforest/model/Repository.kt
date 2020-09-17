@@ -36,6 +36,8 @@ class Repository private constructor(appContext: Context) {
         appDatabase.walletDao.getWalletById(it)
     }
 
+    var walletList = appDatabase.walletDao.getWallets()
+
 
     fun setTabInfoList(list: List<TabInfo>) {
         _tabInfoList.value = list
@@ -56,10 +58,6 @@ class Repository private constructor(appContext: Context) {
     suspend fun updateWallet(wallet: Wallet) {
         appDatabase.walletDao.updateWallet(wallet)
     }
-
-    //fun getFirstWallet() = appDatabase.walletDao.getWallet()
-
-    fun getWallets() = appDatabase.walletDao.getWallets()
 
     fun updateWalletsMap(wallets: List<Wallet>) {
         for (wallet in wallets) {

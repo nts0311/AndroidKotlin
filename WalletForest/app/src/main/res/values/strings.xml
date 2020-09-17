@@ -40,4 +40,6 @@
     <string name="enter_amount_reminder">Please enter amount</string>
     <string name="enter_cate_reminder">Please pick a category</string>
 
+    <string name="select_wallet">Select wallet</string>
+
 </resources>

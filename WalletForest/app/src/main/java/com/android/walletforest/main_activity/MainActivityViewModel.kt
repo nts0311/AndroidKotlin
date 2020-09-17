@@ -16,7 +16,7 @@ import java.time.LocalDate
 
 class MainActivityViewModel(private val repository: Repository) : ViewModel() {
     var categoryList = repository.getCategoriesLiveData()
-    var walletList = repository.getWallets()
+    var walletList = repository.walletList
 
     var startTime: Long = 0L
         private set
