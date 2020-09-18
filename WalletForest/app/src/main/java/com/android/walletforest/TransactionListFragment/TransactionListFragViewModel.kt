@@ -22,11 +22,13 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
 
     private var groupDataJob: Job? = null
 
-    var transactionList: LiveData<List<Transaction>> = MutableLiveData()
+    private val hasTransactionListChanged = MutableLiveData(false)
+    var transactionList : LiveData<List<Transaction>> = MutableLiveData()
 
     private var _dataItemList: MutableLiveData<List<DataItem>> = MutableLiveData()
     var dataItemList: LiveData<List<DataItem>> = _dataItemList
 
+    var previousWalletId = -1L
 
     fun switchViewMode(viewType: ViewType) {
         if (currentViewMode == viewType) return
@@ -60,7 +62,7 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
         if (startTime == start
             && endTime == end
             && range == timeRange.value
-            && walletId == currentWallet.value?.id)
+            && walletId == previousWalletId)
             return
 
         startTime = start
@@ -68,5 +70,7 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
         timeRange = TimeRange.valueOf(range)
 
         transactionList = repo.getTransactionsBetweenRange(start, end, walletId)
+
+        previousWalletId = walletId
     }
 }

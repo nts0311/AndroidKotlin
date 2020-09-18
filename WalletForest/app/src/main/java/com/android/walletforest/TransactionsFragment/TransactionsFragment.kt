@@ -27,12 +27,6 @@ class TransactionsFragment : Fragment() {
     private var pagerPos = -1
     private lateinit var repo:Repository
 
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putParcelable("adapter", viewPagerAdapter.saveState())
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -78,14 +72,7 @@ class TransactionsFragment : Fragment() {
 
                 //set the viewpager to the current month, week,...
                 pagerPos = it.size - 2
-                if (viewModel.tabLayoutPos != -1)
-                    pagerPos = viewModel.tabLayoutPos
-
-                if (it.size > 2)
-                    binding.mainViewPager.currentItem = pagerPos
-                //tabLayout.selectTab(tabLayout.getTabAt(pagerPos))
-                else
-                    binding.mainViewPager.currentItem = 0
+                binding.mainViewPager.currentItem = pagerPos
             }
         }
 

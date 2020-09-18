@@ -30,6 +30,7 @@ class TransactionListFragment : Fragment() {
     private lateinit var repo: Repository
     var key = ""
 
+
     private lateinit var viewModel: TransactionListFragViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,11 +94,6 @@ class TransactionListFragment : Fragment() {
             }
         }
 
-        viewModel.transactionList.observe(viewLifecycleOwner) {
-            if (it != null)
-                viewModel.onTransactionListChange(it)
-        }
-
         //display transaction here
         viewModel.dataItemList.observe(viewLifecycleOwner) {
             if (it != null) {
@@ -106,10 +102,17 @@ class TransactionListFragment : Fragment() {
             }
         }
 
-        viewModel.currentWallet.observe(viewLifecycleOwner){
-            if(it!=null)
-            {
+        viewModel.currentWallet.observe(viewLifecycleOwner) { it ->
+            if (it != null) {
+                viewModel.transactionList.removeObservers(viewLifecycleOwner)
+
                 viewModel.setTimeRange(startTime!!, endTime!!, timeRange!!, it.id)
+
+                viewModel.transactionList.observe(viewLifecycleOwner) {
+                    if (it != null)
+                        viewModel.onTransactionListChange(it)
+                }
+
             }
         }
     }
