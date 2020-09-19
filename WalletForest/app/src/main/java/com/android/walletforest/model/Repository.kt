@@ -55,9 +55,15 @@ class Repository private constructor(appContext: Context) {
         _timeRange.value = timeRange
     }
 
+    suspend fun insertWallet(wallet: Wallet) {
+        appDatabase.walletDao.insertWallet(wallet)
+    }
+
     suspend fun updateWallet(wallet: Wallet) {
         appDatabase.walletDao.updateWallet(wallet)
     }
+
+    fun getWalletById(id: Long) = appDatabase.walletDao.getWalletById(id)
 
     fun updateWalletsMap(wallets: List<Wallet>) {
         for (wallet in wallets) {

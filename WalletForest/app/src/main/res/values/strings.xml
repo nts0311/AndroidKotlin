@@ -42,4 +42,14 @@
 
     <string name="select_wallet">Select wallet</string>
 
+    <string name="add_wallet">Add wallet</string>
+
+    <string name="name_hint">Name</string>
+    <string name="currency_hint">Currency</string>
+    <string name="enter_balance_hint">Enter current balance of this wallet</string>
+    <string name="save">Save</string>
+    <string name="enter_name_reminder">Please enter wallet\'s name</string>
+    <string name="enter_currency_reminder">Please enter wallet\'s currency</string>
+    <string name="error_invalid_amount">Please enter a valid amount.</string>
+
 </resources>

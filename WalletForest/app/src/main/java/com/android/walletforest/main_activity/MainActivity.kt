@@ -75,7 +75,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        //return super.onOptionsItemSelected(item)
         when (item.itemId) {
             R.id.range_month_item -> {
                 viewModel.onTimeRangeChanged(TimeRange.MONTH)

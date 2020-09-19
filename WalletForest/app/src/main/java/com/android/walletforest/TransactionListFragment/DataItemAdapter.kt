@@ -47,7 +47,7 @@ class DataItemAdapter(
     var timeRange = timeRange
         set(value) {
             field = value
-            notifyDataSetChanged()
+            //notifyDataSetChanged()
         }
 
     var itemClickListener: (transaction: Transaction) -> Unit = {}

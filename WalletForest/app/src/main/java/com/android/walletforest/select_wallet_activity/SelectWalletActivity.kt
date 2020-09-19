@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
 import com.android.walletforest.model.Repository
+import com.android.walletforest.wallet_detail_activity.WalletDetailActivity
 import kotlinx.android.synthetic.main.activity_select_wallet.*
 
 const val RESULT_WALLET_ID = "result_wallet_id"
@@ -28,6 +29,12 @@ class SelectWalletActivity : AppCompatActivity() {
 
         setupRecycleView()
         registerListener()
+
+        add_wallet_fab.setOnClickListener {
+            val addWalletActivity = Intent(this@SelectWalletActivity, WalletDetailActivity::class.java)
+            startActivity(addWalletActivity)
+        }
+
     }
 
     private fun registerListener()
