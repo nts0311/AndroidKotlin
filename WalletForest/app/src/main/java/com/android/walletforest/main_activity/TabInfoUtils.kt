@@ -105,7 +105,9 @@ class TabInfoUtils() {
                     TabInfo(
                         walletId,
                         toEpoch(dStart),
-                        toEpoch(nextMonth),
+                        //-1 to fix the error when adding the transaction on
+                        // the first day of month it show on 2 different tabs
+                        toEpoch(nextMonth) - 1,
                         getMonthTitle(dStart)
                     )
                 )

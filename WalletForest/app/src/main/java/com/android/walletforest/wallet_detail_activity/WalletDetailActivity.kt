@@ -4,7 +4,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
 import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
@@ -31,11 +34,17 @@ class WalletDetailActivity : AppCompatActivity() {
 
         getArgs()
 
-        if (walletId != -1L)
+        if (walletId != -1L) {
+            deleteWalletBtn.visibility = View.VISIBLE
             viewModel.setCurrentWallet(walletId)
+        }
+
+        deleteWalletBtn.setOnClickListener {
+            deleteCurrentWallet()
+        }
+
 
         registerObservers()
-
         setupToolbar()
     }
 
@@ -68,9 +77,14 @@ class WalletDetailActivity : AppCompatActivity() {
     }
 
     private fun registerObservers() {
-        viewModel.wallet.observe(this){
+        viewModel.wallet.observe(this) {
+
+            if(it == null) return@observe
+
             wallet_name_edt.setText(it.name)
             wallet_balance_edt.setText(it.amount.toString())
+            wallet_currency_edt.setText(it.currency)
+            wallet_icon_img.setImageResource(it.imageId)
         }
     }
 
@@ -96,18 +110,41 @@ class WalletDetailActivity : AppCompatActivity() {
             return
         }
 
+        val newWallet = Wallet(
+            0,
+            wallet_name_edt.text.toString(),
+            R.drawable.icon,
+            wallet_balance_edt.text.toString().toLong(),
+            wallet_currency_edt.text.toString()
+        )
 
         if (walletId == -1L) {
-            val newWallet = Wallet(
-                0,
-                wallet_name_edt.text.toString(),
-                R.drawable.icon,
-                wallet_balance_edt.text.toString().toLong()
-            )
-
             viewModel.addWallet(newWallet)
         } else {
-
+            newWallet.id = walletId
+            viewModel.updateWallet(newWallet)
         }
+
+        finish()
+    }
+
+    private fun deleteCurrentWallet() {
+        if (walletId == -1L) return
+
+        AlertDialog.Builder(this).run {
+
+            setMessage(R.string.delete_wallet_message)
+            setTitle(getString(R.string.delete_wallet_dialog_title, viewModel.wallet.value!!.name))
+
+            setPositiveButton(R.string.ok) { _, _ ->
+                viewModel.deleteCurrentWallet()
+                finish()
+            }
+
+            setNegativeButton(R.string.cancel) { dialog, _ ->
+                dialog.cancel()
+            }
+            create()
+        }.show()
     }
 }

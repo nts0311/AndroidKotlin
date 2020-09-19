@@ -25,7 +25,7 @@ class TransactionDetailViewModel(private val repository: Repository) : ViewModel
             return
 
         GlobalScope.launch {
-            val currentWallet = wallets[transaction.walletId]
+            val currentWallet = wallets[transaction.walletId]?.copy()
             repository.updateTransaction(transaction)
 
             if (currentWallet != null) {
@@ -49,7 +49,7 @@ class TransactionDetailViewModel(private val repository: Repository) : ViewModel
 
     fun insertTransaction(transaction: Transaction) {
         GlobalScope.launch {
-            val currentWallet = wallets[transaction.walletId]
+            val currentWallet = wallets[transaction.walletId]?.copy()
             repository.insertTransaction(transaction)
 
             if (currentWallet != null) {
@@ -65,7 +65,7 @@ class TransactionDetailViewModel(private val repository: Repository) : ViewModel
 
     fun deleteTransaction(transaction: Transaction) {
         GlobalScope.launch {
-            val currentWallet = wallets[transaction.walletId]
+            val currentWallet = wallets[transaction.walletId]?.copy()
             repository.deleteTransaction(transaction)
 
             if (currentWallet != null) {

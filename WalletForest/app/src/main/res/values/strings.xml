@@ -28,6 +28,7 @@
     <string name="to">To</string>
     <string name="select_time">Select Time</string>
     <string name="cancel">Cancel</string>
+    <string name="ok">Ok</string>
 
     <string name="select_category">Select category</string>
     <string name="expense">Expense</string>
@@ -51,5 +52,8 @@
     <string name="enter_name_reminder">Please enter wallet\'s name</string>
     <string name="enter_currency_reminder">Please enter wallet\'s currency</string>
     <string name="error_invalid_amount">Please enter a valid amount.</string>
+    <string name="delete_wallet">DELETE THIS WALLET</string>
+    <string name="delete_wallet_dialog_title">Do you want to delete wallet %s?</string>
+    <string name="delete_wallet_message">You will also delete all of its transactions, budgets and this action cannot be undone.</string>
 
 </resources>

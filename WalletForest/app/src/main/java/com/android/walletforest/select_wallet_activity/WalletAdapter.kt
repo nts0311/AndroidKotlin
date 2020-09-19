@@ -20,12 +20,13 @@ class WalletAdapter : RecyclerView.Adapter<WalletViewHolder>() {
         }
 
     var itemClickListener : (Wallet) -> Unit = {}
+    var itemLongClickListener : (Wallet) -> Unit = {}
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WalletViewHolder =
         WalletViewHolder.from(parent)
 
     override fun onBindViewHolder(holder: WalletViewHolder, position: Int) {
-        holder.bind(walletList[position], itemClickListener)
+        holder.bind(walletList[position], itemClickListener, itemLongClickListener)
     }
 
     override fun getItemCount(): Int = walletList.size
@@ -36,10 +37,16 @@ class WalletViewHolder(private val root: View) : RecyclerView.ViewHolder(root) {
     private val walletName = root.findViewById<TextView>(R.id.wallet_name_txt)
     private val walletBalance = root.findViewById<TextView>(R.id.wallet_balance_txt)
 
-    fun bind(wallet: Wallet, itemClickListener : (Wallet) -> Unit) {
+    fun bind(wallet: Wallet, itemClickListener : (Wallet) -> Unit, itemLongClickListener : (Wallet) -> Unit) {
         root.setOnClickListener {
             itemClickListener.invoke(wallet)
         }
+
+        root.setOnLongClickListener {
+            itemLongClickListener.invoke(wallet)
+            true
+        }
+
         walletIcon.setImageResource(wallet.imageId)
         walletName.text = wallet.name
         walletBalance.text = wallet.amount.toString()

@@ -57,18 +57,48 @@ class Repository private constructor(appContext: Context) {
 
     suspend fun insertWallet(wallet: Wallet) {
         appDatabase.walletDao.insertWallet(wallet)
+
+        //update the master wallet
+        val masterWallet = walletMap[1L]
+        if (masterWallet != null) {
+            masterWallet.amount += wallet.amount
+            updateWallet(masterWallet)
+        }
     }
 
     suspend fun updateWallet(wallet: Wallet) {
+        //update the master wallet
+        val masterWallet = walletMap[1L]
+        if (masterWallet != null) {
+            val oldAmount = walletMap[wallet.id]?.amount
+            masterWallet.amount += (wallet.amount - oldAmount!!)
+            appDatabase.walletDao.updateWallet(masterWallet)
+        }
+
         appDatabase.walletDao.updateWallet(wallet)
+    }
+
+    suspend fun deleteWallet(wallet: Wallet)
+    {
+        val balance = walletMap[wallet.id]?.amount
+        appDatabase.walletDao.deleteWallet(wallet)
+
+        //update the master wallet
+        val masterWallet = walletMap[1L]
+        if (masterWallet != null) {
+
+            masterWallet.amount -= balance!!
+            appDatabase.walletDao.updateWallet(masterWallet)
+        }
+        _currentWalletId.postValue(1L)
     }
 
     fun getWalletById(id: Long) = appDatabase.walletDao.getWalletById(id)
 
     fun updateWalletsMap(wallets: List<Wallet>) {
+        _walletsMap.clear()
         for (wallet in wallets) {
-            if (!_walletsMap.containsKey(wallet.id))
-                _walletsMap[wallet.id] = wallet
+            _walletsMap[wallet.id] = wallet
         }
     }
 
@@ -93,13 +123,28 @@ class Repository private constructor(appContext: Context) {
         end: Long,
         walletId: Long
     ): LiveData<List<Transaction>> {
-        val key = "$walletId-$start-$end"
+
+        val key: String = if (walletId == 1L)
+            "all-$start-$end"
+        else
+            "$walletId-$start-$end"
+
         return if (fetchedRange.containsKey(key))
             fetchedRange[key]!!
         else {
+
             val transactions =
-                appDatabase.transactionDao.getTransactionsBetweenRange(start, end, walletId)
+                if (walletId == 1L)
+                    appDatabase.transactionDao.getTransactionsBetweenRange(start, end)
+                else
+                    appDatabase.transactionDao.getTransactionsBetweenRangeOfWallet(
+                        start,
+                        end,
+                        walletId
+                    )
+
             fetchedRange[key] = transactions
+
             transactions
         }
     }

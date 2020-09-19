@@ -72,4 +72,18 @@
             android:inputType="number" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <Button
+        android:id="@+id/deleteWalletBtn"
+        android:layout_width="175dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="80dp"
+        android:background="@android:color/transparent"
+        android:drawableLeft="@drawable/ic_bk_delete"
+        android:text="@string/delete_wallet"
+        android:textColor="@color/expense_text"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/balance_input_layout" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

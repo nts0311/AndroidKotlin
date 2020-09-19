@@ -12,7 +12,7 @@ interface TransactionDao {
     fun getTransaction(id: Long): LiveData<Transaction>
 
     @Query("SELECT * FROM transactions WHERE (time >= :start AND time <= :end) AND (walletId = :walletId)")
-    fun getTransactionsBetweenRange(
+    fun getTransactionsBetweenRangeOfWallet(
         start: Long,
         end: Long,
         walletId: Long

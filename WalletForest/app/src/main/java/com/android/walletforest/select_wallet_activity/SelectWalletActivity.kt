@@ -57,6 +57,12 @@ class SelectWalletActivity : AppCompatActivity() {
             finish()
         }
 
+        walletAdapter.itemLongClickListener = {
+            val editWallet = Intent(this@SelectWalletActivity, WalletDetailActivity::class.java)
+            editWallet.putExtra(WalletDetailActivity.WALLET_ID_PARAM, it.id)
+            startActivity(editWallet)
+        }
+
         wallet_list_rv.adapter = walletAdapter
         wallet_list_rv.layoutManager = LinearLayoutManager(this)
     }

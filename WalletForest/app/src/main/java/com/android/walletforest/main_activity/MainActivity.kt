@@ -178,6 +178,7 @@ class MainActivity : AppCompatActivity() {
             if (it != null) {
                 binding.walletName.text = it.name
                 binding.walletBalance.text = it.amount.toString()
+                binding.walletImg.setImageResource(it.imageId)
 
                 if (!viewModel.initTabs) {
                     viewModel.initTabs = true
