@@ -1,5 +1,6 @@
 package com.android.walletforest.wallet_detail_activity
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
@@ -13,6 +14,8 @@ import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
 import com.android.walletforest.model.Entities.Wallet
 import com.android.walletforest.model.Repository
+import com.android.walletforest.select_image_activity.RESULT_ICON_ID
+import com.android.walletforest.select_image_activity.SelectImageActivity
 import kotlinx.android.synthetic.main.activity_wallet_detail.*
 import java.lang.NumberFormatException
 
@@ -21,7 +24,10 @@ class WalletDetailActivity : AppCompatActivity() {
         val WALLET_ID_PARAM = "wallet_id"
     }
 
+    private val LAUNCH_ICON_SELECT_ACTIVITY = 1
+
     private var walletId = -1L
+    private var iconId = R.drawable.icon
     private lateinit var viewModel: WalletDetailActivityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,11 +44,12 @@ class WalletDetailActivity : AppCompatActivity() {
             deleteWalletBtn.visibility = View.VISIBLE
             viewModel.setCurrentWallet(walletId)
         }
-
-        deleteWalletBtn.setOnClickListener {
-            deleteCurrentWallet()
+        else
+        {
+            wallet_icon_img.setImageResource(iconId)
         }
 
+        registerClickListener()
 
         registerObservers()
         setupToolbar()
@@ -65,6 +72,17 @@ class WalletDetailActivity : AppCompatActivity() {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == LAUNCH_ICON_SELECT_ACTIVITY) {
+            if (resultCode == RESULT_OK) {
+                iconId = data?.getIntExtra(RESULT_ICON_ID, iconId)!!
+                wallet_icon_img.setImageResource(iconId)
+            }
+        }
+    }
+
     private fun getArgs() {
         walletId = intent.getLongExtra(WALLET_ID_PARAM, -1)
     }
@@ -79,12 +97,23 @@ class WalletDetailActivity : AppCompatActivity() {
     private fun registerObservers() {
         viewModel.wallet.observe(this) {
 
-            if(it == null) return@observe
+            if (it == null) return@observe
 
             wallet_name_edt.setText(it.name)
             wallet_balance_edt.setText(it.amount.toString())
             wallet_currency_edt.setText(it.currency)
             wallet_icon_img.setImageResource(it.imageId)
+        }
+    }
+
+    private fun registerClickListener() {
+        deleteWalletBtn.setOnClickListener {
+            deleteCurrentWallet()
+        }
+
+        wallet_icon_img.setOnClickListener {
+            val selectIcon = Intent(this@WalletDetailActivity, SelectImageActivity::class.java)
+            startActivityForResult(selectIcon, LAUNCH_ICON_SELECT_ACTIVITY)
         }
     }
 
@@ -113,7 +142,7 @@ class WalletDetailActivity : AppCompatActivity() {
         val newWallet = Wallet(
             0,
             wallet_name_edt.text.toString(),
-            R.drawable.icon,
+            iconId,
             wallet_balance_edt.text.toString().toLong(),
             wallet_currency_edt.text.toString()
         )

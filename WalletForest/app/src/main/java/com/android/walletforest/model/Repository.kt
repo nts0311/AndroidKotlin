@@ -10,6 +10,7 @@ import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Entities.Category
 import com.android.walletforest.model.Entities.Transaction
 import com.android.walletforest.model.Entities.Wallet
+import kotlinx.coroutines.delay
 
 class Repository private constructor(appContext: Context) {
     private val appDatabase = AppDatabase.getInstance(appContext)

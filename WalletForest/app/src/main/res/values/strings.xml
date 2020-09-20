@@ -56,4 +56,9 @@
     <string name="delete_wallet_dialog_title">Do you want to delete wallet %s?</string>
     <string name="delete_wallet_message">You will also delete all of its transactions, budgets and this action cannot be undone.</string>
 
+    <string name="wallet_selection">Touch a wallet to select. Hold a wallet to edit it.</string>
+    <string name="edit">Edit</string>
+    <string name="done">Done</string>
+    <string name="select_icon">Select icon</string>
+
 </resources>
