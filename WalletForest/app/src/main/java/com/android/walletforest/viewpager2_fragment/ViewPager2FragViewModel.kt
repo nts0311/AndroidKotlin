@@ -1,4 +1,4 @@
-package com.android.walletforest.TransactionsFragment
+package com.android.walletforest.viewpager2_fragment
 
 import android.util.Log
 import androidx.lifecycle.*
@@ -18,10 +18,7 @@ import com.android.walletforest.toLocalDate
 import kotlinx.coroutines.async
 import java.time.LocalDate
 
-class TransactionsFragViewModel(private val repository: Repository) : ViewModel() {
-
-    var tabLayoutPos = -1
-
+class ViewPager2FragViewModel(repository: Repository) : ViewModel() {
     var tabInfoList = repository.tabInfoList
     var timeRange = repository.timeRange
 }

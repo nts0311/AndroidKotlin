@@ -2,23 +2,15 @@ package com.android.walletforest.TransactionsFragment
 
 import android.os.Bundle
 import android.view.*
-import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
-import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
-import com.android.walletforest.databinding.FragmentTransactionsBinding
-import com.android.walletforest.enums.TimeRange
-import com.android.walletforest.main_activity.MainActivity
 import com.android.walletforest.model.Repository
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.android.walletforest.viewpager2_fragment.TabFragmentStateAdapter
+import com.android.walletforest.viewpager2_fragment.ViewPager2FragViewModel
+import com.android.walletforest.viewpager2_fragment.ViewPager2Fragment
 
 
+/*
 class TransactionsFragment : Fragment() {
     private lateinit var binding: FragmentTransactionsBinding
     lateinit var viewModel: TransactionsFragViewModel
@@ -102,5 +94,29 @@ class TransactionsFragment : Fragment() {
 
             tabLayout.tabMode = TabLayout.MODE_AUTO
         }
+    }
+}*/
+
+class TransactionsFragment : ViewPager2Fragment()
+{
+    override lateinit var viewModel: ViewPager2FragViewModel
+    override lateinit var viewPagerAdapter: TabFragmentStateAdapter
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+
+        val repo = Repository.getInstance(requireContext().applicationContext)
+        val vmFactory = RepoViewModelFactory(repo)
+        viewModel = ViewModelProvider(
+            requireActivity(),
+            vmFactory
+        ).get(ViewPager2FragViewModel::class.java)
+
+        viewPagerAdapter = TransactionsFragmentStateAdapter(this)
+
+        return super.onCreateView(inflater, container, savedInstanceState)
     }
 }

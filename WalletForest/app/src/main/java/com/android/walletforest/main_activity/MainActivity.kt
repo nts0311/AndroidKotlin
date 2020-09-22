@@ -19,6 +19,7 @@ import com.android.walletforest.databinding.ActivityMainBinding
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Repository
+import com.android.walletforest.report_fragment.ReportFragment
 import com.android.walletforest.select_wallet_activity.RESULT_WALLET_ID
 import com.android.walletforest.select_wallet_activity.SelectWalletActivity
 import com.google.android.material.tabs.TabLayout
