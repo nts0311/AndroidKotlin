@@ -21,6 +21,13 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE (time >= :start AND time <= :end)")
     fun getTransactionsBetweenRange(start: Long, end: Long) : LiveData<List<Transaction>>
 
+    @Query("SELECT * FROM transactions WHERE (time >= :start AND time <= :end) AND (walletId = :walletId)")
+    fun getTransactionsBetweenRangeOfWalletFlow(
+        start: Long,
+        end: Long,
+        walletId: Long
+    ): Flow<List<Transaction>>
+
     @Update
     suspend fun updateTransaction(transaction: Transaction)
 

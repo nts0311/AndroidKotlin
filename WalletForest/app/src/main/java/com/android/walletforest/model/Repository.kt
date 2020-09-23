@@ -10,9 +10,13 @@ import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Entities.Category
 import com.android.walletforest.model.Entities.Transaction
 import com.android.walletforest.model.Entities.Wallet
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 
-class Repository private constructor(appContext: Context) {
+class Repository private constructor(val appContext: Context) {
     private val appDatabase = AppDatabase.getInstance(appContext)
 
     var viewMode = MutableLiveData(ViewType.TRANSACTION)
@@ -38,6 +42,12 @@ class Repository private constructor(appContext: Context) {
     }
 
     var walletList = appDatabase.walletDao.getWallets()
+
+    fun testFlow(start: Long, end: Long, walletId: Long) =
+        appDatabase.transactionDao.getTransactionsBetweenRangeOfWalletFlow(start, end, walletId)
+            .distinctUntilChanged()
+            .map { ChartEntryGenerator(appContext).getBarEntries(it,start,end,_timeRange.value!!) }
+            .flowOn(Dispatchers.Default)
 
 
     fun setTabInfoList(list: List<TabInfo>) {
