@@ -18,7 +18,7 @@ import com.android.walletforest.toLocalDate
 import kotlinx.coroutines.async
 import java.time.LocalDate
 
-class ViewPager2FragViewModel(repository: Repository) : ViewModel() {
+open class ViewPager2FragViewModel(repository: Repository) : ViewModel() {
     var tabInfoList = repository.tabInfoList
     var timeRange = repository.timeRange
 }
