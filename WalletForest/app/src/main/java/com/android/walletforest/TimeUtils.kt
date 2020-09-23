@@ -19,5 +19,7 @@ fun toLocalDate(time: Long): LocalDate {
     )
 }
 
+fun LocalDate.toEpochMilli() : Long = this.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+
 fun toEpoch(ld: LocalDate): Long =
     ld.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()

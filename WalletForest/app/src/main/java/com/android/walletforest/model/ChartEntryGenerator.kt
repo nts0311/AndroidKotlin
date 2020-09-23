@@ -5,6 +5,7 @@ import com.android.walletforest.enums.Constants
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.model.Entities.Transaction
 import com.android.walletforest.toEpoch
+import com.android.walletforest.toEpochMilli
 import com.android.walletforest.toLocalDate
 import com.github.mikephil.charting.data.BarEntry
 import kotlinx.coroutines.Dispatchers
@@ -28,19 +29,59 @@ class ChartEntryGenerator(appContext: Context) {
                 return getBarEntries(transactions, start, toEpoch(toLocalDate(start).plusDays(6)))
                 { _, end ->
                     val endDate = toLocalDate(end)
-                    val nextEndDate = endDate.plusDays(6)
+                    val nextStartDate = endDate.plusDays(1)
+                    val nextEndDate = endDate.plusDays(7)
 
                     val nextEndDateL = toEpoch(nextEndDate)
 
                     if (nextEndDateL <= rangeEndDate)
-                        Pair(end, nextEndDateL)
+                        Pair(toEpoch(nextStartDate), nextEndDateL)
                     else {
                         val endOfMonth = nextEndDate.minusDays(nextEndDate.dayOfMonth.toLong())
-                        Pair(end, toEpoch(endOfMonth))
+                        Pair(toEpoch(nextStartDate), toEpoch(endOfMonth))
                     }
                 }
             }
-            else -> return listOf<BarEntry>()
+
+            TimeRange.WEEK -> {
+                return getBarEntries(
+                    transactions,
+                    start,
+                    toLocalDate(start).plusDays(1).toEpochMilli() - 1
+                ) { _, previousEnd ->
+
+                    val nextStartDate = toLocalDate(previousEnd).plusDays(1L).toEpochMilli()
+                    val nextEndDate = toLocalDate(previousEnd).plusDays(2L).toEpochMilli() - 1
+
+                    if (nextEndDate <= rangeEndDate)
+                        Pair(nextStartDate, nextEndDate)
+                    else
+                        Pair(nextStartDate, rangeEndDate)
+                }
+            }
+
+            TimeRange.YEAR -> {
+                return getBarEntries(
+                    transactions,
+                    start,
+                    toLocalDate(start).plusMonths(1).minusDays(1).toEpochMilli()
+                )
+                { _, previousEnd ->
+                    val nextStartDate = toLocalDate(previousEnd).plusDays(1)
+                    val nextEndDate = nextStartDate.plusMonths(1).minusDays(1)
+
+                    if (nextEndDate.toEpochMilli() <= rangeEndDate)
+                        Pair(nextStartDate.toEpochMilli(), nextEndDate.toEpochMilli())
+                    else
+                        Pair(nextStartDate.toEpochMilli(), rangeEndDate)
+                }
+            }
+
+            TimeRange.CUSTOM -> return getBarEntries(transactions, start, end) { start, end ->
+                Pair(start, end)
+            }
+
+            else -> return listOf()
         }
     }
 
