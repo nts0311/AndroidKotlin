@@ -20,5 +20,7 @@ abstract class TabFragmentStateAdapter(fragment : Fragment) :
             notifyDataSetChanged()
         }
 
+
+
     override fun getItemCount(): Int = tabInfoList.size
 }
