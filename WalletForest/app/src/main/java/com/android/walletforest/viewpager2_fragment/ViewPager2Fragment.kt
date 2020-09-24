@@ -1,14 +1,19 @@
 package com.android.walletforest.viewpager2_fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.viewpager2.widget.ViewPager2
 import com.android.walletforest.R
 import com.android.walletforest.databinding.FragmentViewpager2Binding
 import com.android.walletforest.main_activity.MainActivity
+import com.android.walletforest.report_fragment.ReportFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.coroutines.delay
 
 abstract class ViewPager2Fragment : Fragment() {
     private lateinit var binding: FragmentViewpager2Binding
@@ -38,6 +43,7 @@ abstract class ViewPager2Fragment : Fragment() {
         inflater.inflate(R.menu.transactions_frag_menu, menu)
     }
 
+
     private fun setupObservers() {
         viewModel.tabInfoList.observe(viewLifecycleOwner)
         {
@@ -45,12 +51,26 @@ abstract class ViewPager2Fragment : Fragment() {
                 viewPagerAdapter.tabInfoList = it
 
                 //set the viewpager to the current month, week,...
-                binding.mainViewPager.currentItem = it.size - 2
+                Log.i("aaa", binding.mainViewPager.isAttachedToWindow.toString())
+                binding.mainViewPager.setCurrentItem(it.size - 2, false)
+
             }
         }
 
         viewModel.timeRange.observe(viewLifecycleOwner) {
             viewPagerAdapter.timeRange = it
+        }
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+
+        if (!hidden) {
+            val s = "${this.javaClass.simpleName} - ${binding.mainViewPager.currentItem}"
+            Log.i("aaa", s)
+
+        } else {
+
         }
     }
 
@@ -70,6 +90,16 @@ abstract class ViewPager2Fragment : Fragment() {
             mainViewPager.updateLayoutParams {
                 this.height = ViewGroup.LayoutParams.MATCH_PARENT
             }
+
+            mainViewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback()
+            {
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+                    Log.i("aaa", "${this@ViewPager2Fragment.javaClass.simpleName} - select $position")
+                }
+            })
+
+
 
             tabLayout.tabMode = TabLayout.MODE_AUTO
         }

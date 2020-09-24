@@ -140,6 +140,7 @@ class MainActivity : AppCompatActivity() {
                     supportFragmentManager.beginTransaction().hide(activeFragment)
                         .show(fragmentPlanning).commit()
                     activeFragment = fragmentPlanning
+
                     true
                 }
 
