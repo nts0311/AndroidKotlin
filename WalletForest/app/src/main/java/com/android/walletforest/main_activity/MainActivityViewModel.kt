@@ -58,6 +58,20 @@ class MainActivityViewModel(private val repository: Repository) : ViewModel() {
         repository.setCurrentWallet(walletId)
     }
 
+    fun getTabInfoList() {
+        if (currentWallet.value == null)
+            return
+
+        tabInfoUtils.setProperties(startTime, endTime, timeRange, currentWallet.value!!.id)
+
+        viewModelScope.launch {
+            val result = async {
+                tabInfoUtils.getTabInfoList()
+            }
+            repository.setTabInfoList(result.await())
+        }
+    }
+
     fun onSelectCustomTimeRange(start: Long, end: Long) {
         if (startTime == start && endTime == end)
             return
@@ -80,21 +94,6 @@ class MainActivityViewModel(private val repository: Repository) : ViewModel() {
         this.timeRange = timeRange
         repository.setTimeRange(timeRange)
         getTabInfoList()
-    }
-
-
-    fun getTabInfoList() {
-        if (currentWallet.value == null)
-            return
-
-        tabInfoUtils.setProperties(startTime, endTime, timeRange, currentWallet.value!!.id)
-
-        viewModelScope.launch {
-            val result = async {
-                tabInfoUtils.getTabInfoList()
-            }
-            repository.setTabInfoList(result.await())
-        }
     }
 
     fun switchViewMode(): ViewType {

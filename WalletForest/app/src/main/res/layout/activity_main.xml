@@ -12,11 +12,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appbar"
 
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -66,22 +68,36 @@
                         app:layout_constraintBottom_toBottomOf="@+id/wallet_img"
                         app:layout_constraintStart_toEndOf="@+id/wallet_img" />
 
+
                     <com.google.android.material.tabs.TabLayout
-                        android:id="@+id/tab_layout"
+                        android:id="@+id/transaction_frag_tab_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:visibility="invisible"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/wallet_img"
                         app:tabMinWidth="120dp"
                         app:tabMode="scrollable"/>
+
+                    <com.google.android.material.tabs.TabLayout
+                        android:id="@+id/report_frag_tab_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="invisible"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/wallet_img"
+                        app:tabMinWidth="120dp"
+                        app:tabMode="scrollable"/>
+
                 </androidx.constraintlayout.widget.ConstraintLayout>
-                <!--                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" -->
 
 
             </FrameLayout>
 
         </com.google.android.material.appbar.AppBarLayout>
+
 
         <LinearLayout
             android:id="@+id/fragment_container"

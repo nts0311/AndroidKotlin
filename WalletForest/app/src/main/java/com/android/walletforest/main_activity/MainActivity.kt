@@ -5,10 +5,13 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
+import android.view.View
 import android.widget.DatePicker
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -22,6 +25,7 @@ import com.android.walletforest.model.Repository
 import com.android.walletforest.report_fragment.ReportFragment
 import com.android.walletforest.select_wallet_activity.RESULT_WALLET_ID
 import com.android.walletforest.select_wallet_activity.SelectWalletActivity
+import com.android.walletforest.viewpager2_fragment.ViewPager2Fragment
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.activity_main.*
 import java.time.LocalDate
@@ -35,7 +39,7 @@ class MainActivity : AppCompatActivity() {
     private val fragmentReport = ReportFragment()
     private val fragmentPlanning = PlanningFragment()
     private var activeFragment: Fragment = fragmentTransactions
-    private var rangeSelectDialog: AlertDialog? = null
+    protected var rangeSelectDialog: AlertDialog? = null
 
     private lateinit var binding: ActivityMainBinding
 
@@ -59,18 +63,21 @@ class MainActivity : AppCompatActivity() {
             )
                 .commit()
         }
+        transaction_frag_tab_layout.visibility = View.VISIBLE
 
         val vmFactory = RepoViewModelFactory(Repository.getInstance(this.applicationContext))
         viewModel = ViewModelProvider(this, vmFactory).get(MainActivityViewModel::class.java)
 
+
         setSupportActionBar(binding.toolbar)
         setUpBottomNav()
         registerObservers()
-        createDialogs()
         registerClickListener()
+        createDialogs()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+
         menuInflater.inflate(R.menu.transactions_frag_menu, menu)
         return true
     }
@@ -126,6 +133,8 @@ class MainActivity : AppCompatActivity() {
                     supportFragmentManager.beginTransaction().hide(activeFragment)
                         .show(fragmentTransactions).commit()
                     activeFragment = fragmentTransactions
+                    report_frag_tab_layout.visibility = View.GONE
+                    transaction_frag_tab_layout.visibility = View.VISIBLE
                     true
                 }
 
@@ -133,6 +142,8 @@ class MainActivity : AppCompatActivity() {
                     supportFragmentManager.beginTransaction().hide(activeFragment)
                         .show(fragmentReport).commit()
                     activeFragment = fragmentReport
+                    report_frag_tab_layout.visibility = View.VISIBLE
+                    transaction_frag_tab_layout.visibility = View.GONE
                     true
                 }
 
@@ -186,7 +197,6 @@ class MainActivity : AppCompatActivity() {
                     viewModel.initTabs = true
                     viewModel.getTabInfoList()
                 }
-
             }
         }
 
@@ -206,8 +216,29 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
 
+    private fun createDialogs() {
+        rangeSelectDialog = AlertDialog.Builder(this).run {
 
+            val inflater = layoutInflater
+
+            val dialogView = inflater.inflate(R.layout.range_selection_dialog, null)
+
+            val startEdt = dialogView.findViewById<EditText>(R.id.start_time_edt)
+            val endEdt = dialogView.findViewById<EditText>(R.id.end_time_edt)
+
+            setView(dialogView)
+            setPositiveButton(R.string.select_time) { _, _ ->
+                viewModel.onSelectCustomTimeRange(startEdt.tag as Long, endEdt.tag as Long)
+            }
+
+            setNegativeButton(R.string.cancel) { dialog, _ ->
+                dialog.cancel()
+            }
+
+            create()
+        }
     }
 
     private fun showRangeSelectDialog() {
@@ -254,28 +285,9 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun createDialogs() {
-        rangeSelectDialog = AlertDialog.Builder(this).run {
-
-            val inflater = layoutInflater
-
-            val dialogView = inflater.inflate(R.layout.range_selection_dialog, null)
-
-            val startEdt = dialogView.findViewById<EditText>(R.id.start_time_edt)
-            val endEdt = dialogView.findViewById<EditText>(R.id.end_time_edt)
-
-            setView(dialogView)
-            setPositiveButton(R.string.select_time) { _, _ ->
-                viewModel.onSelectCustomTimeRange(startEdt.tag as Long, endEdt.tag as Long)
-            }
-
-            setNegativeButton(R.string.cancel) { dialog, _ ->
-                dialog.cancel()
-            }
-
-            create()
-        }
-    }
-
-    fun getTabLayout(): TabLayout = binding.tabLayout
+    fun getTabLayout(fragment: ViewPager2Fragment): TabLayout =
+        if (fragment is TransactionsFragment)
+            transaction_frag_tab_layout
+        else
+            report_frag_tab_layout
 }

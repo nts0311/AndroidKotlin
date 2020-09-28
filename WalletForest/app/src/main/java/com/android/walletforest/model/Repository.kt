@@ -43,12 +43,7 @@ class Repository private constructor(val appContext: Context) {
 
     var walletList = appDatabase.walletDao.getWallets()
 
-    private val _currentPage  = MutableLiveData(0)
-    val currentPage : LiveData<Int> = _currentPage
-
-    fun setCurrentPage(page : Int) {
-        _currentPage.value = page
-    }
+    var currentPage = 0
 
     fun testFlow(start: Long, end: Long, walletId: Long) =
         appDatabase.transactionDao.getTransactionsBetweenRangeOfWalletFlow(start, end, walletId)

@@ -3,7 +3,10 @@ package com.android.walletforest.TransactionsFragment
 import android.os.Bundle
 import android.view.*
 import androidx.lifecycle.ViewModelProvider
+import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
+import com.android.walletforest.enums.TimeRange
+import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Repository
 import com.android.walletforest.viewpager2_fragment.TabFragmentStateAdapter
 import com.android.walletforest.viewpager2_fragment.ViewPager2FragViewModel
