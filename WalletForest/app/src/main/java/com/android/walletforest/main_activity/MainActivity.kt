@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
     private val fragmentReport = ReportFragment()
     private val fragmentPlanning = PlanningFragment()
     private var activeFragment: Fragment = fragmentTransactions
-    protected var rangeSelectDialog: AlertDialog? = null
+    private var rangeSelectDialog: AlertDialog? = null
 
     private lateinit var binding: ActivityMainBinding
 
@@ -63,7 +63,6 @@ class MainActivity : AppCompatActivity() {
             )
                 .commit()
         }
-        transaction_frag_tab_layout.visibility = View.VISIBLE
 
         val vmFactory = RepoViewModelFactory(Repository.getInstance(this.applicationContext))
         viewModel = ViewModelProvider(this, vmFactory).get(MainActivityViewModel::class.java)
@@ -133,8 +132,6 @@ class MainActivity : AppCompatActivity() {
                     supportFragmentManager.beginTransaction().hide(activeFragment)
                         .show(fragmentTransactions).commit()
                     activeFragment = fragmentTransactions
-                    report_frag_tab_layout.visibility = View.GONE
-                    transaction_frag_tab_layout.visibility = View.VISIBLE
                     true
                 }
 
@@ -142,8 +139,6 @@ class MainActivity : AppCompatActivity() {
                     supportFragmentManager.beginTransaction().hide(activeFragment)
                         .show(fragmentReport).commit()
                     activeFragment = fragmentReport
-                    report_frag_tab_layout.visibility = View.VISIBLE
-                    transaction_frag_tab_layout.visibility = View.GONE
                     true
                 }
 
@@ -285,9 +280,5 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun getTabLayout(fragment: ViewPager2Fragment): TabLayout =
-        if (fragment is TransactionsFragment)
-            transaction_frag_tab_layout
-        else
-            report_frag_tab_layout
+    fun getTabLayout(fragment: ViewPager2Fragment): TabLayout = binding.tabLayout
 }

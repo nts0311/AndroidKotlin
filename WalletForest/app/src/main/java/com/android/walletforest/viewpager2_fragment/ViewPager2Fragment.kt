@@ -1,41 +1,22 @@
 package com.android.walletforest.viewpager2_fragment
 
-import android.app.DatePickerDialog
 import android.os.Bundle
-import android.util.AttributeSet
-import android.util.Log
-import android.view.*
-import android.widget.DatePicker
-import android.widget.EditText
-import android.widget.TableLayout
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
-import androidx.core.view.get
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
-import com.android.walletforest.R
 import com.android.walletforest.databinding.FragmentViewpager2Binding
-import com.android.walletforest.dateToString
-import com.android.walletforest.enums.TimeRange
-import com.android.walletforest.enums.ViewType
 import com.android.walletforest.main_activity.MainActivity
-import com.android.walletforest.report_fragment.ReportFragment
-import com.android.walletforest.toEpoch
-import com.android.walletforest.toLocalDate
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import java.time.LocalDate
 
 abstract class ViewPager2Fragment : Fragment() {
     private lateinit var binding: FragmentViewpager2Binding
     private lateinit var tabLayout: TabLayout
+    private lateinit var tabLayoutMediator: TabLayoutMediator
 
     abstract var viewModel: ViewPager2FragViewModel
     abstract var viewPagerAdapter: TabFragmentStateAdapter
@@ -62,11 +43,18 @@ abstract class ViewPager2Fragment : Fragment() {
         super.onHiddenChanged(hidden)
 
         if (!hidden) {
+            tabLayoutMediator.attach()
             val pagePos = viewModel.getCurrentPage()
             binding.mainViewPager.setCurrentItem(pagePos, false)
+
+            // Now update the scroll position to match the ViewPager's current item
+            // post because of race condition
+            tabLayout.post {
+                tabLayout.setScrollPosition(pagePos, 0f, true)
+            }
         } else
         {
-
+            tabLayoutMediator.detach()
         }
     }
 
@@ -77,11 +65,6 @@ abstract class ViewPager2Fragment : Fragment() {
             if (it != null) {
                 viewPagerAdapter.tabInfoList = it
                 binding.mainViewPager.setCurrentItem(it.size - 2, false)
-
-                /* binding.mainViewPager.post {
-                     binding.mainViewPager.setCurrentItem(it.size - 2, false)
-                 }*/
-
             }
         }
 
@@ -89,7 +72,6 @@ abstract class ViewPager2Fragment : Fragment() {
             viewPagerAdapter.timeRange = it
         }
     }
-
 
 
     private fun setUpViewPager() {
@@ -100,9 +82,11 @@ abstract class ViewPager2Fragment : Fragment() {
             mainViewPager.adapter = viewPagerAdapter
             mainViewPager.offscreenPageLimit = 2
 
-            TabLayoutMediator(tabLayout, mainViewPager, true) { tab, position ->
+            tabLayoutMediator = TabLayoutMediator(tabLayout, mainViewPager, true) { tab, position ->
                 tab.text = viewPagerAdapter.tabInfoList[position].tabTitle
-            }.attach()
+            }
+
+            tabLayoutMediator.attach()
 
             //fix the weird error of viewpager2, where switch to another time range and back to month
             //caused it to shrink, no idea why lol
