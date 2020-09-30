@@ -12,6 +12,6 @@ class ReportRecordViewModel(private val repository: Repository) : ViewModel() {
     var currentWallet = repository.currentWallet
 
     fun setTimeRange(startTime: Long, endTime: Long, timeRange: String, walletId: Long) {
-        barEntries = repository.testFlow(startTime, endTime, walletId, TimeRange.valueOf(timeRange)).asLiveData()
+        barEntries = repository.getBarEntries(startTime, endTime, walletId, TimeRange.valueOf(timeRange)).asLiveData()
     }
 }

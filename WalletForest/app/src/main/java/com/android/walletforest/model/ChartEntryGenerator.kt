@@ -15,8 +15,7 @@ import kotlinx.coroutines.yield
 
 class ChartEntryGenerator() {
 
-    companion object
-    {
+    companion object {
         suspend fun getBarEntries(
             transactions: List<Transaction>,
             start: Long,
@@ -27,7 +26,11 @@ class ChartEntryGenerator() {
 
             when (timeRange) {
                 TimeRange.MONTH -> {
-                    return getBarEntries(transactions, start, toEpoch(toLocalDate(start).plusDays(6)))
+                    return getBarEntries(
+                        transactions,
+                        start,
+                        toEpoch(toLocalDate(start).plusDays(6))
+                    )
                     { _, end ->
                         val endDate = toLocalDate(end)
                         val nextStartDate = endDate.plusDays(1)
@@ -93,42 +96,40 @@ class ChartEntryGenerator() {
             end: Long,
             getNextRange: (Long, Long) -> Pair<Long, Long>
         ): List<BarEntry> {
-            return withContext(Dispatchers.Default)
-            {
-                val result = mutableListOf<BarEntry>()
-                var startTime = start
-                var endTime = end
+            val result = mutableListOf<BarEntry>()
+            var startTime = start
+            var endTime = end
 
-                var totalIncome = 0L
-                var totalExpense = 0L
-                var xPos = 0f
+            var totalIncome = 0L
+            var totalExpense = 0L
+            var xPos = 0f
 
-                for (transaction in transactions) {
-                    yield()
-                    if (transaction.time in startTime..endTime) {
-                        if (transaction.type == Constants.TYPE_INCOME)
-                            totalIncome += transaction.amount
-                        else
-                            totalExpense -= transaction.amount
-                    } else {
-                        result.add(BarEntry(xPos, totalIncome.toFloat()))
-                        result.add(BarEntry(xPos, totalExpense.toFloat()))
-                        xPos++
+            for (transaction in transactions) {
+                yield()
+                if (transaction.time in startTime..endTime) {
+                    if (transaction.type == Constants.TYPE_INCOME)
+                        totalIncome += transaction.amount
+                    else
+                        totalExpense -= transaction.amount
+                } else {
+                    result.add(BarEntry(xPos, totalIncome.toFloat()))
+                    result.add(BarEntry(xPos, totalExpense.toFloat()))
+                    xPos++
 
-                        val nextRange = getNextRange(start, end)
-                        startTime = nextRange.first
-                        endTime = nextRange.second
+                    val nextRange = getNextRange(start, end)
+                    startTime = nextRange.first
+                    endTime = nextRange.second
 
-                        if (transaction.type == Constants.TYPE_INCOME)
-                            totalIncome = transaction.amount
-                        else
-                            totalExpense = -transaction.amount
-                    }
+                    if (transaction.type == Constants.TYPE_INCOME)
+                        totalIncome = transaction.amount
+                    else
+                        totalExpense = -transaction.amount
                 }
-
-                result
             }
+
+            return result
         }
+
     }
 }
 

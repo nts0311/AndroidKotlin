@@ -12,6 +12,7 @@ import com.android.walletforest.model.Entities.Transaction
 import com.android.walletforest.model.Entities.Wallet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -22,7 +23,7 @@ class Repository private constructor(val appContext: Context) {
     var viewMode = MutableLiveData(ViewType.TRANSACTION)
 
     //caching list of transactions of each wallet, avoiding database query
-    private var fetchedRange: MutableMap<String, LiveData<List<Transaction>>> = mutableMapOf()
+    private var fetchedRange: MutableMap<String, Flow<List<Transaction>>> = mutableMapOf()
 
     private var _categoriesMap: MutableMap<Long, Category> = mutableMapOf()
     var categoryMap: Map<Long, Category> = _categoriesMap
@@ -45,8 +46,8 @@ class Repository private constructor(val appContext: Context) {
 
     var currentPage = 0
 
-    fun testFlow(start: Long, end: Long, walletId: Long, timeRange: TimeRange) =
-        appDatabase.transactionDao.getTransactionsBetweenRangeOfWalletFlow(start, end, walletId)
+    fun getBarEntries(start: Long, end: Long, walletId: Long, timeRange: TimeRange) =
+        getTransactionsBetweenRange(start, end, walletId)
             .distinctUntilChanged()
             .map { ChartEntryGenerator.getBarEntries(it, start, end, timeRange) }
             .flowOn(Dispatchers.Default)
@@ -134,7 +135,7 @@ class Repository private constructor(val appContext: Context) {
         start: Long,
         end: Long,
         walletId: Long
-    ): LiveData<List<Transaction>> {
+    ): Flow<List<Transaction>> {
 
         val key: String = if (walletId == 1L)
             "all-$start-$end"

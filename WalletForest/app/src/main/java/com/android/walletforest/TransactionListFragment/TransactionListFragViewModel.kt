@@ -69,7 +69,7 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
         endTime = end
         timeRange = TimeRange.valueOf(range)
 
-        transactionList = repo.getTransactionsBetweenRange(start, end, walletId)
+        transactionList = repo.getTransactionsBetweenRange(start, end, walletId).asLiveData()
 
         previousWalletId = walletId
     }
