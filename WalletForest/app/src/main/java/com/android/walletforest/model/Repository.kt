@@ -45,10 +45,10 @@ class Repository private constructor(val appContext: Context) {
 
     var currentPage = 0
 
-    fun testFlow(start: Long, end: Long, walletId: Long) =
+    fun testFlow(start: Long, end: Long, walletId: Long, timeRange: TimeRange) =
         appDatabase.transactionDao.getTransactionsBetweenRangeOfWalletFlow(start, end, walletId)
             .distinctUntilChanged()
-            .map { ChartEntryGenerator(appContext).getBarEntries(it,start,end,_timeRange.value!!) }
+            .map { ChartEntryGenerator.getBarEntries(it, start, end, timeRange) }
             .flowOn(Dispatchers.Default)
 
 
@@ -91,8 +91,7 @@ class Repository private constructor(val appContext: Context) {
         appDatabase.walletDao.updateWallet(wallet)
     }
 
-    suspend fun deleteWallet(wallet: Wallet)
-    {
+    suspend fun deleteWallet(wallet: Wallet) {
         val balance = walletMap[wallet.id]?.amount
         appDatabase.walletDao.deleteWallet(wallet)
 

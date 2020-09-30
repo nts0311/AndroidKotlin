@@ -1,14 +1,24 @@
 package com.android.walletforest.report_record_fragment
 
+import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModelProvider
 import com.android.walletforest.R
+import com.android.walletforest.RepoViewModelFactory
+import com.android.walletforest.TransactionListFragment.TransactionListFragViewModel
 import com.android.walletforest.enums.TimeRange
+import com.android.walletforest.model.Repository
 import com.android.walletforest.toLocalDate
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
 import kotlinx.android.synthetic.main.fragment_report_record.*
 
 private const val START_TIME_PARAM = "startTime"
@@ -22,6 +32,8 @@ class ReportRecordFragment : Fragment() {
     private var walletId: Long? = null
     private var timeRange: String? = null
     var viewModelKey = ""
+
+    private lateinit var viewModel: ReportRecordViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,18 +50,82 @@ class ReportRecordFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        /*val s = "${toLocalDate(startTime!!)} - ${toLocalDate(endTime!!)}"
-        Toast.makeText(requireContext(), s, Toast.LENGTH_SHORT)
-            .show()*/
+
+        val repo = Repository.getInstance(requireContext().applicationContext)
+        val vmFactory = RepoViewModelFactory(repo)
+
+        viewModel = ViewModelProvider(
+            requireActivity(),
+            vmFactory
+        ).get(viewModelKey, ReportRecordViewModel::class.java)
+
+        if (startTime != null && endTime != null && timeRange != null) {
+            viewModel.setTimeRange(startTime!!, endTime!!, timeRange!!, walletId!!)
+        }
+
         return inflater.inflate(R.layout.fragment_report_record, container, false)
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val s = "${toLocalDate(startTime!!)} - ${toLocalDate(endTime!!)}"
-        net_income_txt.text=s
+
+        setUpIncomeExpenseChart()
+
+        registerObservers()
     }
+
+    private fun registerObservers() {
+        viewModel.currentWallet.observe(viewLifecycleOwner)
+        {
+            viewModel.setTimeRange(startTime!!, endTime!!, timeRange!!, it.id)
+            observeChartData()
+        }
+    }
+
+    private fun observeChartData()
+    {
+        viewModel.barEntries.observe(viewLifecycleOwner) {
+            drawInComeExpenseChart(it)
+        }
+    }
+
+    private fun setUpIncomeExpenseChart() {
+        val barChart = income_expense_chart
+
+        barChart.apply {
+            xAxis.setDrawGridLines(true)
+            legend.isEnabled = false
+            axisRight.isEnabled = false
+            xAxis.position = XAxis.XAxisPosition.BOTTOM
+            xAxis.setDrawGridLines(false)
+            xAxis.labelCount = 4
+            xAxis.labelRotationAngle = 45f
+            description.text = ""
+        }
+    }
+
+    private fun drawInComeExpenseChart(barEntries: List<BarEntry>) {
+        val set = BarDataSet(barEntries, "")
+        val green = Color.rgb(110, 190, 102)
+        val red = Color.rgb(211, 74, 88)
+        val colors = mutableListOf<Int>()
+
+        for (i in 0..barEntries.size) {
+            val color = if (i % 2 == 0) green
+            else red
+
+            colors.add(color)
+        }
+
+        set.colors = colors
+
+        val data = BarData(set)
+        data.barWidth = 0.7f
+        income_expense_chart.data = data
+        income_expense_chart.invalidate()
+    }
+
 
     companion object {
         @JvmStatic

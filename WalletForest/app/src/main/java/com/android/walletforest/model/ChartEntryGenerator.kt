@@ -13,119 +13,121 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
 
 
-class ChartEntryGenerator(appContext: Context) {
+class ChartEntryGenerator() {
 
-    suspend fun getBarEntries(
-        transactions: List<Transaction>,
-        start: Long,
-        end: Long,
-        timeRange: TimeRange
-    ): List<BarEntry> {
-        var rangeStartDate = start
-        var rangeEndDate = end
+    companion object
+    {
+        suspend fun getBarEntries(
+            transactions: List<Transaction>,
+            start: Long,
+            end: Long,
+            timeRange: TimeRange
+        ): List<BarEntry> {
+            var rangeEndDate = end
 
-        when (timeRange) {
-            TimeRange.MONTH -> {
-                return getBarEntries(transactions, start, toEpoch(toLocalDate(start).plusDays(6)))
-                { _, end ->
-                    val endDate = toLocalDate(end)
-                    val nextStartDate = endDate.plusDays(1)
-                    val nextEndDate = endDate.plusDays(7)
+            when (timeRange) {
+                TimeRange.MONTH -> {
+                    return getBarEntries(transactions, start, toEpoch(toLocalDate(start).plusDays(6)))
+                    { _, end ->
+                        val endDate = toLocalDate(end)
+                        val nextStartDate = endDate.plusDays(1)
+                        val nextEndDate = endDate.plusDays(7)
 
-                    val nextEndDateL = toEpoch(nextEndDate)
+                        val nextEndDateL = toEpoch(nextEndDate)
 
-                    if (nextEndDateL <= rangeEndDate)
-                        Pair(toEpoch(nextStartDate), nextEndDateL)
-                    else {
-                        val endOfMonth = nextEndDate.minusDays(nextEndDate.dayOfMonth.toLong())
-                        Pair(toEpoch(nextStartDate), toEpoch(endOfMonth))
+                        if (nextEndDateL <= rangeEndDate)
+                            Pair(toEpoch(nextStartDate), nextEndDateL)
+                        else {
+                            val endOfMonth = nextEndDate.minusDays(nextEndDate.dayOfMonth.toLong())
+                            Pair(toEpoch(nextStartDate), toEpoch(endOfMonth))
+                        }
                     }
                 }
-            }
 
-            TimeRange.WEEK -> {
-                return getBarEntries(
-                    transactions,
-                    start,
-                    toLocalDate(start).plusDays(1).toEpochMilli() - 1
-                ) { _, previousEnd ->
+                TimeRange.WEEK -> {
+                    return getBarEntries(
+                        transactions,
+                        start,
+                        toLocalDate(start).plusDays(1).toEpochMilli() - 1
+                    ) { _, previousEnd ->
 
-                    val nextStartDate = toLocalDate(previousEnd).plusDays(1L).toEpochMilli()
-                    val nextEndDate = toLocalDate(previousEnd).plusDays(2L).toEpochMilli() - 1
+                        val nextStartDate = toLocalDate(previousEnd).plusDays(1L).toEpochMilli()
+                        val nextEndDate = toLocalDate(previousEnd).plusDays(2L).toEpochMilli() - 1
 
-                    if (nextEndDate <= rangeEndDate)
-                        Pair(nextStartDate, nextEndDate)
-                    else
-                        Pair(nextStartDate, rangeEndDate)
+                        if (nextEndDate <= rangeEndDate)
+                            Pair(nextStartDate, nextEndDate)
+                        else
+                            Pair(nextStartDate, rangeEndDate)
+                    }
                 }
-            }
 
-            TimeRange.YEAR -> {
-                return getBarEntries(
-                    transactions,
-                    start,
-                    toLocalDate(start).plusMonths(1).minusDays(1).toEpochMilli()
-                )
-                { _, previousEnd ->
-                    val nextStartDate = toLocalDate(previousEnd).plusDays(1)
-                    val nextEndDate = nextStartDate.plusMonths(1).minusDays(1)
+                TimeRange.YEAR -> {
+                    return getBarEntries(
+                        transactions,
+                        start,
+                        toLocalDate(start).plusMonths(1).minusDays(1).toEpochMilli()
+                    )
+                    { _, previousEnd ->
+                        val nextStartDate = toLocalDate(previousEnd).plusDays(1)
+                        val nextEndDate = nextStartDate.plusMonths(1).minusDays(1)
 
-                    if (nextEndDate.toEpochMilli() <= rangeEndDate)
-                        Pair(nextStartDate.toEpochMilli(), nextEndDate.toEpochMilli())
-                    else
-                        Pair(nextStartDate.toEpochMilli(), rangeEndDate)
+                        if (nextEndDate.toEpochMilli() <= rangeEndDate)
+                            Pair(nextStartDate.toEpochMilli(), nextEndDate.toEpochMilli())
+                        else
+                            Pair(nextStartDate.toEpochMilli(), rangeEndDate)
+                    }
                 }
-            }
 
-            TimeRange.CUSTOM -> return getBarEntries(transactions, start, end) { start, end ->
-                Pair(start, end)
-            }
+                TimeRange.CUSTOM -> return getBarEntries(transactions, start, end) { start, end ->
+                    Pair(start, end)
+                }
 
-            else -> return listOf()
+                else -> return listOf()
+            }
         }
-    }
 
 
-    private suspend fun getBarEntries(
-        transactions: List<Transaction>,
-        start: Long,
-        end: Long,
-        getNextRange: (Long, Long) -> Pair<Long, Long>
-    ): List<BarEntry> {
-        return withContext(Dispatchers.Default)
-        {
-            val result = mutableListOf<BarEntry>()
-            var startTime = start
-            var endTime = end
+        private suspend fun getBarEntries(
+            transactions: List<Transaction>,
+            start: Long,
+            end: Long,
+            getNextRange: (Long, Long) -> Pair<Long, Long>
+        ): List<BarEntry> {
+            return withContext(Dispatchers.Default)
+            {
+                val result = mutableListOf<BarEntry>()
+                var startTime = start
+                var endTime = end
 
-            var totalIncome = 0L
-            var totalExpense = 0L
-            var xPos = 0f
+                var totalIncome = 0L
+                var totalExpense = 0L
+                var xPos = 0f
 
-            for (transaction in transactions) {
-                yield()
-                if (transaction.time in startTime..endTime) {
-                    if (transaction.type == Constants.TYPE_INCOME)
-                        totalIncome += transaction.amount
-                    else
-                        totalExpense -= transaction.amount
-                } else {
-                    result.add(BarEntry(xPos, totalIncome.toFloat()))
-                    result.add(BarEntry(xPos, totalExpense.toFloat()))
-                    xPos++
+                for (transaction in transactions) {
+                    yield()
+                    if (transaction.time in startTime..endTime) {
+                        if (transaction.type == Constants.TYPE_INCOME)
+                            totalIncome += transaction.amount
+                        else
+                            totalExpense -= transaction.amount
+                    } else {
+                        result.add(BarEntry(xPos, totalIncome.toFloat()))
+                        result.add(BarEntry(xPos, totalExpense.toFloat()))
+                        xPos++
 
-                    val nextRange = getNextRange(start, end)
-                    startTime = nextRange.first
-                    endTime = nextRange.second
+                        val nextRange = getNextRange(start, end)
+                        startTime = nextRange.first
+                        endTime = nextRange.second
 
-                    if (transaction.type == Constants.TYPE_INCOME)
-                        totalIncome = transaction.amount
-                    else
-                        totalExpense = -transaction.amount
+                        if (transaction.type == Constants.TYPE_INCOME)
+                            totalIncome = transaction.amount
+                        else
+                            totalExpense = -transaction.amount
+                    }
                 }
-            }
 
-            result
+                result
+            }
         }
     }
 }

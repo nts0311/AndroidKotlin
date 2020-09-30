@@ -132,7 +132,7 @@ class TabInfoUtils() {
                     TabInfo(
                         walletId,
                         toEpoch(dStart),
-                        toEpoch(nextYear),
+                        toEpoch(nextYear) - 1,
                         dStart.year.toString()
                     )
                 )
