@@ -17,13 +17,13 @@ class ChartEntryGenerator() {
             timeRange: TimeRange
         ): List<BarChartData> {
 
-            if(transactions.isEmpty()) return listOf()
+            if (transactions.isEmpty()) return listOf()
 
-            var rangeEndDate = end
+            val rangeEndDate = end
 
             when (timeRange) {
                 TimeRange.MONTH -> {
-                    return getBarData(
+                    return getBarChartData(
                         transactions,
                         start,
                         toEpoch(toLocalDate(start).plusDays(6)),
@@ -46,7 +46,7 @@ class ChartEntryGenerator() {
                 }
 
                 TimeRange.WEEK -> {
-                    return getBarData(
+                    return getBarChartData(
                         transactions,
                         start,
                         toLocalDate(start).plusDays(1).toEpochMilli() - 1,
@@ -64,7 +64,7 @@ class ChartEntryGenerator() {
                 }
 
                 TimeRange.YEAR -> {
-                    return getBarData(
+                    return getBarChartData(
                         transactions,
                         start,
                         toLocalDate(start).plusMonths(1).minusDays(1).toEpochMilli(),
@@ -81,7 +81,7 @@ class ChartEntryGenerator() {
                     }
                 }
 
-                TimeRange.CUSTOM -> return getBarData(
+                TimeRange.CUSTOM -> return getBarChartData(
                     transactions,
                     start,
                     end,
@@ -94,57 +94,14 @@ class ChartEntryGenerator() {
             }
         }
 
-
-        private suspend fun getBarChartData(
-            transactions: List<Transaction>,
-            start: Long,
-            end: Long,
-            timeRange: TimeRange,
-            getNextRange: (Long, Long) -> Pair<Long, Long>
-        ): MutableList<BarChartData> {
-            val result = mutableListOf<BarChartData>()
-            var startTime = start
-            var endTime = end
-
-            var totalIncome = 0L
-            var totalExpense = 0L
-            var xPos = 0f
-
-            for (transaction in transactions) {
-                yield()
-                if (transaction.time in startTime..endTime) {
-                    if (transaction.type == Constants.TYPE_INCOME)
-                        totalIncome += transaction.amount
-                    else
-                        totalExpense -= transaction.amount
-                } else {
-
-                    val label = when (timeRange) {
-                        TimeRange.MONTH -> getMonthAxisLabel(startTime, endTime)
-                        TimeRange.WEEK -> getWeekAxisLabel(startTime)
-                        TimeRange.YEAR -> getYearAxisLabel(startTime)
-                        TimeRange.CUSTOM -> getCustomAxisLabel(startTime, endTime)
-                    }
-
-                    result.add(BarChartData(label, totalIncome, totalExpense, startTime, endTime))
-
-                    xPos++
-
-                    val nextRange = getNextRange(start, end)
-                    startTime = nextRange.first
-                    endTime = nextRange.second
-
-                    if (transaction.type == Constants.TYPE_INCOME)
-                        totalIncome = transaction.amount
-                    else
-                        totalExpense = -transaction.amount
-                }
+        private fun getLabel(timeRange: TimeRange, startTime: Long, endTime: Long): String =
+            when (timeRange) {
+                TimeRange.MONTH -> getMonthAxisLabel(startTime, endTime)
+                TimeRange.WEEK -> getWeekAxisLabel(startTime)
+                TimeRange.YEAR -> getYearAxisLabel(startTime)
+                TimeRange.CUSTOM -> getCustomAxisLabel(startTime, endTime)
             }
-
-            return result
-        }
-
-        private suspend fun getBarData(
+        private suspend fun getBarChartData(
             transactions: List<Transaction>,
             start: Long,
             end: Long,
@@ -162,29 +119,36 @@ class ChartEntryGenerator() {
             var startTime = start
             var endTime = end
 
-            val result = getBarChartData(transactions, startTime, endTime, timeRange,getNextRange)
-            startTime = result.last().startDate
-            endTime = result.last().endDate
+            val result = List(maxEntryCount) {
+                val label = getLabel(timeRange, startTime, endTime)
 
-            //Fill result with empty data
+                val result = BarChartData(label, 0, 0, startTime, endTime)
 
-            while (result.size != maxEntryCount) {
-                yield()
-                val label = when (timeRange) {
-                    TimeRange.MONTH -> getMonthAxisLabel(startTime, endTime)
-                    TimeRange.WEEK -> getWeekAxisLabel(startTime)
-                    TimeRange.YEAR -> getYearAxisLabel(startTime)
-                    TimeRange.CUSTOM -> getCustomAxisLabel(startTime, endTime)
-                }
-
-                result.add(BarChartData(label, 0, 0, startTime, endTime))
-
-                val nextRange = getNextRange(start, end)
+                val nextRange = getNextRange(startTime, endTime)
                 startTime = nextRange.first
                 endTime = nextRange.second
+
+                result
             }
+
+            for (transaction in transactions) {
+                yield()
+                for (barData in result) {
+                    yield()
+                    if (transaction.time in barData.startDate..barData.endDate) {
+                        if (transaction.type == Constants.TYPE_INCOME)
+                            barData.totalIncome += transaction.amount
+                        else
+                            barData.totalExpense -= transaction.amount
+
+                        break
+                    }
+                }
+            }
+
             return result
         }
+
     }
 }
 

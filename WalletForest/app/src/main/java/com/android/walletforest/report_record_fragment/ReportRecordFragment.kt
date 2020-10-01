@@ -127,7 +127,7 @@ class ReportRecordFragment : Fragment() {
                     return barDataList[value.toInt()].xAxisLabel
                 }
             }
-            setLabelCount(barDataList.size, true)
+            labelCount = barDataList.size
         }
 
 
