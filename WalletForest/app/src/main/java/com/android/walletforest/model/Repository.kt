@@ -46,7 +46,7 @@ class Repository private constructor(val appContext: Context) {
 
     var currentPage = 0
 
-    fun getBarEntries(start: Long, end: Long, walletId: Long, timeRange: TimeRange) =
+    fun getBarData(start: Long, end: Long, walletId: Long, timeRange: TimeRange) =
         getTransactionsBetweenRange(start, end, walletId)
             .distinctUntilChanged()
             .map { ChartEntryGenerator.getBarEntries(it, start, end, timeRange) }

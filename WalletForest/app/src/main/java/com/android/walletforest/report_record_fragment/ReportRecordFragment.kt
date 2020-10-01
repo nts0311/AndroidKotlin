@@ -6,15 +6,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
-import com.android.walletforest.TransactionListFragment.TransactionListFragViewModel
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.model.Repository
-import com.android.walletforest.toLocalDate
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
@@ -85,7 +81,7 @@ class ReportRecordFragment : Fragment() {
 
     private fun observeChartData()
     {
-        viewModel.barEntries.observe(viewLifecycleOwner) {
+        viewModel.barData.observe(viewLifecycleOwner) {
             drawInComeExpenseChart(it)
         }
     }
@@ -95,6 +91,9 @@ class ReportRecordFragment : Fragment() {
 
         barChart.apply {
             xAxis.setDrawGridLines(true)
+
+            xAxis.axisMaximum = 5.0f
+
             legend.isEnabled = false
             axisRight.isEnabled = false
             xAxis.position = XAxis.XAxisPosition.BOTTOM
@@ -105,24 +104,8 @@ class ReportRecordFragment : Fragment() {
         }
     }
 
-    private fun drawInComeExpenseChart(barEntries: List<BarEntry>) {
-        val set = BarDataSet(barEntries, "")
-        val green = Color.rgb(110, 190, 102)
-        val red = Color.rgb(211, 74, 88)
-        val colors = mutableListOf<Int>()
-
-        for (i in 0..barEntries.size) {
-            val color = if (i % 2 == 0) green
-            else red
-
-            colors.add(color)
-        }
-
-        set.colors = colors
-
-        val data = BarData(set)
-        data.barWidth = 0.7f
-        income_expense_chart.data = data
+    private fun drawInComeExpenseChart(barData: BarData) {
+        income_expense_chart.data = barData
         income_expense_chart.invalidate()
     }
 
