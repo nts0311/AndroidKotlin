@@ -8,7 +8,7 @@ import com.github.mikephil.charting.data.BarData
 
 class ReportRecordViewModel(private val repository: Repository) : ViewModel() {
 
-    var barData : LiveData<BarData> = MutableLiveData()
+    var barData : LiveData<List<BarChartData>> = MutableLiveData()
     var currentWallet = repository.currentWallet
 
     fun setTimeRange(startTime: Long, endTime: Long, timeRange: String, walletId: Long) {

@@ -29,7 +29,7 @@ fun getMonthAxisLabel(start: Long, end:Long) : String
     val startLD = toLocalDate(start)
     val endLD = toLocalDate(end)
 
-    return "${startLD.dayOfMonth}/${startLD.month} - ${endLD.dayOfMonth}/${endLD.month}"
+    return "${startLD.dayOfMonth}/${startLD.monthValue} - ${endLD.dayOfMonth}/${endLD.monthValue}"
 }
 
 fun getWeekAxisLabel(time:Long) : String

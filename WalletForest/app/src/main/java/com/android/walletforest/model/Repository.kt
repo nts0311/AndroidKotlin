@@ -10,8 +10,8 @@ import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Entities.Category
 import com.android.walletforest.model.Entities.Transaction
 import com.android.walletforest.model.Entities.Wallet
+import com.android.walletforest.report_record_fragment.ChartEntryGenerator
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
@@ -48,8 +48,7 @@ class Repository private constructor(val appContext: Context) {
 
     fun getBarData(start: Long, end: Long, walletId: Long, timeRange: TimeRange) =
         getTransactionsBetweenRange(start, end, walletId)
-            .distinctUntilChanged()
-            .map { ChartEntryGenerator.getBarEntries(it, start, end, timeRange) }
+            .map { ChartEntryGenerator.getBarChartData(it, start, end, timeRange) }
             .flowOn(Dispatchers.Default)
 
 
@@ -156,7 +155,7 @@ class Repository private constructor(val appContext: Context) {
                         walletId
                     )
 
-            fetchedRange[key] = transactions
+            fetchedRange[key] = transactions.distinctUntilChanged()
 
             transactions
         }

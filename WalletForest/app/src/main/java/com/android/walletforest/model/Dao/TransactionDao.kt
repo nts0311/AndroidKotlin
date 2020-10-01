@@ -18,7 +18,7 @@ interface TransactionDao {
         walletId: Long
     ): Flow<List<Transaction>>
 
-    @Query("SELECT * FROM transactions WHERE (time >= :start AND time <= :end)")
+    @Query("SELECT * FROM transactions WHERE (time >= :start AND time <= :end) ORDER BY time")
     fun getTransactionsBetweenRange(start: Long, end: Long) : Flow<List<Transaction>>
 
     @Query("SELECT * FROM transactions WHERE (time >= :start AND time <= :end) AND (walletId = :walletId) ORDER BY time")

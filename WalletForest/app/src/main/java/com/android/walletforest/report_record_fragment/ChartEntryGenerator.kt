@@ -1,25 +1,24 @@
-package com.android.walletforest.model
+package com.android.walletforest.report_record_fragment
 
-import android.graphics.Color
 import com.android.walletforest.*
 import com.android.walletforest.enums.Constants
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.model.Entities.Transaction
-import com.github.mikephil.charting.data.BarData
-import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.data.BarEntry
 import kotlinx.coroutines.yield
 
 
 class ChartEntryGenerator() {
 
     companion object {
-        suspend fun getBarEntries(
+        suspend fun getBarChartData(
             transactions: List<Transaction>,
             start: Long,
             end: Long,
             timeRange: TimeRange
-        ): BarData {
+        ): List<BarChartData> {
+
+            if(transactions.isEmpty()) return listOf()
+
             var rangeEndDate = end
 
             when (timeRange) {
@@ -82,22 +81,28 @@ class ChartEntryGenerator() {
                     }
                 }
 
-                TimeRange.CUSTOM -> return getBarData(transactions, start, end, timeRange) { start, end ->
+                TimeRange.CUSTOM -> return getBarData(
+                    transactions,
+                    start,
+                    end,
+                    timeRange
+                ) { start, end ->
                     Pair(start, end)
                 }
 
-                else -> return BarData()
+                else -> return listOf()
             }
         }
 
 
-        private suspend fun getBarEntries(
+        private suspend fun getBarChartData(
             transactions: List<Transaction>,
             start: Long,
             end: Long,
+            timeRange: TimeRange,
             getNextRange: (Long, Long) -> Pair<Long, Long>
-        ): MutableList<BarEntry> {
-            val result = mutableListOf<BarEntry>()
+        ): MutableList<BarChartData> {
+            val result = mutableListOf<BarChartData>()
             var startTime = start
             var endTime = end
 
@@ -113,8 +118,16 @@ class ChartEntryGenerator() {
                     else
                         totalExpense -= transaction.amount
                 } else {
-                    result.add(BarEntry(xPos, totalIncome.toFloat()))
-                    result.add(BarEntry(xPos, totalExpense.toFloat()))
+
+                    val label = when (timeRange) {
+                        TimeRange.MONTH -> getMonthAxisLabel(startTime, endTime)
+                        TimeRange.WEEK -> getWeekAxisLabel(startTime)
+                        TimeRange.YEAR -> getYearAxisLabel(startTime)
+                        TimeRange.CUSTOM -> getCustomAxisLabel(startTime, endTime)
+                    }
+
+                    result.add(BarChartData(label, totalIncome, totalExpense, startTime, endTime))
+
                     xPos++
 
                     val nextRange = getNextRange(start, end)
@@ -137,7 +150,7 @@ class ChartEntryGenerator() {
             end: Long,
             timeRange: TimeRange,
             getNextRange: (Long, Long) -> Pair<Long, Long>
-        ): BarData {
+        ): List<BarChartData> {
 
             val maxEntryCount = when (timeRange) {
                 TimeRange.MONTH -> 5
@@ -146,24 +159,17 @@ class ChartEntryGenerator() {
                 TimeRange.CUSTOM -> 1
             }
 
-            val barEntries = getBarEntries(transactions,start, end,getNextRange)
-
             var startTime = start
             var endTime = end
 
-            val xAxisLabel = mutableListOf<String>()
+            val result = getBarChartData(transactions, startTime, endTime, timeRange,getNextRange)
+            startTime = result.last().startDate
+            endTime = result.last().endDate
 
-            val green = Color.rgb(110, 190, 102)
-            val red = Color.rgb(211, 74, 88)
+            //Fill result with empty data
 
-            var count = barEntries.size
-            while (barEntries.size != maxEntryCount*2) {
-               yield()
-
-                barEntries.add(BarEntry(count.toFloat(), 0f))
-                barEntries.add(BarEntry(count.toFloat(), 0f))
-                count++
-
+            while (result.size != maxEntryCount) {
+                yield()
                 val label = when (timeRange) {
                     TimeRange.MONTH -> getMonthAxisLabel(startTime, endTime)
                     TimeRange.WEEK -> getWeekAxisLabel(startTime)
@@ -171,25 +177,14 @@ class ChartEntryGenerator() {
                     TimeRange.CUSTOM -> getCustomAxisLabel(startTime, endTime)
                 }
 
-                xAxisLabel.add(label)
+                result.add(BarChartData(label, 0, 0, startTime, endTime))
 
                 val nextRange = getNextRange(start, end)
                 startTime = nextRange.first
                 endTime = nextRange.second
             }
-
-            val set = BarDataSet(barEntries, "")
-            set.colors = List(maxEntryCount*2) {
-                if (it % 2 == 0) green
-                else red
-            }
-
-            val data = BarData(set)
-            data.barWidth=0.8f
-
-            return data
+            return result
         }
-
     }
 }
 

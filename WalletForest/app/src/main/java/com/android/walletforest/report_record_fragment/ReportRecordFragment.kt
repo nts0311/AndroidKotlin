@@ -15,6 +15,7 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.formatter.ValueFormatter
 import kotlinx.android.synthetic.main.fragment_report_record.*
 
 private const val START_TIME_PARAM = "startTime"
@@ -79,8 +80,7 @@ class ReportRecordFragment : Fragment() {
         }
     }
 
-    private fun observeChartData()
-    {
+    private fun observeChartData() {
         viewModel.barData.observe(viewLifecycleOwner) {
             drawInComeExpenseChart(it)
         }
@@ -92,7 +92,7 @@ class ReportRecordFragment : Fragment() {
         barChart.apply {
             xAxis.setDrawGridLines(true)
 
-            xAxis.axisMaximum = 5.0f
+            //xAxis.axisMaximum = 5.0f
 
             legend.isEnabled = false
             axisRight.isEnabled = false
@@ -104,8 +104,42 @@ class ReportRecordFragment : Fragment() {
         }
     }
 
-    private fun drawInComeExpenseChart(barData: BarData) {
-        income_expense_chart.data = barData
+    private fun drawInComeExpenseChart(barDataList: List<BarChartData>) {
+
+        if(barDataList.isEmpty()) return
+
+        val barEntries = mutableListOf<BarEntry>()
+
+        var xPos = 0
+        barDataList.forEach {
+            barEntries.add(BarEntry(xPos.toFloat(), it.totalIncome.toFloat()))
+            barEntries.add(BarEntry(xPos.toFloat(), it.totalExpense.toFloat()))
+            xPos++
+        }
+
+        income_expense_chart.xAxis.apply {
+            axisMaximum = barDataList.size.toFloat()
+            valueFormatter = object : ValueFormatter()
+            {
+                override fun getFormattedValue(value: Float): String {
+                    if(value >= barDataList.size) return ""
+
+                    return barDataList[value.toInt()].xAxisLabel
+                }
+            }
+            setLabelCount(barDataList.size, true)
+        }
+
+
+        val set = BarDataSet(barEntries, "")
+        val blue = Color.rgb(52, 134, 235)
+        val red = Color.rgb(211, 74, 88)
+        set.colors = List(barDataList.size * 2) { if (it % 2 == 0) blue else red }
+
+        val data = BarData(set)
+        data.barWidth = 0.8f
+
+        income_expense_chart.data = data
         income_expense_chart.invalidate()
     }
 
