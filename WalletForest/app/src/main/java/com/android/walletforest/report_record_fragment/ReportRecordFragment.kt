@@ -13,6 +13,7 @@ import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.model.Repository
+import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
@@ -103,7 +104,7 @@ class ReportRecordFragment : Fragment() {
 
             xAxis.labelRotationAngle = 45f
             xAxis.setDrawAxisLine(false)
-            description.text = ""
+            description.isEnabled = false
 
             axisLeft.valueFormatter = LargeValueFormatter().apply {
                 setSuffix(arrayOf("", "K", "M", "B", "T"))
@@ -149,22 +150,29 @@ class ReportRecordFragment : Fragment() {
         income_expense_chart.invalidate()
     }
 
-    private fun drawPieCharts(pieChartData: PieChartData)
-    {
-        drawPieChart(income_chart, pieChartData.incomePieList)
-        drawPieChart(expense_chart, pieChartData.expensePieList)
+    private fun drawPieCharts(pieChartData: PieChartData) {
+        if (pieChartData.incomePieList.isNotEmpty())
+            drawPieChart(income_chart, pieChartData.incomePieList)
+        if (pieChartData.expensePieList.isNotEmpty())
+            drawPieChart(expense_chart, pieChartData.expensePieList)
     }
 
-    private fun IntArray.asList(): List<Int> {
-        val list = mutableListOf<Int>()
-        onEach { list.add(it) }
-        return list
-    }
 
-    private fun drawPieChart(pieChart: PieChart, categoryMap: Map<Long, Long>) {
-        val dataSet = PieDataSet(getPieEntries(categoryMap), "")
-        dataSet.colors = ColorTemplate.COLORFUL_COLORS.asList()
-        dataSet.iconsOffset= MPPointF(0f, 25f)
+    private fun drawPieChart(pieChart: PieChart, pieList: List<Pair<Long, Long>>) {
+        pieChart.setExtraOffsets(0f, 10f, 0f, 15f)
+        pieChart.description.isEnabled = false
+        pieChart.transparentCircleRadius = 65f
+        pieChart.setTransparentCircleColor(Color.rgb(36, 36, 36))
+        pieChart.isRotationEnabled = false
+
+        val dataSet = PieDataSet(getPieEntries(pieList), "")
+        dataSet.colors = listOf(
+            Color.rgb(5, 64, 82), Color.rgb(24, 184, 130),
+            Color.rgb(31, 149, 204), Color.rgb(204, 167, 6), Color.rgb(214, 60, 9),
+        )
+        dataSet.iconsOffset = MPPointF(0f, 25f)
+
+        dataSet.setDrawValues(false)
 
         pieChart.setUsePercentValues(true)
 
@@ -175,25 +183,44 @@ class ReportRecordFragment : Fragment() {
         pieChart.invalidate()
     }
 
-    private fun getPieEntries(categoryMap: Map<Long, Long>): List<PieEntry> {
+    private fun getDrawable(imageId: Int): ScaleDrawable {
+        return ScaleDrawable(
+            requireContext().getDrawable(imageId),
+            Gravity.CENTER,
+            1f,
+            1f
+        ).apply {
+            level = 5000
+            invalidateSelf()
+        }
+    }
+
+    private fun getPieEntries(pieList: List<Pair<Long, Long>>): List<PieEntry> {
+
         val pieEntries = mutableListOf<PieEntry>()
 
-        categoryMap.toList().forEach {
-            val cateImageId = viewModel.getCateImageId(it.first)
-            val cateImage =
-                ScaleDrawable(
-                    requireContext().getDrawable(cateImageId),
-                    Gravity.CENTER,
-                    1f,
-                    1f
-                ).apply {
-                    level = 5000
-                    invalidateSelf()
-                }
+        if (pieList.size <= 5) {
+            pieList.forEach {
+                val cateImage = getDrawable(viewModel.getCateImageId(it.first))
+                pieEntries.add(PieEntry(it.second.toFloat(), cateImage))
+            }
+        } else {
+            for (i in 0..4) {
+                val cateImage = getDrawable(viewModel.getCateImageId(pieList[i].first))
+                pieEntries.add(PieEntry(pieList[i].second.toFloat(), cateImage))
+            }
 
-            pieEntries.add(PieEntry(it.second.toFloat(), cateImage))
+            var otherCateAmount = 0L
+            for (i in 5 until pieList.size)
+                otherCateAmount += pieList[i].second
+
+            pieEntries.add(
+                PieEntry(
+                    otherCateAmount.toFloat(),
+                    getDrawable(R.drawable.ic_category_other_chart)
+                )
+            )
         }
-
         return pieEntries
     }
 
