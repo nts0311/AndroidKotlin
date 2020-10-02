@@ -172,6 +172,8 @@ class Repository private constructor(val appContext: Context) {
 
     fun getCategoriesByType(type: String) = appDatabase.categoryDao.getCategoriesByType(type)
 
+    fun getCategoryImage(cateId : Long) : Int = categoryMap[cateId]?.imageId!!
+
     companion object {
         private var instance: Repository? = null
 

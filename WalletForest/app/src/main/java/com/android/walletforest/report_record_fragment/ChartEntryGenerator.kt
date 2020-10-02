@@ -15,15 +15,18 @@ class ChartEntryGenerator() {
             start: Long,
             end: Long,
             timeRange: TimeRange
-        ): List<BarChartData> {
+        ): Pair<List<BarChartData>, PieChartData> {
 
-            if (transactions.isEmpty()) return listOf()
+            if (transactions.isEmpty()) return Pair(
+                listOf(),
+                PieChartData(listOf(), listOf())
+            )
 
             val rangeEndDate = end
 
-            when (timeRange) {
+            val barChartData = when (timeRange) {
                 TimeRange.MONTH -> {
-                    return getBarChartData(
+                    getBarChartData(
                         transactions,
                         start,
                         toEpoch(toLocalDate(start).plusDays(6)),
@@ -46,7 +49,7 @@ class ChartEntryGenerator() {
                 }
 
                 TimeRange.WEEK -> {
-                    return getBarChartData(
+                    getBarChartData(
                         transactions,
                         start,
                         toLocalDate(start).plusDays(1).toEpochMilli() - 1,
@@ -64,7 +67,7 @@ class ChartEntryGenerator() {
                 }
 
                 TimeRange.YEAR -> {
-                    return getBarChartData(
+                    getBarChartData(
                         transactions,
                         start,
                         toLocalDate(start).plusMonths(1).minusDays(1).toEpochMilli(),
@@ -81,7 +84,7 @@ class ChartEntryGenerator() {
                     }
                 }
 
-                TimeRange.CUSTOM -> return getBarChartData(
+                TimeRange.CUSTOM -> getBarChartData(
                     transactions,
                     start,
                     end,
@@ -89,9 +92,11 @@ class ChartEntryGenerator() {
                 ) { start, end ->
                     Pair(start, end)
                 }
-
-                else -> return listOf()
             }
+
+            val pieChartData = getPieData(transactions)
+
+            return Pair(barChartData, pieChartData)
         }
 
         private fun getLabel(timeRange: TimeRange, startTime: Long, endTime: Long): String =
@@ -101,6 +106,7 @@ class ChartEntryGenerator() {
                 TimeRange.YEAR -> getYearAxisLabel(startTime)
                 TimeRange.CUSTOM -> getCustomAxisLabel(startTime, endTime)
             }
+
         private suspend fun getBarChartData(
             transactions: List<Transaction>,
             start: Long,
@@ -147,6 +153,27 @@ class ChartEntryGenerator() {
             }
 
             return result
+        }
+
+        private suspend fun getPieData(transactions: List<Transaction>): PieChartData {
+            val incomeCategoryMap = mutableMapOf<Long, Long>()
+            val expenseCategoryMap = mutableMapOf<Long, Long>()
+
+            for (transaction in transactions) {
+                yield()
+                if (transaction.type == Constants.TYPE_INCOME) {
+                    val value = incomeCategoryMap.getOrDefault(transaction.categoryId, 0L)
+                    incomeCategoryMap[transaction.categoryId] = value + transaction.amount
+                } else {
+                    val value = expenseCategoryMap.getOrDefault(transaction.categoryId, 0L)
+                    expenseCategoryMap[transaction.categoryId] = value + transaction.amount
+                }
+            }
+
+            val incomePieList = incomeCategoryMap.toList().sortedByDescending { (_, value) -> value }
+            val expensePieList = expenseCategoryMap.toList().sortedByDescending { (_, value) -> value }
+
+            return PieChartData(incomePieList, expensePieList)
         }
 
     }

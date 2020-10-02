@@ -1,21 +1,25 @@
 package com.android.walletforest.report_record_fragment
 
 import android.graphics.Color
+import android.graphics.drawable.ScaleDrawable
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.model.Repository
+import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.BarData
-import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.formatter.LargeValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.utils.ColorTemplate
+import com.github.mikephil.charting.utils.MPPointF
 import kotlinx.android.synthetic.main.fragment_report_record.*
 
 private const val START_TIME_PARAM = "startTime"
@@ -82,7 +86,8 @@ class ReportRecordFragment : Fragment() {
 
     private fun observeChartData() {
         viewModel.barData.observe(viewLifecycleOwner) {
-            drawInComeExpenseChart(it)
+            drawInComeExpenseChart(it.first)
+            drawPieCharts(it.second)
         }
     }
 
@@ -91,22 +96,24 @@ class ReportRecordFragment : Fragment() {
 
         barChart.apply {
             xAxis.setDrawGridLines(true)
-
-            //xAxis.axisMaximum = 5.0f
-
             legend.isEnabled = false
             axisRight.isEnabled = false
             xAxis.position = XAxis.XAxisPosition.BOTTOM
             xAxis.setDrawGridLines(false)
-            xAxis.labelCount = 4
+
             xAxis.labelRotationAngle = 45f
+            xAxis.setDrawAxisLine(false)
             description.text = ""
+
+            axisLeft.valueFormatter = LargeValueFormatter().apply {
+                setSuffix(arrayOf("", "K", "M", "B", "T"))
+            }
         }
     }
 
     private fun drawInComeExpenseChart(barDataList: List<BarChartData>) {
 
-        if(barDataList.isEmpty()) return
+        if (barDataList.isEmpty()) return
 
         val barEntries = mutableListOf<BarEntry>()
 
@@ -119,10 +126,9 @@ class ReportRecordFragment : Fragment() {
 
         income_expense_chart.xAxis.apply {
             axisMaximum = barDataList.size.toFloat()
-            valueFormatter = object : ValueFormatter()
-            {
+            valueFormatter = object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
-                    if(value >= barDataList.size) return ""
+                    if (value >= barDataList.size) return ""
 
                     return barDataList[value.toInt()].xAxisLabel
                 }
@@ -143,6 +149,53 @@ class ReportRecordFragment : Fragment() {
         income_expense_chart.invalidate()
     }
 
+    private fun drawPieCharts(pieChartData: PieChartData)
+    {
+        drawPieChart(income_chart, pieChartData.incomePieList)
+        drawPieChart(expense_chart, pieChartData.expensePieList)
+    }
+
+    private fun IntArray.asList(): List<Int> {
+        val list = mutableListOf<Int>()
+        onEach { list.add(it) }
+        return list
+    }
+
+    private fun drawPieChart(pieChart: PieChart, categoryMap: Map<Long, Long>) {
+        val dataSet = PieDataSet(getPieEntries(categoryMap), "")
+        dataSet.colors = ColorTemplate.COLORFUL_COLORS.asList()
+        dataSet.iconsOffset= MPPointF(0f, 25f)
+
+        pieChart.setUsePercentValues(true)
+
+        val data = PieData(dataSet)
+        pieChart.legend.isEnabled = false
+
+        pieChart.data = data
+        pieChart.invalidate()
+    }
+
+    private fun getPieEntries(categoryMap: Map<Long, Long>): List<PieEntry> {
+        val pieEntries = mutableListOf<PieEntry>()
+
+        categoryMap.toList().forEach {
+            val cateImageId = viewModel.getCateImageId(it.first)
+            val cateImage =
+                ScaleDrawable(
+                    requireContext().getDrawable(cateImageId),
+                    Gravity.CENTER,
+                    1f,
+                    1f
+                ).apply {
+                    level = 5000
+                    invalidateSelf()
+                }
+
+            pieEntries.add(PieEntry(it.second.toFloat(), cateImage))
+        }
+
+        return pieEntries
+    }
 
     companion object {
         @JvmStatic
