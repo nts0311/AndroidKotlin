@@ -21,12 +21,9 @@ class ChartEntryGenerator() {
             start: Long,
             end: Long,
             timeRange: TimeRange
-        ): Pair<List<BarChartData>, PieChartData> {
+        ): List<BarChartData> {
 
-            if (transactions.isEmpty()) return Pair(
-                listOf(),
-                PieChartData(listOf(), listOf())
-            )
+            if (transactions.isEmpty()) return listOf()
 
             val rangeEndDate = end
 
@@ -100,9 +97,7 @@ class ChartEntryGenerator() {
                 }
             }
 
-            val pieChartData = getPieData(transactions)
-
-            return Pair(barChartData, pieChartData)
+            return barChartData
         }
 
         private fun getLabel(timeRange: TimeRange, startTime: Long, endTime: Long): String =
@@ -159,29 +154,6 @@ class ChartEntryGenerator() {
             }
 
             return result
-        }
-
-        private suspend fun getPieData(transactions: List<Transaction>): PieChartData {
-            val incomeCategoryMap = mutableMapOf<Long, Long>()
-            val expenseCategoryMap = mutableMapOf<Long, Long>()
-
-            for (transaction in transactions) {
-                yield()
-                if (transaction.type == Constants.TYPE_INCOME) {
-                    val value = incomeCategoryMap.getOrDefault(transaction.categoryId, 0L)
-                    incomeCategoryMap[transaction.categoryId] = value + transaction.amount
-                } else {
-                    val value = expenseCategoryMap.getOrDefault(transaction.categoryId, 0L)
-                    expenseCategoryMap[transaction.categoryId] = value + transaction.amount
-                }
-            }
-
-            val incomePieList =
-                incomeCategoryMap.toList().sortedByDescending { (_, value) -> value }
-            val expensePieList =
-                expenseCategoryMap.toList().sortedByDescending { (_, value) -> value }
-
-            return PieChartData(incomePieList, expensePieList)
         }
 
         private fun getDrawable(context: Context, imageId: Int): ScaleDrawable {

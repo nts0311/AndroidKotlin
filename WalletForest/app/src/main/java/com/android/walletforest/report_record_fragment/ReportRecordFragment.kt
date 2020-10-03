@@ -1,28 +1,21 @@
 package com.android.walletforest.report_record_fragment
 
 import android.graphics.Color
-import android.graphics.drawable.ScaleDrawable
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.asFlow
-import androidx.lifecycle.lifecycleScope
 import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.model.Repository
-import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.LargeValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
-import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.utils.MPPointF
 import kotlinx.android.synthetic.main.fragment_report_record.*
-import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.launch
 
 private const val START_TIME_PARAM = "startTime"
 private const val END_TIME_PARAM = "endTime"
@@ -64,7 +57,7 @@ class ReportRecordFragment : Fragment() {
 
         if (startTime != null && endTime != null && timeRange != null) {
             viewModel.setTimeRange(startTime!!, endTime!!, timeRange!!, walletId!!)
-            viewModel.getPieEntries(startTime!!, endTime!!, timeRange!!, walletId!!)
+            viewModel.getPieEntries(startTime!!, endTime!!, walletId!!)
         }
 
         return inflater.inflate(R.layout.fragment_report_record, container, false)
@@ -77,22 +70,45 @@ class ReportRecordFragment : Fragment() {
         setUpIncomeExpenseChart()
 
         registerObservers()
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.report_frag_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        if(item.itemId == R.id.change_pie_mode)
+        {
+            viewModel.excludeSubCate = !viewModel.excludeSubCate
+            viewModel.getPieEntries(startTime!!,endTime!!, walletId!!)
+            observePieChartData()
+        }
+
+        return true
     }
 
     private fun registerObservers() {
         viewModel.currentWallet.observe(viewLifecycleOwner)
         {
             viewModel.setTimeRange(startTime!!, endTime!!, timeRange!!, it.id)
-            viewModel.getPieEntries(startTime!!, endTime!!, timeRange!!, walletId!!)
-            observeChartData()
+            viewModel.getPieEntries(startTime!!, endTime!!, walletId!!)
+            observeBarChartData()
+            observePieChartData()
         }
     }
 
-    private fun observeChartData() {
+    private fun observeBarChartData() {
+        viewModel.barData.removeObservers(viewLifecycleOwner)
         viewModel.barData.observe(viewLifecycleOwner) {
-            drawInComeExpenseChart(it.first)
+            drawInComeExpenseChart(it)
         }
+    }
 
+    private fun observePieChartData()
+    {
+        viewModel.pieEntries.removeObservers(viewLifecycleOwner)
         viewModel.pieEntries.observe(viewLifecycleOwner) {
             drawPieCharts(it)
         }

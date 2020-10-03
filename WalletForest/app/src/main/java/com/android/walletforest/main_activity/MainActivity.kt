@@ -106,6 +106,8 @@ class MainActivity : AppCompatActivity() {
             R.id.edit_wallet_item -> {
 
             }
+
+            R.id.change_pie_mode -> return false
         }
 
         return true
