@@ -20,6 +20,6 @@ data class Transaction(
     var type: String,
     var amount: Long,
     var note: String,
-    var time: Long
+    var date: Long
 ) {
 }

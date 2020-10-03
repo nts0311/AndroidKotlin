@@ -11,17 +11,17 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE id = :id")
     fun getTransaction(id: Long): LiveData<Transaction>
 
-    @Query("SELECT * FROM transactions WHERE (time >= :start AND time <= :end) AND (walletId = :walletId)")
+    @Query("SELECT * FROM transactions WHERE (date >= :start AND date <= :end) AND (walletId = :walletId)")
     fun getTransactionsBetweenRangeOfWallet(
         start: Long,
         end: Long,
         walletId: Long
     ): Flow<List<Transaction>>
 
-    @Query("SELECT * FROM transactions WHERE (time >= :start AND time <= :end) ORDER BY time")
+    @Query("SELECT * FROM transactions WHERE (date >= :start AND date <= :end) ORDER BY date")
     fun getTransactionsBetweenRange(start: Long, end: Long) : Flow<List<Transaction>>
 
-    @Query("SELECT * FROM transactions WHERE (time >= :start AND time <= :end) AND (walletId = :walletId) ORDER BY time")
+    @Query("SELECT * FROM transactions WHERE (date >= :start AND date <= :end) AND (walletId = :walletId) ORDER BY date")
     fun getTransactionsBetweenRangeOfWalletFlow(
         start: Long,
         end: Long,

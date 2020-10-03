@@ -45,10 +45,6 @@ class DataItemAdapter(
         }
 
     var timeRange = timeRange
-        set(value) {
-            field = value
-            //notifyDataSetChanged()
-        }
 
     var itemClickListener: (transaction: Transaction) -> Unit = {}
 
@@ -127,7 +123,7 @@ class TransactionItemViewHolder(var binding: ItemTransactionBinding) :
                 categoryImage.visibility = View.INVISIBLE
                 categoryText.visibility = View.INVISIBLE
 
-                val date = toLocalDate(transaction.time)
+                val date = toLocalDate(transaction.date)
 
                 dateText.text = dateFormatter.format(date)
                 dateText.visibility = View.VISIBLE

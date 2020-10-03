@@ -22,7 +22,6 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
 
     private var groupDataJob: Job? = null
 
-    private val hasTransactionListChanged = MutableLiveData(false)
     var transactionList : LiveData<List<Transaction>> = MutableLiveData()
 
     private var _dataItemList: MutableLiveData<List<DataItem>> = MutableLiveData()

@@ -1,7 +1,12 @@
 package com.android.walletforest.report_record_fragment
 
-data class PieChartData(
-    var incomePieList: List<Pair<Long, Long>>,
-    var expensePieList: List<Pair<Long, Long>>
-) {
+import com.github.mikephil.charting.data.PieEntry
+import java.io.Serializable
+
+class PieChartData: Serializable {
+    var incomePieEntries : List<PieEntry> = listOf()
+    var expensePieEntries : List<PieEntry> = listOf()
+
+    var incomeCategoryInfo : List<Pair<Long, Long>> = listOf()
+    var expenseCategoryInfo : List<Pair<Long, Long>> = listOf()
 }

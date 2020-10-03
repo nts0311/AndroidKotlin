@@ -113,7 +113,7 @@ class TransactionDetailActivity : AppCompatActivity() {
                 categoryId = transactionCategoryId
                 amount = binding.amountTxt.text.toString().toLong()
                 note = binding.noteEdt.text.toString()
-                time = transactionDate
+                date = transactionDate
                 type = viewModel.categories[transactionCategoryId]?.type!!
             }
 
@@ -203,7 +203,7 @@ class TransactionDetailActivity : AppCompatActivity() {
                 if (it == null) return@observe
 
                 currentTransaction = it
-                transactionDate = it.time
+                transactionDate = it.date
                 transactionCategoryId = it.categoryId
 
                 //category
@@ -218,7 +218,7 @@ class TransactionDetailActivity : AppCompatActivity() {
                 binding.amountTxt.setTextColor(color)
 
                 //date
-                binding.dateTxt.text = dateToFullString(toLocalDate(it.time))
+                binding.dateTxt.text = dateToFullString(toLocalDate(it.date))
 
                 //wallet name
                 binding.walletNameTxt.text = viewModel.wallets[it.walletId]?.name

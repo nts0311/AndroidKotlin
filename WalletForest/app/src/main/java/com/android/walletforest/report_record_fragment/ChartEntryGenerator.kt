@@ -9,7 +9,6 @@ import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.model.Entities.Transaction
 import com.android.walletforest.model.Repository
 import com.github.mikephil.charting.data.PieEntry
-import kotlinx.coroutines.NonCancellable.isActive
 import kotlinx.coroutines.yield
 
 
@@ -142,7 +141,7 @@ class ChartEntryGenerator() {
                 yield()
                 for (barData in result) {
                     yield()
-                    if (transaction.time in barData.startDate..barData.endDate) {
+                    if (transaction.date in barData.startDate..barData.endDate) {
                         if (transaction.type == Constants.TYPE_INCOME)
                             barData.totalIncome += transaction.amount
                         else
@@ -172,8 +171,7 @@ class ChartEntryGenerator() {
             transactions: List<Transaction>,
             excludeSubCate: Boolean,
             context: Context
-        ) : Pair<List<PieEntry>, List<PieEntry>>
-        {
+        ): PieChartData {
             val categoriesMap = Repository.getInstance(context.applicationContext).categoryMap
 
             val incomeCategoryMap = mutableMapOf<Long, Long>()
@@ -194,13 +192,23 @@ class ChartEntryGenerator() {
                 }
             }
 
-            return Pair(toPieEntries(context, incomeCategoryMap), toPieEntries(context, expenseCategoryMap))
+            val result = PieChartData()
+
+            result.incomeCategoryInfo =
+                incomeCategoryMap.toList().sortedByDescending { (_, value) -> value }
+            result.expenseCategoryInfo =
+                expenseCategoryMap.toList().sortedByDescending { (_, value) -> value }
+            result.incomePieEntries = toPieEntries(context, result.incomeCategoryInfo)
+            result.expensePieEntries = toPieEntries(context, result.expenseCategoryInfo)
+
+            return result
         }
 
-        private suspend fun toPieEntries(context: Context, cateReport : Map<Long, Long>) : List<PieEntry>
-        {
+        private suspend fun toPieEntries(
+            context: Context,
+            pieList: List<Pair<Long, Long>>
+        ): List<PieEntry> {
             val categoriesMap = Repository.getInstance(context.applicationContext).categoryMap
-            val pieList = cateReport.toList().sortedByDescending { (_, value) -> value }
 
             val pieEntries = mutableListOf<PieEntry>()
 
@@ -218,8 +226,7 @@ class ChartEntryGenerator() {
                 }
 
                 var otherCateAmount = 0L
-                for (i in 5 until pieList.size)
-                {
+                for (i in 5 until pieList.size) {
                     yield()
                     otherCateAmount += pieList[i].second
                 }
@@ -227,7 +234,8 @@ class ChartEntryGenerator() {
                 pieEntries.add(
                     PieEntry(
                         otherCateAmount.toFloat(),
-                        getDrawable(context, R.drawable.ic_category_other_chart))
+                        getDrawable(context, R.drawable.ic_category_other_chart)
+                    )
                 )
             }
             return pieEntries

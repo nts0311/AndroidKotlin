@@ -34,15 +34,15 @@ class DataGrouper {
         if (viewType == ViewType.TRANSACTION) {
             when (timeRange) {
                 TimeRange.WEEK, TimeRange.MONTH -> group { dividerItem, transaction ->
-                    dividerItem.date.dayOfMonth == toLocalDate(transaction.time).dayOfMonth
+                    dividerItem.date.dayOfMonth == toLocalDate(transaction.date).dayOfMonth
                 }
 
                 TimeRange.YEAR -> group { dividerItem, transaction ->
-                    dividerItem.date.monthValue == toLocalDate(transaction.time).monthValue
+                    dividerItem.date.monthValue == toLocalDate(transaction.date).monthValue
                 }
 
                 TimeRange.CUSTOM -> group { dividerItem, transaction ->
-                    val transactionDate = toLocalDate(transaction.time)
+                    val transactionDate = toLocalDate(transaction.date)
                     (dividerItem.date.monthValue == transactionDate.monthValue)
                             && (dividerItem.date.dayOfMonth == transactionDate.dayOfMonth)
                 }
@@ -76,19 +76,19 @@ class DataGrouper {
             transactions = if (viewType == ViewType.TRANSACTION) {
                 transactions.sortedWith { t1: Transaction, t2: Transaction ->
 
-                    if (t1.time == t2.time)
+                    if (t1.date == t2.date)
                         cmpLong(t2.id, t1.id)
                     else
-                        cmpLong(t2.time, t1.time)
+                        cmpLong(t2.date, t1.date)
                 }
             } else {
                 transactions.sortedWith { t1: Transaction, t2: Transaction ->
 
                     if (t1.categoryId == t2.categoryId) {
-                        if (t2.time == t1.time)
+                        if (t2.date == t1.date)
                             cmpLong(t2.id, t1.id)
                         else
-                            cmpLong(t2.time, t1.time)
+                            cmpLong(t2.date, t1.date)
                     } else
                         cmpLong(t1.categoryId, t2.categoryId)
                 }
@@ -99,7 +99,7 @@ class DataGrouper {
             var numOfTransaction = 0
 
             var currentDividerItem = DataItem.DividerItem(
-                toLocalDate(transactions[0].time), transactions[0].categoryId,
+                toLocalDate(transactions[0].date), transactions[0].categoryId,
                 totalAmount, numOfTransaction
             )
 
@@ -138,7 +138,7 @@ class DataGrouper {
 
 
                     val dividerItem = DataItem.DividerItem(
-                        toLocalDate(transaction.time), transaction.categoryId,
+                        toLocalDate(transaction.date), transaction.categoryId,
                         totalAmount, numOfTransaction
                     )
 

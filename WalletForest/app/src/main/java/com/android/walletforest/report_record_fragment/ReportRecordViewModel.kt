@@ -3,13 +3,12 @@ package com.android.walletforest.report_record_fragment
 import androidx.lifecycle.*
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.model.Repository
-import com.github.mikephil.charting.data.PieEntry
 
 
 class ReportRecordViewModel(private val repository: Repository) : ViewModel() {
 
     var barData: LiveData<List<BarChartData>> = MutableLiveData()
-    var pieEntries: LiveData<Pair<List<PieEntry>, List<PieEntry>>> = MutableLiveData()
+    var pieChartData: LiveData<PieChartData> = MutableLiveData()
 
     var currentWallet = repository.currentWallet
     var excludeSubCate = false
@@ -19,7 +18,7 @@ class ReportRecordViewModel(private val repository: Repository) : ViewModel() {
     }
 
     fun getPieEntries(startTime: Long, endTime: Long, walletId: Long) {
-        pieEntries =
+        pieChartData =
             repository.getPieEntries(startTime, endTime, walletId, excludeSubCate).asLiveData()
     }
 }
