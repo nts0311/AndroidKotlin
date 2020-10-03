@@ -3,12 +3,11 @@ package com.android.walletforest.report_record_fragment
 import android.graphics.Color
 import android.graphics.drawable.ScaleDrawable
 import android.os.Bundle
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.lifecycleScope
 import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
 import com.android.walletforest.enums.TimeRange
@@ -22,6 +21,8 @@ import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.utils.MPPointF
 import kotlinx.android.synthetic.main.fragment_report_record.*
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.launch
 
 private const val START_TIME_PARAM = "startTime"
 private const val END_TIME_PARAM = "endTime"
@@ -75,6 +76,19 @@ class ReportRecordFragment : Fragment() {
         setUpIncomeExpenseChart()
 
         registerObservers()
+    }
+
+    @InternalCoroutinesApi
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+        R.id.edit_wallet_item -> {
+
+            viewModel.test()
+
+        }
+    }
+
+    return true
     }
 
     private fun registerObservers() {
@@ -168,7 +182,8 @@ class ReportRecordFragment : Fragment() {
         val dataSet = PieDataSet(getPieEntries(pieList), "")
         dataSet.colors = listOf(
             Color.rgb(5, 64, 82), Color.rgb(24, 184, 130),
-            Color.rgb(31, 149, 204), Color.rgb(204, 167, 6), Color.rgb(214, 60, 9),
+            Color.rgb(31, 149, 204), Color.rgb(204, 167, 6),
+            Color.rgb(212, 81, 25), Color.rgb(224, 139, 90)
         )
         dataSet.iconsOffset = MPPointF(0f, 25f)
 
@@ -217,9 +232,7 @@ class ReportRecordFragment : Fragment() {
             pieEntries.add(
                 PieEntry(
                     otherCateAmount.toFloat(),
-                    getDrawable(R.drawable.ic_category_other_chart)
-                )
-            )
+                    getDrawable(R.drawable.ic_category_other_chart)))
         }
         return pieEntries
     }

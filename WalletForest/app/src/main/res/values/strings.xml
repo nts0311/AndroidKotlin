@@ -64,4 +64,74 @@
     <string name="income_expense">Income &amp; Expense</string>
     <string name="net_income">Net income</string>
 
+
+    <!-- categories label -->
+    <string name="food_n_beverage">Food &amp; Beverage</string>
+    <string name="restaurants">Restaurants</string>
+    <string name="cafe">Café</string>
+
+    <string name="bill_utilities">Bill &amp; Utilities</string>
+    <string name="phone">Phone</string>
+    <string name="water">Water</string>
+    <string name="electricity">Electricity</string>
+    <string name="gas">Gas</string>
+    <string name="television">Television</string>
+    <string name="internet">Internet</string>
+    <string name="rentals">Rentals</string>
+
+    <string name="transportation">Transportation</string>
+    <string name="taxi">Taxi</string>
+    <string name="parking_fees">Parking Fees</string>
+    <string name="petrol">Petrol</string>
+    <string name="maintenance">Maintenance</string>
+
+    <string name="shopping">Shopping</string>
+    <string name="clothing">Clothing</string>
+    <string name="footwear">Footwear</string>
+    <string name="accessories">Accessories</string>
+    <string name="electronics">Electronics</string>
+
+    <string name="friends_n_lover">Friends &amp; Lover</string>
+
+    <string name="entertainment">Entertainment</string>
+    <string name="movies">Movies</string>
+    <string name="games">Games</string>
+
+    <string name="travel">Travel</string>
+
+    <string name="health_fitness">Health &amp; Fitness</string>
+    <string name="sports">Sports</string>
+    <string name="doctor">Doctor</string>
+    <string name="pharmacy">Pharmacy</string>
+    <string name="personal_care">Personal Care</string>
+
+    <string name="gift_donations">Gift &amp; Donations</string>
+    <string name="marriage">Marriage</string>
+    <string name="funeral">Funeral</string>
+    <string name="charity">Charity</string>
+
+    <string name="family">Family</string>
+    <string name="children_baby">Children &amp; Baby</string>
+    <string name="home_improvement">Home Improvement</string>
+    <string name="home_services">Home Services</string>
+    <string name="pets">Pets</string>
+
+    <string name="education">Education</string>
+    <string name="books">Books</string>
+
+    <string name="investment">Investment</string>
+    <string name="business">Business</string>
+    <string name="insurances">Insurances</string>
+    <string name="fees_n_charges">Fees &amp; Charges</string>
+    <string name="withdrawal">Withdrawal</string>
+    <string name="other">Other</string>
+
+    <string name="award">Award</string>
+    <string name="interest_money">Interest Money</string>
+    <string name="salary">Salary</string>
+    <string name="gifts">Gifts</string>
+    <string name="selling">Selling</string>
+    <string name="parent">Parent</string>
+
+
 </resources>
