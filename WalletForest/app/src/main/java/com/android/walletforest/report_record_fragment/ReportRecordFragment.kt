@@ -64,6 +64,7 @@ class ReportRecordFragment : Fragment() {
 
         if (startTime != null && endTime != null && timeRange != null) {
             viewModel.setTimeRange(startTime!!, endTime!!, timeRange!!, walletId!!)
+            viewModel.getPieEntries(startTime!!, endTime!!, timeRange!!, walletId!!)
         }
 
         return inflater.inflate(R.layout.fragment_report_record, container, false)
@@ -78,23 +79,11 @@ class ReportRecordFragment : Fragment() {
         registerObservers()
     }
 
-    @InternalCoroutinesApi
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-        R.id.edit_wallet_item -> {
-
-            viewModel.test()
-
-        }
-    }
-
-    return true
-    }
-
     private fun registerObservers() {
         viewModel.currentWallet.observe(viewLifecycleOwner)
         {
             viewModel.setTimeRange(startTime!!, endTime!!, timeRange!!, it.id)
+            viewModel.getPieEntries(startTime!!, endTime!!, timeRange!!, walletId!!)
             observeChartData()
         }
     }
@@ -102,7 +91,10 @@ class ReportRecordFragment : Fragment() {
     private fun observeChartData() {
         viewModel.barData.observe(viewLifecycleOwner) {
             drawInComeExpenseChart(it.first)
-            drawPieCharts(it.second)
+        }
+
+        viewModel.pieEntries.observe(viewLifecycleOwner) {
+            drawPieCharts(it)
         }
     }
 
@@ -164,22 +156,22 @@ class ReportRecordFragment : Fragment() {
         income_expense_chart.invalidate()
     }
 
-    private fun drawPieCharts(pieChartData: PieChartData) {
-        if (pieChartData.incomePieList.isNotEmpty())
-            drawPieChart(income_chart, pieChartData.incomePieList)
-        if (pieChartData.expensePieList.isNotEmpty())
-            drawPieChart(expense_chart, pieChartData.expensePieList)
+    private fun drawPieCharts(pieEntriesPair : Pair<List<PieEntry>, List<PieEntry>>) {
+        if (pieEntriesPair.first.isNotEmpty())
+            drawPieChart(income_chart, pieEntriesPair.first)
+        if (pieEntriesPair.second.isNotEmpty())
+            drawPieChart(expense_chart, pieEntriesPair.second)
     }
 
 
-    private fun drawPieChart(pieChart: PieChart, pieList: List<Pair<Long, Long>>) {
+    private fun drawPieChart(pieChart: PieChart, pieEntries : List<PieEntry>) {
         pieChart.setExtraOffsets(0f, 10f, 0f, 15f)
         pieChart.description.isEnabled = false
         pieChart.transparentCircleRadius = 65f
         pieChart.setTransparentCircleColor(Color.rgb(36, 36, 36))
         pieChart.isRotationEnabled = false
 
-        val dataSet = PieDataSet(getPieEntries(pieList), "")
+        val dataSet = PieDataSet(pieEntries, "")
         dataSet.colors = listOf(
             Color.rgb(5, 64, 82), Color.rgb(24, 184, 130),
             Color.rgb(31, 149, 204), Color.rgb(204, 167, 6),
@@ -196,45 +188,6 @@ class ReportRecordFragment : Fragment() {
 
         pieChart.data = data
         pieChart.invalidate()
-    }
-
-    private fun getDrawable(imageId: Int): ScaleDrawable {
-        return ScaleDrawable(
-            requireContext().getDrawable(imageId),
-            Gravity.CENTER,
-            1f,
-            1f
-        ).apply {
-            level = 5000
-            invalidateSelf()
-        }
-    }
-
-    private fun getPieEntries(pieList: List<Pair<Long, Long>>): List<PieEntry> {
-
-        val pieEntries = mutableListOf<PieEntry>()
-
-        if (pieList.size <= 5) {
-            pieList.forEach {
-                val cateImage = getDrawable(viewModel.getCateImageId(it.first))
-                pieEntries.add(PieEntry(it.second.toFloat(), cateImage))
-            }
-        } else {
-            for (i in 0..4) {
-                val cateImage = getDrawable(viewModel.getCateImageId(pieList[i].first))
-                pieEntries.add(PieEntry(pieList[i].second.toFloat(), cateImage))
-            }
-
-            var otherCateAmount = 0L
-            for (i in 5 until pieList.size)
-                otherCateAmount += pieList[i].second
-
-            pieEntries.add(
-                PieEntry(
-                    otherCateAmount.toFloat(),
-                    getDrawable(R.drawable.ic_category_other_chart)))
-        }
-        return pieEntries
     }
 
     companion object {

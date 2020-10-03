@@ -133,5 +133,6 @@
     <string name="selling">Selling</string>
     <string name="parent">Parent</string>
 
+    <string name="separate_sub_category">Separate sub-categories</string>
 
 </resources>

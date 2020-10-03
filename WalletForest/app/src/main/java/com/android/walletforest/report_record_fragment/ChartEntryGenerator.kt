@@ -1,9 +1,15 @@
 package com.android.walletforest.report_record_fragment
 
+import android.content.Context
+import android.graphics.drawable.ScaleDrawable
+import android.view.Gravity
 import com.android.walletforest.*
 import com.android.walletforest.enums.Constants
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.model.Entities.Transaction
+import com.android.walletforest.model.Repository
+import com.github.mikephil.charting.data.PieEntry
+import kotlinx.coroutines.NonCancellable.isActive
 import kotlinx.coroutines.yield
 
 
@@ -170,10 +176,89 @@ class ChartEntryGenerator() {
                 }
             }
 
-            val incomePieList = incomeCategoryMap.toList().sortedByDescending { (_, value) -> value }
-            val expensePieList = expenseCategoryMap.toList().sortedByDescending { (_, value) -> value }
+            val incomePieList =
+                incomeCategoryMap.toList().sortedByDescending { (_, value) -> value }
+            val expensePieList =
+                expenseCategoryMap.toList().sortedByDescending { (_, value) -> value }
 
             return PieChartData(incomePieList, expensePieList)
+        }
+
+        private fun getDrawable(context: Context, imageId: Int): ScaleDrawable {
+            return ScaleDrawable(
+                context.getDrawable(imageId),
+                Gravity.CENTER,
+                1f,
+                1f
+            ).apply {
+                level = 5000
+                invalidateSelf()
+            }
+        }
+
+        suspend fun getPieEntries(
+            transactions: List<Transaction>,
+            excludeSubCate: Boolean,
+            context: Context
+        ) : Pair<List<PieEntry>, List<PieEntry>>
+        {
+            val categoriesMap = Repository.getInstance(context.applicationContext).categoryMap
+
+            val incomeCategoryMap = mutableMapOf<Long, Long>()
+            val expenseCategoryMap = mutableMapOf<Long, Long>()
+
+            for (transaction in transactions) {
+                yield()
+
+                val key = if (excludeSubCate) transaction.categoryId
+                else categoriesMap[transaction.categoryId]!!.parentId
+
+                if (transaction.type == Constants.TYPE_INCOME) {
+                    val value = incomeCategoryMap.getOrDefault(key, 0L)
+                    incomeCategoryMap[key] = value + transaction.amount
+                } else {
+                    val value = expenseCategoryMap.getOrDefault(key, 0L)
+                    expenseCategoryMap[key] = value + transaction.amount
+                }
+            }
+
+            return Pair(toPieEntries(context, incomeCategoryMap), toPieEntries(context, expenseCategoryMap))
+        }
+
+        private suspend fun toPieEntries(context: Context, cateReport : Map<Long, Long>) : List<PieEntry>
+        {
+            val categoriesMap = Repository.getInstance(context.applicationContext).categoryMap
+            val pieList = cateReport.toList().sortedByDescending { (_, value) -> value }
+
+            val pieEntries = mutableListOf<PieEntry>()
+
+            if (pieList.size <= 5) {
+                pieList.forEach {
+                    yield()
+                    val cateImage = getDrawable(context, categoriesMap[it.first]!!.imageId)
+                    pieEntries.add(PieEntry(it.second.toFloat(), cateImage))
+                }
+            } else {
+                for (i in 0..4) {
+                    yield()
+                    val cateImage = getDrawable(context, categoriesMap[pieList[i].first]!!.imageId)
+                    pieEntries.add(PieEntry(pieList[i].second.toFloat(), cateImage))
+                }
+
+                var otherCateAmount = 0L
+                for (i in 5 until pieList.size)
+                {
+                    yield()
+                    otherCateAmount += pieList[i].second
+                }
+
+                pieEntries.add(
+                    PieEntry(
+                        otherCateAmount.toFloat(),
+                        getDrawable(context, R.drawable.ic_category_other_chart))
+                )
+            }
+            return pieEntries
         }
 
     }

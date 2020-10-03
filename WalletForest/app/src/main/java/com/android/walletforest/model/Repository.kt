@@ -51,6 +51,16 @@ class Repository private constructor(val appContext: Context) {
             .map { ChartEntryGenerator.getBarChartData(it, start, end, timeRange) }
             .flowOn(Dispatchers.Default)
 
+    fun getPieEntries(
+        start: Long,
+        end: Long,
+        walletId: Long,
+        excludeSubCate: Boolean
+    ) =
+        getTransactionsBetweenRange(start, end, walletId)
+            .map { ChartEntryGenerator.getPieEntries(it, excludeSubCate, appContext) }
+            .flowOn(Dispatchers.Default)
+
 
     fun setTabInfoList(list: List<TabInfo>) {
         _tabInfoList.value = list
@@ -171,8 +181,6 @@ class Repository private constructor(val appContext: Context) {
     }
 
     fun getCategoriesByType(type: String) = appDatabase.categoryDao.getCategoriesByType(type)
-
-    fun getCategoryImage(cateId : Long) : Int = categoryMap[cateId]?.imageId!!
 
     companion object {
         private var instance: Repository? = null
