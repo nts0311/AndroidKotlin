@@ -16,6 +16,7 @@ import com.github.mikephil.charting.formatter.LargeValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.utils.MPPointF
 import kotlinx.android.synthetic.main.fragment_report_record.*
+import kotlin.math.absoluteValue
 
 private const val START_TIME_PARAM = "startTime"
 private const val END_TIME_PARAM = "endTime"
@@ -79,10 +80,9 @@ class ReportRecordFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
-        if(item.itemId == R.id.change_pie_mode)
-        {
+        if (item.itemId == R.id.change_pie_mode) {
             viewModel.excludeSubCate = !viewModel.excludeSubCate
-            viewModel.getPieEntries(startTime!!,endTime!!, walletId!!)
+            viewModel.getPieEntries(startTime!!, endTime!!, walletId!!)
             observePieChartData()
         }
 
@@ -103,15 +103,29 @@ class ReportRecordFragment : Fragment() {
         viewModel.barData.removeObservers(viewLifecycleOwner)
         viewModel.barData.observe(viewLifecycleOwner) {
             drawInComeExpenseChart(it)
+            displayIncomeExpenseInfo(it)
         }
     }
 
-    private fun observePieChartData()
-    {
+    private fun observePieChartData() {
         viewModel.pieEntries.removeObservers(viewLifecycleOwner)
         viewModel.pieEntries.observe(viewLifecycleOwner) {
             drawPieCharts(it)
         }
+    }
+
+    private fun displayIncomeExpenseInfo(list: List<BarChartData>) {
+        var income = 0L
+        var expense = 0L
+
+        list.forEach {
+            income += it.totalIncome
+            expense += it.totalExpense.absoluteValue
+        }
+
+        income_txt.text = income.toString()
+        expense_txt.text = expense.toString()
+        net_income_txt.text = (income - expense).toString()
     }
 
     private fun setUpIncomeExpenseChart() {
@@ -172,7 +186,7 @@ class ReportRecordFragment : Fragment() {
         income_expense_chart.invalidate()
     }
 
-    private fun drawPieCharts(pieEntriesPair : Pair<List<PieEntry>, List<PieEntry>>) {
+    private fun drawPieCharts(pieEntriesPair: Pair<List<PieEntry>, List<PieEntry>>) {
         if (pieEntriesPair.first.isNotEmpty())
             drawPieChart(income_chart, pieEntriesPair.first)
         if (pieEntriesPair.second.isNotEmpty())
@@ -180,7 +194,7 @@ class ReportRecordFragment : Fragment() {
     }
 
 
-    private fun drawPieChart(pieChart: PieChart, pieEntries : List<PieEntry>) {
+    private fun drawPieChart(pieChart: PieChart, pieEntries: List<PieEntry>) {
         pieChart.setExtraOffsets(0f, 10f, 0f, 15f)
         pieChart.description.isEnabled = false
         pieChart.transparentCircleRadius = 65f

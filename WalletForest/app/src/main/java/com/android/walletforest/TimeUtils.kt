@@ -19,35 +19,32 @@ fun toLocalDate(time: Long): LocalDate {
     )
 }
 
-fun LocalDate.toEpochMilli() : Long = this.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+fun LocalDate.toEpochMilli(): Long =
+    this.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
 fun toEpoch(ld: LocalDate): Long =
     ld.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
-fun getMonthAxisLabel(start: Long, end:Long) : String
-{
+fun getMonthAxisLabel(start: Long, end: Long): String {
     val startLD = toLocalDate(start)
     val endLD = toLocalDate(end)
 
     return "${startLD.dayOfMonth}/${startLD.monthValue} - ${endLD.dayOfMonth}/${endLD.monthValue}"
 }
 
-fun getWeekAxisLabel(time:Long) : String
-{
+fun getWeekAxisLabel(time: Long): String {
     val ld = toLocalDate(time)
     return dateToString(ld)
 }
 
-fun getYearAxisLabel(time:Long) : String
-{
+fun getYearAxisLabel(time: Long): String {
     val ld = toLocalDate(time)
     return "${ld.monthValue}-${ld.year}"
 }
 
-fun getCustomAxisLabel(start: Long, end:Long) : String
-{
+fun getCustomAxisLabel(start: Long, end: Long): String {
     val startLD = toLocalDate(start)
     val endLD = toLocalDate(end)
 
-    return "${startLD.dayOfMonth}/${startLD.month}/${startLD.year} - ${endLD.dayOfMonth}/${endLD.month}/${endLD.year}"
+    return "${startLD.dayOfMonth}/${startLD.month.value}/${startLD.year} - ${endLD.dayOfMonth}/${endLD.month.value}/${endLD.year}"
 }

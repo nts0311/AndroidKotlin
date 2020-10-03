@@ -12,7 +12,7 @@ class ReportRecordViewModel(private val repository: Repository) : ViewModel() {
     var pieEntries: LiveData<Pair<List<PieEntry>, List<PieEntry>>> = MutableLiveData()
 
     var currentWallet = repository.currentWallet
-    var excludeSubCate = true
+    var excludeSubCate = false
 
     fun setTimeRange(startTime: Long, endTime: Long, timeRange: String, walletId: Long) {
         barData = repository.getBarData(startTime, endTime, walletId, TimeRange.valueOf(timeRange)).asLiveData()
