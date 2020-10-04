@@ -8,11 +8,6 @@
     android:layout_height="match_parent"
     android:fillViewport="true">
 
-    <FrameLayout
-        android:id="@+id/frag_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
         <LinearLayout
             android:id="@+id/root_layout"
             android:layout_width="match_parent"
@@ -36,5 +31,4 @@
                 android:background="#5a5c5a" />
 
         </LinearLayout>
-    </FrameLayout>
 </ScrollView>

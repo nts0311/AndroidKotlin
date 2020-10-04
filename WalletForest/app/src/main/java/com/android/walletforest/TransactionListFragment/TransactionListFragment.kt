@@ -18,10 +18,10 @@ import kotlinx.android.synthetic.main.fragment_report_record.*
 import kotlinx.android.synthetic.main.fragment_transaction_list.*
 
 
-private const val START_TIME_PARAM = "startTime"
-private const val END_TIME_PARAM = "endTime"
-private const val WALLET_ID_PARAM = "walletId"
-private const val TIME_RANGE_PARAM = "timeRange"
+const val START_TIME_PARAM = "startTime"
+const val END_TIME_PARAM = "endTime"
+const val WALLET_ID_PARAM = "walletId"
+const val TIME_RANGE_PARAM = "timeRange"
 
 class TransactionListFragment : Fragment() {
 

@@ -2,6 +2,7 @@ package com.android.walletforest.report_record_fragment
 
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.drawable.ScaleDrawable
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -11,11 +12,14 @@ import com.android.walletforest.RepoViewModelFactory
 import com.android.walletforest.bar_chart_detail_activity.BarChartDetailActivity
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.model.Repository
+import com.android.walletforest.pie_chart_detail_activity.PieChartDetailActivity
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.LargeValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.listener.ChartTouchListener
+import com.github.mikephil.charting.listener.OnChartGestureListener
 import com.github.mikephil.charting.utils.MPPointF
 import kotlinx.android.synthetic.main.fragment_report_record.*
 import java.io.Serializable
@@ -120,13 +124,66 @@ class ReportRecordFragment : Fragment() {
         }
     }
 
-    private fun registerClickListeners()
-    {
+    private fun registerClickListeners() {
         income_expense_chart.setOnClickListener {
             val intent = Intent(requireContext(), BarChartDetailActivity::class.java)
-            intent.putExtra(BarChartDetailActivity.BAR_DATA_KEY, viewModel.barData.value as Serializable)
+            intent.putExtra(
+                BarChartDetailActivity.BAR_DATA_KEY,
+                viewModel.barData.value as Serializable
+            )
+            intent.putExtra(BarChartDetailActivity.WALLET_ID_KEY, walletId)
             startActivity(intent)
         }
+
+        expense_chart.onChartGestureListener = object : OnChartGestureListener
+        {
+            override fun onChartGestureStart(
+                me: MotionEvent?,
+                lastPerformedGesture: ChartTouchListener.ChartGesture?
+            ) {
+            }
+
+            override fun onChartGestureEnd(
+                me: MotionEvent?,
+                lastPerformedGesture: ChartTouchListener.ChartGesture?
+            ) {
+            }
+
+            override fun onChartLongPressed(me: MotionEvent?) {
+            }
+
+            override fun onChartDoubleTapped(me: MotionEvent?) {
+            }
+
+            override fun onChartSingleTapped(me: MotionEvent?) {
+                val intent = Intent(requireContext(), PieChartDetailActivity::class.java)
+                intent.putExtra(
+                    PieChartDetailActivity.PIE_DATA_KEY,
+                    viewModel.pieChartData.value!! as Serializable
+                )
+                intent.putExtra(
+                    PieChartDetailActivity.IS_EXPENSE_KEY,
+                    true
+                )
+                intent.putExtra(BarChartDetailActivity.WALLET_ID_KEY, walletId)
+                startActivity(intent)
+            }
+
+            override fun onChartFling(
+                me1: MotionEvent?,
+                me2: MotionEvent?,
+                velocityX: Float,
+                velocityY: Float
+            ) {
+            }
+
+            override fun onChartScale(me: MotionEvent?, scaleX: Float, scaleY: Float) {
+            }
+
+            override fun onChartTranslate(me: MotionEvent?, dX: Float, dY: Float) {
+            }
+        }
+
     }
 
     private fun displayIncomeExpenseInfo(list: List<BarChartData>) {
