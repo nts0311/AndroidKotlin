@@ -5,8 +5,12 @@ import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Entities.Transaction
 import com.android.walletforest.model.Repository
+import com.android.walletforest.pie_chart_detail_activity.PieChartRangeParams
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
@@ -22,7 +26,7 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
 
     private var groupDataJob: Job? = null
 
-    var transactionList : LiveData<List<Transaction>> = MutableLiveData()
+    var transactionList: LiveData<List<Transaction>> = MutableLiveData()
 
     private var _dataItemList: MutableLiveData<List<DataItem>> = MutableLiveData()
     var dataItemList: LiveData<List<DataItem>> = _dataItemList
@@ -56,19 +60,46 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
         groupDataJob?.cancel()
     }
 
-    fun setTimeRange(start: Long, end: Long, range: String, walletId: Long) {
+    fun setTimeRange(
+        start: Long,
+        end: Long,
+        range: String,
+        walletId: Long,
+        rangeParams: PieChartRangeParams
+    ) {
 
         if (startTime == start
             && endTime == end
             && range == timeRange.value
-            && walletId == previousWalletId)
+            && walletId == previousWalletId
+        )
             return
 
         startTime = start
         endTime = end
         timeRange = TimeRange.valueOf(range)
 
-        transactionList = repo.getTransactionsBetweenRange(start, end, walletId).asLiveData()
+        val transactionsFlow = repo.getTransactionsBetweenRange(start, end, walletId)
+
+        transactionList = if (rangeParams.categoryIdToFilter == -1L) transactionsFlow.asLiveData()
+        else transactionsFlow.map {
+            //include transactions with sub category in parent category
+            val subCategoryId = mutableListOf<Long>()
+            subCategoryId.add(rangeParams.categoryIdToFilter)
+
+            if (!rangeParams.excludeSubCate)
+                repo.categoryMap.values.forEach { category ->
+                    if (category.parentId == rangeParams.categoryIdToFilter)
+                        subCategoryId.add(category.id)
+                }
+
+
+            it.filter { transaction ->
+                subCategoryId.contains(transaction.categoryId)
+                        && transaction.type == rangeParams.transactionType
+            }
+        }
+            .flowOn(Dispatchers.Default).asLiveData()
 
         previousWalletId = walletId
     }

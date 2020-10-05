@@ -138,18 +138,32 @@ class ReportRecordFragment : Fragment() {
 
         expense_chart.setTouchEnabled(false)
         expense_chart.setOnClickListener {
-            val intent = Intent(requireContext(), PieChartDetailActivity::class.java)
-
-            PieChartDetailData.pieChartData = viewModel.pieChartData.value!!
-
-            intent.putExtra(
-                PieChartDetailActivity.IS_EXPENSE_KEY,
-                true
-            )
-            intent.putExtra(BarChartDetailActivity.WALLET_ID_KEY, walletId)
-            startActivity(intent)
+            startPieChartDetailActivity(true)
         }
 
+        income_chart.setTouchEnabled(false)
+        income_chart.setOnClickListener {
+            startPieChartDetailActivity(false)
+        }
+
+    }
+
+    private fun startPieChartDetailActivity(isExpense : Boolean)
+    {
+        val intent = Intent(requireContext(), PieChartDetailActivity::class.java)
+
+        PieChartDetailData.pieChartData = viewModel.pieChartData.value!!
+
+        intent.putExtra(
+            PieChartDetailActivity.IS_EXPENSE_KEY,
+            isExpense
+        )
+        intent.putExtra(PieChartDetailActivity.WALLET_ID_KEY, walletId)
+        intent.putExtra(PieChartDetailActivity.START_DATE_KEY, startTime)
+        intent.putExtra(PieChartDetailActivity.END_DATE_KEY, endTime)
+        intent.putExtra(PieChartDetailActivity.EXCLUDE_SUB_CATE_KEY, viewModel.excludeSubCate)
+
+        startActivity(intent)
     }
 
     private fun displayIncomeExpenseInfo(list: List<BarChartData>) {

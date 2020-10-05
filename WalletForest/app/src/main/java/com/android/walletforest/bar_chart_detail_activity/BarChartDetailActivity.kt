@@ -29,6 +29,9 @@ class BarChartDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bar_chart_detail)
 
+        setSupportActionBar(bar_chart_detail_toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
         val barDataList = intent.getSerializableExtra(BAR_DATA_KEY) as List<BarChartData>
         walletId = intent.getLongExtra(WALLET_ID_KEY, 1L)
 
