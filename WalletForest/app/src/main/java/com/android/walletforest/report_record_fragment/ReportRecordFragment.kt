@@ -13,6 +13,7 @@ import com.android.walletforest.bar_chart_detail_activity.BarChartDetailActivity
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.model.Repository
 import com.android.walletforest.pie_chart_detail_activity.PieChartDetailActivity
+import com.android.walletforest.pie_chart_detail_activity.PieChartDetailData
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
@@ -135,53 +136,18 @@ class ReportRecordFragment : Fragment() {
             startActivity(intent)
         }
 
-        expense_chart.onChartGestureListener = object : OnChartGestureListener
-        {
-            override fun onChartGestureStart(
-                me: MotionEvent?,
-                lastPerformedGesture: ChartTouchListener.ChartGesture?
-            ) {
-            }
+        expense_chart.setTouchEnabled(false)
+        expense_chart.setOnClickListener {
+            val intent = Intent(requireContext(), PieChartDetailActivity::class.java)
 
-            override fun onChartGestureEnd(
-                me: MotionEvent?,
-                lastPerformedGesture: ChartTouchListener.ChartGesture?
-            ) {
-            }
+            PieChartDetailData.pieChartData = viewModel.pieChartData.value!!
 
-            override fun onChartLongPressed(me: MotionEvent?) {
-            }
-
-            override fun onChartDoubleTapped(me: MotionEvent?) {
-            }
-
-            override fun onChartSingleTapped(me: MotionEvent?) {
-                val intent = Intent(requireContext(), PieChartDetailActivity::class.java)
-                intent.putExtra(
-                    PieChartDetailActivity.PIE_DATA_KEY,
-                    viewModel.pieChartData.value!! as Serializable
-                )
-                intent.putExtra(
-                    PieChartDetailActivity.IS_EXPENSE_KEY,
-                    true
-                )
-                intent.putExtra(BarChartDetailActivity.WALLET_ID_KEY, walletId)
-                startActivity(intent)
-            }
-
-            override fun onChartFling(
-                me1: MotionEvent?,
-                me2: MotionEvent?,
-                velocityX: Float,
-                velocityY: Float
-            ) {
-            }
-
-            override fun onChartScale(me: MotionEvent?, scaleX: Float, scaleY: Float) {
-            }
-
-            override fun onChartTranslate(me: MotionEvent?, dX: Float, dY: Float) {
-            }
+            intent.putExtra(
+                PieChartDetailActivity.IS_EXPENSE_KEY,
+                true
+            )
+            intent.putExtra(BarChartDetailActivity.WALLET_ID_KEY, walletId)
+            startActivity(intent)
         }
 
     }
@@ -202,9 +168,9 @@ class ReportRecordFragment : Fragment() {
 
     private fun drawPieCharts(pieChartData: PieChartData) {
         if (pieChartData.incomePieEntries.isNotEmpty())
-            ChartsDrawer.drawPieChart(income_chart, pieChartData.incomePieEntries)
+            ChartsDrawer.drawPieChart(income_chart, pieChartData.incomePieEntries, false)
         if (pieChartData.expensePieEntries.isNotEmpty())
-            ChartsDrawer.drawPieChart(expense_chart, pieChartData.expensePieEntries)
+            ChartsDrawer.drawPieChart(expense_chart, pieChartData.expensePieEntries, false)
     }
 
     companion object {

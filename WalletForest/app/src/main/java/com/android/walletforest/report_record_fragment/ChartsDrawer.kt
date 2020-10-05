@@ -67,7 +67,7 @@ class ChartsDrawer {
             barChart.invalidate()
         }
 
-        fun drawPieChart(pieChart: PieChart, pieEntries: List<PieEntry>) {
+        fun drawPieChart(pieChart: PieChart, pieEntries: List<PieEntry>, drawValue:Boolean) {
             pieChart.setExtraOffsets(0f, 10f, 0f, 15f)
             pieChart.description.isEnabled = false
             pieChart.transparentCircleRadius = 65f
@@ -82,12 +82,22 @@ class ChartsDrawer {
             )
             dataSet.iconsOffset = MPPointF(0f, 25f)
 
-            dataSet.setDrawValues(false)
+            pieChart.isHighlightPerTapEnabled = false
+
+            dataSet.setDrawValues(drawValue)
+
+
+            if(drawValue)
+            {
+                dataSet.valueTextColor = Color.rgb(255,255,255)
+                dataSet.valueTextSize = 13.0f
+            }
 
             pieChart.setUsePercentValues(true)
 
             val data = PieData(dataSet)
             pieChart.legend.isEnabled = false
+
 
             pieChart.data = data
             pieChart.invalidate()

@@ -13,7 +13,6 @@ import kotlinx.android.synthetic.main.activity_pie_chart_detail.*
 class PieChartDetailActivity : AppCompatActivity() {
 
     companion object {
-        const val PIE_DATA_KEY = "pie_data_key"
         const val IS_EXPENSE_KEY = "is_expense_key"
         const val WALLET_ID_KEY = "wallet_id"
     }
@@ -25,18 +24,20 @@ class PieChartDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pie_chart_detail)
 
-        val pieChartData = intent.getSerializableExtra(PIE_DATA_KEY) as PieChartData
+        val pieChartData = PieChartDetailData.pieChartData
         isExpenseChart = intent.getBooleanExtra(IS_EXPENSE_KEY, true)
 
         walletId = intent.getLongExtra(WALLET_ID_KEY, 1L)
 
         if(isExpenseChart)
         {
-            ChartsDrawer.drawPieChart(pie_chart, pieChartData.expensePieEntries)
+            ChartsDrawer.drawPieChart(pie_chart, pieChartData.expensePieEntries, true)
         }
         else
         {
-
+            ChartsDrawer.drawPieChart(pie_chart, pieChartData.incomePieEntries, true)
         }
     }
+
+    private fun add
 }
