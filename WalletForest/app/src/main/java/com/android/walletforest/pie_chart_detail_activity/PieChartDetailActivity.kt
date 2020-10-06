@@ -9,16 +9,11 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.android.walletforest.R
 import com.android.walletforest.TransactionListFragment.*
-import com.android.walletforest.bar_chart_detail_activity.BarChartDetailActivity
 import com.android.walletforest.enums.Constants
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.model.Repository
-import com.android.walletforest.report_record_fragment.BarChartData
 import com.android.walletforest.report_record_fragment.ChartsDrawer
-import com.android.walletforest.report_record_fragment.PieChartData
 import com.android.walletforest.transaction_list_activity.TransactionListActivity
-import com.github.mikephil.charting.data.PieEntry
-import kotlinx.android.synthetic.main.activity_bar_chart_detail.*
 import kotlinx.android.synthetic.main.activity_pie_chart_detail.*
 import kotlinx.android.synthetic.main.activity_pie_chart_detail.root_layout
 
@@ -108,9 +103,9 @@ class PieChartDetailActivity : AppCompatActivity() {
                 val transactionType = if(isExpenseChart) Constants.TYPE_EXPENSE
                 else Constants.TYPE_INCOME
 
-                var pieChartRangeParams = PieChartRangeParams(pair.first,transactionType,excludeSubCategory)
+                var filteringParams = FilteringParams(pair.first,transactionType,excludeSubCategory)
 
-                transactionListIntent.putExtra(RANGE_PARAMS, pieChartRangeParams)
+                transactionListIntent.putExtra(RANGE_PARAMS, filteringParams)
 
                 startActivity(transactionListIntent)
             }

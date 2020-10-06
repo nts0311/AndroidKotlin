@@ -16,6 +16,9 @@ interface BudgetDao {
     @Query("SELECT * FROM budgets WHERE categoryId = :cateId")
     fun getBudgetByCategory(cateId : Long) : Flow<Budget>
 
+    @Query("SELECT * FROM budgets WHERE categoryId = :cateId")
+    suspend fun getBudgetByCategorySync(cateId: Long) : Budget
+
     @Insert
     fun insertBudget(budget: Budget)
 

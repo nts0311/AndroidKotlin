@@ -9,15 +9,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".pie_chart_detail_activity.PieChartDetailActivity"
-            android:parentActivityName=".main_activity.MainActivity"></activity>
+        <activity android:name=".budget_activity.BudgetActivity"></activity>
+        <activity
+            android:name=".pie_chart_detail_activity.PieChartDetailActivity"
+            android:parentActivityName=".main_activity.MainActivity" />
         <activity
             android:name=".transaction_list_activity.TransactionListActivity"
             android:parentActivityName=".bar_chart_detail_activity.BarChartDetailActivity" /> <!-- <activity android:name=".TransactionListActivity" /> -->
         <activity
             android:name=".bar_chart_detail_activity.BarChartDetailActivity"
             android:launchMode="singleTop"
-            android:parentActivityName=".main_activity.MainActivity"/>
+            android:parentActivityName=".main_activity.MainActivity" />
         <activity android:name=".select_image_activity.SelectImageActivity" />
         <activity android:name=".wallet_detail_activity.WalletDetailActivity" />
         <activity android:name=".select_wallet_activity.SelectWalletActivity" />

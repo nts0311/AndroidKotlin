@@ -5,20 +5,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
-import com.android.walletforest.enums.Constants
 import com.android.walletforest.transaction_detail_activity.TransactionDetailActivity
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.model.Repository
-import com.android.walletforest.pie_chart_detail_activity.PieChartRangeParams
-import com.android.walletforest.toLocalDate
-import kotlinx.android.synthetic.main.fragment_report_record.*
+import com.android.walletforest.pie_chart_detail_activity.FilteringParams
 import kotlinx.android.synthetic.main.fragment_transaction_list.*
-import java.util.*
 
 
 const val START_TIME_PARAM = "startTime"
@@ -34,7 +29,7 @@ class TransactionListFragment : Fragment() {
     private var walletId: Long? = null
     private var timeRange: String? = null
     private var itemAdapter: DataItemAdapter? = null
-    private var pieChartRangeParams = PieChartRangeParams()
+    private var filteringParams = FilteringParams()
     private lateinit var repo: Repository
     var key = ""
 
@@ -49,7 +44,7 @@ class TransactionListFragment : Fragment() {
             walletId = it.getLong(WALLET_ID_PARAM)
             timeRange = it.getString(TIME_RANGE_PARAM, TimeRange.MONTH.value)
             if(it.containsKey(RANGE_PARAMS))
-                pieChartRangeParams = it.getSerializable(RANGE_PARAMS) as PieChartRangeParams
+                filteringParams = it.getSerializable(RANGE_PARAMS) as FilteringParams
             key = "$startTime - $endTime"
         }
     }
@@ -74,7 +69,7 @@ class TransactionListFragment : Fragment() {
                 endTime!!,
                 timeRange!!,
                 walletId!!,
-                pieChartRangeParams
+                filteringParams
             )
         }
 
@@ -127,7 +122,7 @@ class TransactionListFragment : Fragment() {
                     endTime!!,
                     timeRange!!,
                     it.id,
-                    pieChartRangeParams
+                    filteringParams
                 )
 
                 viewModel.transactionList.observe(viewLifecycleOwner) {
@@ -147,7 +142,7 @@ class TransactionListFragment : Fragment() {
             endTime: Long,
             walletId: Long,
             timeRange: TimeRange,
-            pieChartRangeParams: PieChartRangeParams
+            filteringParams: FilteringParams
         ) =
             TransactionListFragment().apply {
                 arguments = Bundle().apply {
@@ -155,7 +150,7 @@ class TransactionListFragment : Fragment() {
                     putLong(END_TIME_PARAM, endTime)
                     putLong(WALLET_ID_PARAM, walletId)
                     putString(TIME_RANGE_PARAM, timeRange.value)
-                    putSerializable(RANGE_PARAMS, pieChartRangeParams)
+                    putSerializable(RANGE_PARAMS, filteringParams)
                 }
             }
     }

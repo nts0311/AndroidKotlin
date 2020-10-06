@@ -137,4 +137,6 @@
 
     <string name="transactions">Transactions</string>
 
+    <string name="budget">Budget</string>
+
 </resources>

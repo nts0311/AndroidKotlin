@@ -5,7 +5,7 @@ import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Entities.Transaction
 import com.android.walletforest.model.Repository
-import com.android.walletforest.pie_chart_detail_activity.PieChartRangeParams
+import com.android.walletforest.pie_chart_detail_activity.FilteringParams
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -65,7 +65,7 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
         end: Long,
         range: String,
         walletId: Long,
-        rangeParams: PieChartRangeParams
+        filteringParams: FilteringParams
     ) {
 
         if (startTime == start
@@ -81,22 +81,22 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
 
         val transactionsFlow = repo.getTransactionsBetweenRange(start, end, walletId)
 
-        transactionList = if (rangeParams.categoryIdToFilter == -1L) transactionsFlow.asLiveData()
+        transactionList = if (filteringParams.categoryIdToFilter == -1L) transactionsFlow.asLiveData()
         else transactionsFlow.map {
             //include transactions with sub category in parent category
             val subCategoryId = mutableListOf<Long>()
-            subCategoryId.add(rangeParams.categoryIdToFilter)
+            subCategoryId.add(filteringParams.categoryIdToFilter)
 
-            if (!rangeParams.excludeSubCate)
+            if (!filteringParams.excludeSubCate)
                 repo.categoryMap.values.forEach { category ->
-                    if (category.parentId == rangeParams.categoryIdToFilter)
+                    if (category.parentId == filteringParams.categoryIdToFilter)
                         subCategoryId.add(category.id)
                 }
 
 
             it.filter { transaction ->
                 subCategoryId.contains(transaction.categoryId)
-                        && transaction.type == rangeParams.transactionType
+                        && transaction.type == filteringParams.transactionType
             }
         }
             .flowOn(Dispatchers.Default).asLiveData()

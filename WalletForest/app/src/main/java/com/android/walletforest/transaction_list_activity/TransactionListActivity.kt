@@ -4,9 +4,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.android.walletforest.R
 import com.android.walletforest.TransactionListFragment.*
-import com.android.walletforest.enums.Constants
 import com.android.walletforest.enums.TimeRange
-import com.android.walletforest.pie_chart_detail_activity.PieChartRangeParams
+import com.android.walletforest.pie_chart_detail_activity.FilteringParams
 
 class TransactionListActivity : AppCompatActivity() {
 
@@ -14,7 +13,7 @@ class TransactionListActivity : AppCompatActivity() {
     private var endTime: Long? = null
     private var walletId: Long? = null
     private var timeRange: String? = null
-    private var pieChartRangeParams = PieChartRangeParams()
+    private var filteringParams = FilteringParams()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,7 +27,9 @@ class TransactionListActivity : AppCompatActivity() {
             endTime = it.getLongExtra(END_TIME_PARAM, 0L)
             walletId = it.getLongExtra(WALLET_ID_PARAM, 0L)
             timeRange = it.getStringExtra(TIME_RANGE_PARAM)
-            pieChartRangeParams = it.getSerializableExtra(RANGE_PARAMS) as PieChartRangeParams
+
+            if(it.hasExtra(RANGE_PARAMS))
+                filteringParams = it.getSerializableExtra(RANGE_PARAMS) as FilteringParams
         }
 
         val transactionsFragment = TransactionListFragment.newInstance(
@@ -36,7 +37,7 @@ class TransactionListActivity : AppCompatActivity() {
             endTime!!,
             walletId!!,
             TimeRange.valueOf(timeRange!!),
-            pieChartRangeParams
+            filteringParams
         )
 
         supportFragmentManager.beginTransaction()
