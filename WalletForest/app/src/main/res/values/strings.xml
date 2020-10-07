@@ -144,4 +144,7 @@
     <string name="running">Running</string>
     <string name="ended">Ended</string>
 
+    <string name="left">Left</string>
+    <string name="overspent">Overspent</string>
+
 </resources>

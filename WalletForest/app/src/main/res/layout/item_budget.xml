@@ -16,8 +16,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -29,6 +29,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:text="TextView"
+            android:textColor="#000000"
+            android:textSize="15sp"
             app:layout_constraintStart_toEndOf="@+id/category_image"
             app:layout_constraintTop_toTopOf="@+id/category_image" />
 
@@ -37,9 +39,9 @@
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="16dp"
-            android:progress="50"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="8dp"
+            android:max="100"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/amount_left"
             app:layout_constraintStart_toStartOf="@+id/category_name"
@@ -51,6 +53,8 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:text="TextView"
+            android:textColor="#000000"
+            android:textSize="15sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/category_name" />
 
@@ -59,7 +63,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="TextView"
+            android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="@+id/category_image"
             app:layout_constraintEnd_toEndOf="@+id/total_amount" />
+
+        <View
+            android:id="@+id/view2"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="#5a5c5a"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

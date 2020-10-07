@@ -1,11 +1,18 @@
 package com.android.walletforest.budget_list_fragment
 
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.icu.text.NumberFormat
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import androidx.recyclerview.widget.RecyclerView
+import com.android.walletforest.NumberFormatter
+import com.android.walletforest.R
 import com.android.walletforest.databinding.ItemBudgetBinding
 import com.android.walletforest.model.Entities.Budget
 import com.android.walletforest.model.Repository
+import java.util.*
 
 class BudgetAdapter : RecyclerView.Adapter<BudgetViewHolder>() {
 
@@ -39,11 +46,34 @@ class BudgetViewHolder(private val binding: ItemBudgetBinding) :
 
         val category = categoryMap[budget.categoryId]
 
-        binding.categoryImage.setImageResource(category!!.imageId)
-        binding.categoryName.text = category.name
-        binding.totalAmount.text = budget.amount.toString()
-        binding.amountLeft.text = (budget.amount - budget.spent).toString()
-        binding.progressBar.progress = (budget.spent / budget.amount * 100).toInt()
+        binding.apply {
+            categoryImage.setImageResource(category!!.imageId)
+            categoryName.text = category.name
+
+            totalAmount.text = NumberFormatter.format(budget.amount)
+
+            val diffText = if(budget.amount > budget.spent)
+                root.context.getString(R.string.left)
+            else
+                root.context.getString(R.string.overspent)
+
+            val diffAmount = if(budget.amount > budget.spent) budget.amount - budget.spent
+            else budget.spent - budget.amount
+
+            amountLeft.text = "${diffText} ${NumberFormatter.format(diffAmount)}"
+
+            setProgressProgressBar(progressBar, (budget.spent.toFloat() / budget.amount * 100).toInt())
+        }
+    }
+
+    private fun setProgressProgressBar(progressBar: ProgressBar, progress: Int) {
+        progressBar.progress = progress
+        progressBar.scaleY = 1.5f
+        progressBar.progressTintList = when (progress) {
+            in 0..69 -> ColorStateList.valueOf(Color.rgb(0,153,51))
+            in 70..89 -> ColorStateList.valueOf(Color.rgb(255, 153, 51))
+            else -> ColorStateList.valueOf(Color.RED)
+        }
     }
 
     companion object {

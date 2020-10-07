@@ -275,6 +275,10 @@ abstract class AppDatabase() : RoomDatabase() {
                                     (14, 1, 2, Constants.TYPE_EXPENSE, 13, "aaa", 1598832000000)
                             )
 
+                            database.budgetDao.insertBudget(Budget(1,1,2,10000,1500,1598918400, 1601424000))
+                            database.budgetDao.insertBudget(Budget(2,12,2,500000,10000,1598918400, 1601424000))
+                            database.budgetDao.insertBudget(Budget(3,36,2,20000000,10000,1598918400, 1601424000))
+
                         }
                     }
                 })
