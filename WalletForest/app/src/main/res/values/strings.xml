@@ -141,4 +141,7 @@
 
     <string name="budget_dis">Set budget for individual category, or for all categories in a wallet.</string>
 
+    <string name="running">Running</string>
+    <string name="ended">Ended</string>
+
 </resources>

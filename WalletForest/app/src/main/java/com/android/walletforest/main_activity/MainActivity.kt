@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.DatePicker
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
@@ -132,6 +133,8 @@ class MainActivity : AppCompatActivity() {
                     supportFragmentManager.beginTransaction().hide(activeFragment)
                         .show(fragmentTransactions).commit()
                     activeFragment = fragmentTransactions
+                    if(binding.tabLayout.visibility == View.GONE)
+                        binding.tabLayout.visibility = View.VISIBLE
                     true
                 }
 
@@ -139,6 +142,8 @@ class MainActivity : AppCompatActivity() {
                     supportFragmentManager.beginTransaction().hide(activeFragment)
                         .show(fragmentReport).commit()
                     activeFragment = fragmentReport
+                    if(binding.tabLayout.visibility == View.GONE)
+                        binding.tabLayout.visibility = View.VISIBLE
                     true
                 }
 
@@ -146,7 +151,8 @@ class MainActivity : AppCompatActivity() {
                     supportFragmentManager.beginTransaction().hide(activeFragment)
                         .show(fragmentPlanning).commit()
                     activeFragment = fragmentPlanning
-
+                    if(binding.tabLayout.visibility == View.VISIBLE)
+                        binding.tabLayout.visibility = View.GONE
                     true
                 }
 

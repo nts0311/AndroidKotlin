@@ -6,19 +6,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
 import com.android.walletforest.model.Repository
+import kotlinx.android.synthetic.main.fragment_budget_list.*
 
-private const val BUDGET_STATUS = "budget_status"
-private const val BUDGET_STATUS_RUNNING = "budget_status_running"
-private const val BUDGET_STATUS_ENDED = "budget_status_ended"
+const val BUDGET_STATUS = "budget_status"
+const val BUDGET_STATUS_RUNNING = "budget_status_running"
+const val BUDGET_STATUS_ENDED = "budget_status_ended"
 
 
 class BudgetListFragment : Fragment() {
 
     private var budgetsStatus: String = BUDGET_STATUS_RUNNING
     private lateinit var viewModel: BudgetListFragViewModel
+    private val budgetAdapter = BudgetAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,10 +51,18 @@ class BudgetListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setUpRecycleView()
+
         viewModel.budgetList.observe(viewLifecycleOwner)
         {
-
+            budgetAdapter.budgetList = it
         }
+    }
+
+    private fun setUpRecycleView()
+    {
+        budget_list_rv.layoutManager = LinearLayoutManager(requireContext())
+        budget_list_rv.adapter = budgetAdapter
     }
 
     companion object {

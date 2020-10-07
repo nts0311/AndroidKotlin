@@ -11,6 +11,7 @@ import com.android.walletforest.model.Dao.BudgetDao
 import com.android.walletforest.model.Dao.CategoryDao
 import com.android.walletforest.model.Dao.TransactionDao
 import com.android.walletforest.model.Dao.WalletDao
+import com.android.walletforest.model.Entities.Budget
 import com.android.walletforest.model.Entities.Category
 import com.android.walletforest.model.Entities.Transaction
 import com.android.walletforest.model.Entities.Wallet
@@ -18,7 +19,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@Database(entities = [Transaction::class, Category::class, Wallet::class], version = 1)
+@Database(entities = [Transaction::class, Category::class, Wallet::class, Budget::class], version = 1)
 abstract class AppDatabase() : RoomDatabase() {
     abstract val transactionDao: TransactionDao
     abstract val categoryDao: CategoryDao
