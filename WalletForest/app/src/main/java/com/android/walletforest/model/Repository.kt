@@ -7,6 +7,7 @@ import androidx.lifecycle.Transformations
 import com.android.walletforest.main_activity.TabInfo
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
+import com.android.walletforest.model.Entities.Budget
 import com.android.walletforest.model.Entities.Category
 import com.android.walletforest.model.Entities.Transaction
 import com.android.walletforest.model.Entities.Wallet
@@ -19,6 +20,8 @@ import kotlinx.coroutines.flow.map
 
 class Repository private constructor(val appContext: Context) {
     private val appDatabase = AppDatabase.getInstance(appContext)
+
+    val budgetRepository = BudgetRepository(appDatabase.budgetDao)
 
     var viewMode = MutableLiveData(ViewType.TRANSACTION)
 
@@ -181,6 +184,8 @@ class Repository private constructor(val appContext: Context) {
     }
 
     fun getCategoriesByType(type: String) = appDatabase.categoryDao.getCategoriesByType(type)
+
+    fun getAllBudget(): Flow<List<Budget>> = budgetRepository.getAllBudgets()
 
     companion object {
         private var instance: Repository? = null

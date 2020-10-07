@@ -7,6 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.android.walletforest.R
 import com.android.walletforest.enums.Constants
+import com.android.walletforest.model.Dao.BudgetDao
 import com.android.walletforest.model.Dao.CategoryDao
 import com.android.walletforest.model.Dao.TransactionDao
 import com.android.walletforest.model.Dao.WalletDao
@@ -22,6 +23,7 @@ abstract class AppDatabase() : RoomDatabase() {
     abstract val transactionDao: TransactionDao
     abstract val categoryDao: CategoryDao
     abstract val walletDao: WalletDao
+    abstract val budgetDao: BudgetDao
 
     companion object {
         @Volatile

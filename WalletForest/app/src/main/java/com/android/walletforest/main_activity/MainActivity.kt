@@ -5,13 +5,10 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
-import android.view.View
 import android.widget.DatePicker
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -22,6 +19,7 @@ import com.android.walletforest.databinding.ActivityMainBinding
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Repository
+import com.android.walletforest.planning_fragment.PlanningFragment
 import com.android.walletforest.report_fragment.ReportFragment
 import com.android.walletforest.select_wallet_activity.RESULT_WALLET_ID
 import com.android.walletforest.select_wallet_activity.SelectWalletActivity

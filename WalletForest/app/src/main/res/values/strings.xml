@@ -139,4 +139,6 @@
 
     <string name="budget">Budget</string>
 
+    <string name="budget_dis">Set budget for individual category, or for all categories in a wallet.</string>
+
 </resources>
