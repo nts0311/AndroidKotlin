@@ -1,5 +1,6 @@
 package com.android.walletforest.budget_list_fragment
 
+import android.annotation.SuppressLint
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.icu.text.NumberFormat
@@ -39,6 +40,7 @@ class BudgetViewHolder(private val binding: ItemBudgetBinding) :
     private val categoryMap =
         Repository.getInstance(binding.root.context.applicationContext).categoryMap
 
+    @SuppressLint("SetTextI18n")
     fun bind(budget: Budget, budgetClickListener: (Budget) -> Unit) {
         binding.root.setOnClickListener {
             budgetClickListener.invoke(budget)
@@ -60,7 +62,7 @@ class BudgetViewHolder(private val binding: ItemBudgetBinding) :
             val diffAmount = if(budget.amount > budget.spent) budget.amount - budget.spent
             else budget.spent - budget.amount
 
-            amountLeft.text = "${diffText} ${NumberFormatter.format(diffAmount)}"
+            amountLeft.text = "$diffText ${NumberFormatter.format(diffAmount)}"
 
             setProgressProgressBar(progressBar, (budget.spent.toFloat() / budget.amount * 100).toInt())
         }

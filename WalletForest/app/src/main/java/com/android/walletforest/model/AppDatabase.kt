@@ -276,8 +276,8 @@ abstract class AppDatabase() : RoomDatabase() {
                             )
 
                             database.budgetDao.insertBudget(Budget(1,1,2,10000,1500,1598918400, 1601424000))
-                            database.budgetDao.insertBudget(Budget(2,12,2,500000,10000,1598918400, 1601424000))
-                            database.budgetDao.insertBudget(Budget(3,36,2,20000000,10000,1598918400, 1601424000))
+                            database.budgetDao.insertBudget(Budget(2,12,2,500000,1000000,1598918400, 1601424000))
+                            database.budgetDao.insertBudget(Budget(3,36,2,20000000,16000000,1598918400, 1601424000))
 
                         }
                     }
