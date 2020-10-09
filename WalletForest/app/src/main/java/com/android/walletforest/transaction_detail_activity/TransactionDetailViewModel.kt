@@ -43,12 +43,14 @@ class TransactionDetailViewModel(private val repository: Repository) : ViewModel
                 }
 
                 repository.updateWallet(currentWallet)
+
+
             }
         }
     }
 
     fun insertTransaction(transaction: Transaction) {
-        GlobalScope.launch {
+        /*GlobalScope.launch {
             val currentWallet = wallets[transaction.walletId]?.copy()
             repository.insertTransaction(transaction)
 
@@ -60,8 +62,31 @@ class TransactionDetailViewModel(private val repository: Repository) : ViewModel
 
                 repository.updateWallet(currentWallet)
             }
-        }
+
+            val budget = repository.getBudgetByIdSync(transaction.categoryId, currentWallet!!.id)
+            if(budget!=null)
+            {
+                budget.spent += transaction.amount
+                repository.updateBudget(budget)
+            }
+
+            val category = repository.categoryMap[transaction.categoryId]!!
+            if(category.id != category.parentId)
+            {
+                val parentBudget = repository.getBudgetByIdSync(category.parentId, currentWallet!!.id)
+                if(parentBudget!=null)
+                {
+                    parentBudget.spent += transaction.amount
+                    repository.updateBudget(parentBudget)
+                }
+            }
+
+        }*/
+
+        repository.insertTransaction(transaction)
     }
+
+
 
     fun deleteTransaction(transaction: Transaction) {
         GlobalScope.launch {

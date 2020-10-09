@@ -9,19 +9,24 @@ import kotlinx.coroutines.flow.map
 
 class BudgetListFragViewModel(private val repository: Repository) : ViewModel() {
     var filterRunningBudgets: Boolean = true
+    private val currentWalletId = MutableLiveData<Long>(-1)
+    var currentWallet = repository.currentWallet
 
-    var budgetList : LiveData<List<Budget>> = liveData {
+    var budgetList = currentWalletId.switchMap {newWalletId->
         val now = System.currentTimeMillis()
 
-        val result = repository.getAllBudget().map {
+        repository.getAllBudget(newWalletId).map {budgetList->
             if(filterRunningBudgets)
-                it.filter { budget -> budget.endDate >= now}
+                budgetList.filter { budget -> budget.endDate >= now}
             else
-                it.filter { budget -> budget.endDate < now }
+                budgetList.filter { budget -> budget.endDate < now }
         }
             .flowOn(Dispatchers.Default)
             .asLiveData()
+    }
 
-        emitSource(result)
+    fun onWalletChanged(newWalletId:Long)
+    {
+        currentWalletId.value = newWalletId
     }
 }

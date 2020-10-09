@@ -21,8 +21,6 @@ import kotlinx.coroutines.flow.map
 class Repository private constructor(val appContext: Context) {
     private val appDatabase = AppDatabase.getInstance(appContext)
 
-    val budgetRepository = BudgetRepository(appDatabase.budgetDao)
-
     var viewMode = MutableLiveData(ViewType.TRANSACTION)
 
     //caching list of transactions of each wallet, avoiding database query
@@ -48,6 +46,15 @@ class Repository private constructor(val appContext: Context) {
     var walletList = appDatabase.walletDao.getWallets()
 
     var currentPage = 0
+
+    private val budgetRepository = BudgetRepository(appDatabase.budgetDao)
+    private val transactionRepository = TransactionRepository(
+        appDatabase.transactionDao,
+        appDatabase.walletDao,
+        appDatabase.budgetDao,
+        _walletsMap,
+        _categoriesMap
+    )
 
     fun getBarData(start: Long, end: Long, walletId: Long, timeRange: TimeRange) =
         getTransactionsBetweenRange(start, end, walletId)
@@ -133,8 +140,12 @@ class Repository private constructor(val appContext: Context) {
         appDatabase.transactionDao.updateTransaction(transaction)
     }
 
-    suspend fun insertTransaction(transaction: Transaction) {
+    /*suspend fun insertTransaction(transaction: Transaction) {
         appDatabase.transactionDao.insertTransaction(transaction)
+    }*/
+
+    fun insertTransaction(transaction: Transaction) {
+        transactionRepository.insertTransaction(transaction)
     }
 
     suspend fun deleteTransaction(transaction: Transaction) {
@@ -185,7 +196,14 @@ class Repository private constructor(val appContext: Context) {
 
     fun getCategoriesByType(type: String) = appDatabase.categoryDao.getCategoriesByType(type)
 
-    fun getAllBudget(): Flow<List<Budget>> = budgetRepository.getAllBudgets()
+    fun getAllBudget(walletId: Long): Flow<List<Budget>> = budgetRepository.getAllBudgets(walletId)
+
+    suspend fun getBudgetByIdSync(cateId: Long, walletId: Long): Budget? =
+        budgetRepository.getBudgetByIdSync(cateId, walletId)
+
+    suspend fun updateBudget(budget: Budget) {
+        budgetRepository.updateBudget(budget)
+    }
 
     companion object {
         private var instance: Repository? = null

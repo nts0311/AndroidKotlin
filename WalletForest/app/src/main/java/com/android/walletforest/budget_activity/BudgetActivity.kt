@@ -22,7 +22,7 @@ class BudgetActivity : AppCompatActivity() {
         budgetFragStateAdapter = BudgetFragStateAdapter(this)
         budget_veiw_pager.adapter = budgetFragStateAdapter
 
-        TabLayoutMediator(tabLayout, budget_veiw_pager){ tab, position ->
+        TabLayoutMediator(tabLayout, budget_veiw_pager, true, true){ tab, position ->
             val tabTitle = if(position == 0) getString(R.string.running)
             else getString(R.string.ended)
 

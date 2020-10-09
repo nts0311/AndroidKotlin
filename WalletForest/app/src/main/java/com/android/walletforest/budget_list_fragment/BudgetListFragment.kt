@@ -57,6 +57,11 @@ class BudgetListFragment : Fragment() {
         {
             budgetAdapter.budgetList = it
         }
+
+        viewModel.currentWallet.observe(viewLifecycleOwner)
+        {
+            viewModel.onWalletChanged(it.id)
+        }
     }
 
     private fun setUpRecycleView()
