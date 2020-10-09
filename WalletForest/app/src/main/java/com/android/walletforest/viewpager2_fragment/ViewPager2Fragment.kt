@@ -76,7 +76,7 @@ abstract class ViewPager2Fragment : Fragment() {
 
     private fun setUpViewPager() {
 
-        tabLayout = (requireActivity() as MainActivity).getTabLayout(this)
+        tabLayout = (requireActivity() as MainActivity).getTabLayout()
 
         binding.apply {
             mainViewPager.adapter = viewPagerAdapter

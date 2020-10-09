@@ -6,14 +6,13 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
 import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
 import com.android.walletforest.model.Entities.Wallet
-import com.android.walletforest.model.Repository
+import com.android.walletforest.model.repositories.Repository
 import com.android.walletforest.select_image_activity.RESULT_ICON_ID
 import com.android.walletforest.select_image_activity.SelectImageActivity
 import kotlinx.android.synthetic.main.activity_wallet_detail.*

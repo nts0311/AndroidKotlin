@@ -7,7 +7,7 @@ import com.android.walletforest.*
 import com.android.walletforest.enums.Constants
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.model.Entities.Transaction
-import com.android.walletforest.model.Repository
+import com.android.walletforest.model.repositories.Repository
 import com.github.mikephil.charting.data.PieEntry
 import kotlinx.coroutines.yield
 

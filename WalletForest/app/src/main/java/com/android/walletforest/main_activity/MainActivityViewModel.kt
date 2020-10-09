@@ -7,7 +7,7 @@ import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Entities.Category
 import com.android.walletforest.model.Entities.Wallet
-import com.android.walletforest.model.Repository
+import com.android.walletforest.model.repositories.Repository
 import com.android.walletforest.toEpoch
 import com.android.walletforest.toLocalDate
 import kotlinx.coroutines.async

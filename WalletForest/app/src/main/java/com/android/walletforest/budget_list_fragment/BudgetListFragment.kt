@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
-import com.android.walletforest.model.Repository
+import com.android.walletforest.model.repositories.Repository
 import kotlinx.android.synthetic.main.fragment_budget_list.*
 
 const val BUDGET_STATUS = "budget_status"

@@ -11,7 +11,7 @@ import com.android.walletforest.R
 import com.android.walletforest.TransactionListFragment.*
 import com.android.walletforest.enums.Constants
 import com.android.walletforest.enums.TimeRange
-import com.android.walletforest.model.Repository
+import com.android.walletforest.model.repositories.Repository
 import com.android.walletforest.report_record_fragment.ChartsDrawer
 import com.android.walletforest.transaction_list_activity.TransactionListActivity
 import kotlinx.android.synthetic.main.activity_pie_chart_detail.*

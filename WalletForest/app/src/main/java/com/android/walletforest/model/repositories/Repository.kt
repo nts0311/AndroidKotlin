@@ -1,4 +1,4 @@
-package com.android.walletforest.model
+package com.android.walletforest.model.repositories
 
 import android.content.Context
 import androidx.lifecycle.LiveData
@@ -7,6 +7,7 @@ import androidx.lifecycle.Transformations
 import com.android.walletforest.main_activity.TabInfo
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
+import com.android.walletforest.model.AppDatabase
 import com.android.walletforest.model.Entities.Budget
 import com.android.walletforest.model.Entities.Category
 import com.android.walletforest.model.Entities.Transaction
@@ -148,8 +149,8 @@ class Repository private constructor(val appContext: Context) {
         transactionRepository.insertTransaction(transaction)
     }
 
-    suspend fun deleteTransaction(transaction: Transaction) {
-        appDatabase.transactionDao.deleteTransaction(transaction)
+    fun deleteTransaction(transaction: Transaction) {
+       transactionRepository.deleteTransaction(transaction)
     }
 
     //Get the list of transactions in a specific wallet and specific period

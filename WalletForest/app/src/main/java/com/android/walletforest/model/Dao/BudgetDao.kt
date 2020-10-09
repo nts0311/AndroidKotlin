@@ -8,16 +8,19 @@ import kotlinx.coroutines.flow.Flow
 interface BudgetDao {
 
     @Query("SELECT * FROM budgets WHERE walletId=:walletId")
-    fun getBudgetList(walletId: Long) : Flow<List<Budget>>
+    fun getBudgetList(walletId: Long): Flow<List<Budget>>
 
     @Query("SELECT * FROM budgets WHERE id = :id AND walletId=:walletId")
-    fun getBudgetById(id : Long, walletId:Long) : Flow<Budget>
+    fun getBudgetById(id: Long, walletId: Long): Flow<Budget>
 
     @Query("SELECT * FROM budgets WHERE categoryId = :cateId AND walletId=:walletId")
-    fun getBudgetByCategory(cateId : Long, walletId:Long) : Flow<Budget>
+    fun getBudgetByCategory(cateId: Long, walletId: Long): Flow<Budget>
 
     @Query("SELECT * FROM budgets WHERE categoryId = :cateId AND walletId=:walletId ORDER BY endDate DESC LIMIT 1")
-    suspend fun getBudgetByCategorySync(cateId: Long, walletId:Long) : Budget?
+    suspend fun getBudgetByCategorySync(cateId: Long, walletId: Long): Budget?
+
+    @Query("SELECT * FROM budgets WHERE walletId=:walletId AND categoryId=-1 ORDER BY endDate DESC LIMIT 1")
+    suspend fun getAllCategoriesBudgetSync(walletId: Long): Budget?
 
     @Insert
     suspend fun insertBudget(budget: Budget)

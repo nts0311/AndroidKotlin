@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
-import com.android.walletforest.model.Repository
+import com.android.walletforest.model.repositories.Repository
 import com.android.walletforest.wallet_detail_activity.WalletDetailActivity
 import kotlinx.android.synthetic.main.activity_select_wallet.*
 
@@ -77,9 +77,11 @@ class SelectWalletActivity : AppCompatActivity() {
         walletAdapter.itemClickListener = clickListener@{
 
             if (!isEditingWallets) {
-                val result = Intent()
+                /*val result = Intent()
                 result.putExtra(RESULT_WALLET_ID, it.id)
-                setResult(RESULT_OK, result)
+                setResult(RESULT_OK, result)*/
+
+                viewModel.selectWallet(it.id)
                 finish()
             } else {
                 if (it.id == 1L)

@@ -1,4 +1,4 @@
-package com.android.walletforest.model
+package com.android.walletforest.model.repositories
 
 import com.android.walletforest.model.Dao.BudgetDao
 import com.android.walletforest.model.Entities.Budget

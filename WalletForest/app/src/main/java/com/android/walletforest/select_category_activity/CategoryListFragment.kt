@@ -12,9 +12,8 @@ import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
 import com.android.walletforest.enums.Constants
 import com.android.walletforest.model.Entities.Category
-import com.android.walletforest.model.Repository
+import com.android.walletforest.model.repositories.Repository
 import kotlinx.android.synthetic.main.fragment_category_list.*
-import kotlinx.android.synthetic.main.fragment_transaction_list.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch

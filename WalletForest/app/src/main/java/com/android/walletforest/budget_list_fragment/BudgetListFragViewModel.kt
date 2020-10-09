@@ -1,8 +1,7 @@
 package com.android.walletforest.budget_list_fragment
 
 import androidx.lifecycle.*
-import com.android.walletforest.model.Entities.Budget
-import com.android.walletforest.model.Repository
+import com.android.walletforest.model.repositories.Repository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map

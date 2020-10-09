@@ -4,7 +4,7 @@ import androidx.lifecycle.*
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Entities.Transaction
-import com.android.walletforest.model.Repository
+import com.android.walletforest.model.repositories.Repository
 import com.android.walletforest.pie_chart_detail_activity.FilteringParams
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

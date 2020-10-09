@@ -1,8 +1,6 @@
 package com.android.walletforest.report_record_fragment
 
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ScaleDrawable
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -11,20 +9,11 @@ import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
 import com.android.walletforest.bar_chart_detail_activity.BarChartDetailActivity
 import com.android.walletforest.enums.TimeRange
-import com.android.walletforest.model.Repository
+import com.android.walletforest.model.repositories.Repository
 import com.android.walletforest.pie_chart_detail_activity.PieChartDetailActivity
 import com.android.walletforest.pie_chart_detail_activity.PieChartDetailData
-import com.github.mikephil.charting.charts.PieChart
-import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.*
-import com.github.mikephil.charting.formatter.LargeValueFormatter
-import com.github.mikephil.charting.formatter.ValueFormatter
-import com.github.mikephil.charting.listener.ChartTouchListener
-import com.github.mikephil.charting.listener.OnChartGestureListener
-import com.github.mikephil.charting.utils.MPPointF
 import kotlinx.android.synthetic.main.fragment_report_record.*
 import java.io.Serializable
-import java.util.ArrayList
 import kotlin.math.absoluteValue
 
 private const val START_TIME_PARAM = "startTime"

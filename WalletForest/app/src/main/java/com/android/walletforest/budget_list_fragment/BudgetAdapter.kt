@@ -3,7 +3,6 @@ package com.android.walletforest.budget_list_fragment
 import android.annotation.SuppressLint
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.icu.text.NumberFormat
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ProgressBar
@@ -12,8 +11,7 @@ import com.android.walletforest.NumberFormatter
 import com.android.walletforest.R
 import com.android.walletforest.databinding.ItemBudgetBinding
 import com.android.walletforest.model.Entities.Budget
-import com.android.walletforest.model.Repository
-import java.util.*
+import com.android.walletforest.model.repositories.Repository
 
 class BudgetAdapter : RecyclerView.Adapter<BudgetViewHolder>() {
 
@@ -49,22 +47,29 @@ class BudgetViewHolder(private val binding: ItemBudgetBinding) :
         val category = categoryMap[budget.categoryId]
 
         binding.apply {
-            categoryImage.setImageResource(category!!.imageId)
-            categoryName.text = category.name
+            val categoryIconId = if (budget.categoryId != -1L) category!!.imageId
+            else R.drawable.ic_category_all
+            categoryImage.setImageResource(categoryIconId)
+
+            categoryName.text = if (budget.categoryId != -1L) category!!.name
+            else root.context.getString(R.string.all_categories)
 
             totalAmount.text = NumberFormatter.format(budget.amount)
 
-            val diffText = if(budget.amount > budget.spent)
+            val diffText = if (budget.amount > budget.spent)
                 root.context.getString(R.string.left)
             else
                 root.context.getString(R.string.overspent)
 
-            val diffAmount = if(budget.amount > budget.spent) budget.amount - budget.spent
+            val diffAmount = if (budget.amount > budget.spent) budget.amount - budget.spent
             else budget.spent - budget.amount
 
             amountLeft.text = "$diffText ${NumberFormatter.format(diffAmount)}"
 
-            setProgressProgressBar(progressBar, (budget.spent.toFloat() / budget.amount * 100).toInt())
+            setProgressProgressBar(
+                progressBar,
+                (budget.spent.toFloat() / budget.amount * 100).toInt()
+            )
         }
     }
 
@@ -72,7 +77,7 @@ class BudgetViewHolder(private val binding: ItemBudgetBinding) :
         progressBar.progress = progress
         progressBar.scaleY = 1.5f
         progressBar.progressTintList = when (progress) {
-            in 0..69 -> ColorStateList.valueOf(Color.rgb(0,153,51))
+            in 0..69 -> ColorStateList.valueOf(Color.rgb(0, 153, 51))
             in 70..89 -> ColorStateList.valueOf(Color.rgb(255, 153, 51))
             else -> ColorStateList.valueOf(Color.RED)
         }

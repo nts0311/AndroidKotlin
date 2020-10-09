@@ -11,7 +11,7 @@ import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
 import com.android.walletforest.enums.Constants
 import com.android.walletforest.model.Entities.Category
-import com.android.walletforest.model.Repository
+import com.android.walletforest.model.repositories.Repository
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.activity_select_category.*

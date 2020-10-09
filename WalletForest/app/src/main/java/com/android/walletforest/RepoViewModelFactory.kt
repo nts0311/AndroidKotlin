@@ -1,9 +1,8 @@
 package com.android.walletforest
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.android.walletforest.model.Repository
+import com.android.walletforest.model.repositories.Repository
 
 class RepoViewModelFactory(private val repository: Repository) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {

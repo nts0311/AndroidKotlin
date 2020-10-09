@@ -2,7 +2,7 @@ package com.android.walletforest.report_record_fragment
 
 import androidx.lifecycle.*
 import com.android.walletforest.enums.TimeRange
-import com.android.walletforest.model.Repository
+import com.android.walletforest.model.repositories.Repository
 
 
 class ReportRecordViewModel(private val repository: Repository) : ViewModel() {

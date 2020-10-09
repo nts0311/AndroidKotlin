@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.android.walletforest.enums.Constants
-import com.android.walletforest.model.Repository
+import com.android.walletforest.model.repositories.Repository
 
 class CategorySelectFragViewModel(repository: Repository) : ViewModel() {
     private val categoryType = MutableLiveData(Constants.TYPE_EXPENSE)

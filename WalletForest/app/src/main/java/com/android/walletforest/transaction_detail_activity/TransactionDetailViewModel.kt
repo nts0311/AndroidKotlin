@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.android.walletforest.enums.Constants
 import com.android.walletforest.model.Entities.Transaction
-import com.android.walletforest.model.Repository
+import com.android.walletforest.model.repositories.Repository
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -43,64 +43,15 @@ class TransactionDetailViewModel(private val repository: Repository) : ViewModel
                 }
 
                 repository.updateWallet(currentWallet)
-
-
             }
         }
     }
 
     fun insertTransaction(transaction: Transaction) {
-        /*GlobalScope.launch {
-            val currentWallet = wallets[transaction.walletId]?.copy()
-            repository.insertTransaction(transaction)
-
-            if (currentWallet != null) {
-                if (transaction.type == Constants.TYPE_EXPENSE)
-                    currentWallet.amount -= transaction.amount
-                else
-                    currentWallet.amount += transaction.amount
-
-                repository.updateWallet(currentWallet)
-            }
-
-            val budget = repository.getBudgetByIdSync(transaction.categoryId, currentWallet!!.id)
-            if(budget!=null)
-            {
-                budget.spent += transaction.amount
-                repository.updateBudget(budget)
-            }
-
-            val category = repository.categoryMap[transaction.categoryId]!!
-            if(category.id != category.parentId)
-            {
-                val parentBudget = repository.getBudgetByIdSync(category.parentId, currentWallet!!.id)
-                if(parentBudget!=null)
-                {
-                    parentBudget.spent += transaction.amount
-                    repository.updateBudget(parentBudget)
-                }
-            }
-
-        }*/
-
         repository.insertTransaction(transaction)
     }
 
-
-
     fun deleteTransaction(transaction: Transaction) {
-        GlobalScope.launch {
-            val currentWallet = wallets[transaction.walletId]?.copy()
-            repository.deleteTransaction(transaction)
-
-            if (currentWallet != null) {
-                if (transaction.type == Constants.TYPE_EXPENSE)
-                    currentWallet.amount += transaction.amount
-                else
-                    currentWallet.amount -= transaction.amount
-
-                repository.updateWallet(currentWallet)
-            }
-        }
+        repository.deleteTransaction(transaction)
     }
 }

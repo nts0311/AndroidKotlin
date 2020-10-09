@@ -1,15 +1,12 @@
 package com.android.walletforest.report_fragment
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
-import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
-import com.android.walletforest.TransactionsFragment.TransactionsFragmentStateAdapter
-import com.android.walletforest.model.Repository
+import com.android.walletforest.model.repositories.Repository
 import com.android.walletforest.viewpager2_fragment.TabFragmentStateAdapter
 import com.android.walletforest.viewpager2_fragment.ViewPager2FragViewModel
 import com.android.walletforest.viewpager2_fragment.ViewPager2Fragment

@@ -146,5 +146,6 @@
 
     <string name="left">Left</string>
     <string name="overspent">Overspent</string>
+    <string name="all_categories">All categories</string>
 
 </resources>

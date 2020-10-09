@@ -1,8 +1,10 @@
 package com.android.walletforest.budget_activity
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.android.walletforest.R
+import com.android.walletforest.select_wallet_activity.SelectWalletActivity
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.android.synthetic.main.activity_budget.*
 
@@ -15,6 +17,11 @@ class BudgetActivity : AppCompatActivity() {
         setContentView(R.layout.activity_budget)
 
         setUpViewPager2()
+
+        wallet_icon.setOnClickListener {
+            val selectWalletActivity = Intent(this@BudgetActivity, SelectWalletActivity::class.java)
+            startActivity(selectWalletActivity,)
+        }
     }
 
     private fun setUpViewPager2()
