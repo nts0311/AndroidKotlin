@@ -24,7 +24,7 @@ class TransactionDetailViewModel(private val repository: Repository) : ViewModel
         if (transaction == this.transaction.value)
             return
 
-        GlobalScope.launch {
+        /*GlobalScope.launch {
             val currentWallet = wallets[transaction.walletId]?.copy()
             repository.updateTransaction(transaction)
 
@@ -44,7 +44,7 @@ class TransactionDetailViewModel(private val repository: Repository) : ViewModel
 
                 repository.updateWallet(currentWallet)
             }
-        }
+        }*/
     }
 
     fun insertTransaction(transaction: Transaction) {

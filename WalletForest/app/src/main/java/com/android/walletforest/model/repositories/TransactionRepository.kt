@@ -51,7 +51,54 @@ class TransactionRepository(
         }
     }
 
-    fun updateTransaction(){
+    fun updateTransaction(newTransaction: Transaction, oldTransaction: Transaction) {
+
+        GlobalScope.launch {
+            val currentWallet = walletMap[newTransaction.walletId]!!.copy()
+            transactionDao.updateTransaction(newTransaction)
+
+
+            if (newTransaction.type == oldTransaction.type) {
+                if (newTransaction.type == Constants.TYPE_EXPENSE)
+                    currentWallet.amount += (oldTransaction.amount - newTransaction.amount)
+                else
+                    currentWallet.amount -= (oldTransaction.amount - newTransaction.amount)
+            } else {
+                if (newTransaction.type == Constants.TYPE_EXPENSE)
+                    currentWallet.amount -= (oldTransaction.amount + newTransaction.amount)
+                else
+                    currentWallet.amount += (oldTransaction.amount + newTransaction.amount)
+            }
+
+            walletDao.updateWallet(currentWallet)
+
+
+            //update budget
+            if (newTransaction.categoryId == oldTransaction.categoryId) {
+                if (newTransaction.type == Constants.TYPE_INCOME && oldTransaction.type == Constants.TYPE_EXPENSE)
+                    updateBudget(
+                        oldTransaction.categoryId,
+                        oldTransaction.walletId,
+                        oldTransaction.amount * -1
+                    )
+                else if (newTransaction.type == Constants.TYPE_EXPENSE && oldTransaction.type == Constants.TYPE_INCOME)
+                    updateBudget(
+                        newTransaction.categoryId,
+                        newTransaction.walletId,
+                        newTransaction.amount
+                    )
+                else if (newTransaction.type == Constants.TYPE_EXPENSE && oldTransaction.type == Constants.TYPE_EXPENSE)
+                {
+
+                }
+
+
+            } else {
+
+            }
+
+        }
+
 
     }
 
