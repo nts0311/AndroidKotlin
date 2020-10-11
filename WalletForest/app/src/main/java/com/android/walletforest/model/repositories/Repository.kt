@@ -24,9 +24,6 @@ class Repository private constructor(val appContext: Context) {
 
     var viewMode = MutableLiveData(ViewType.TRANSACTION)
 
-    //caching list of transactions of each wallet, avoiding database query
-    private var fetchedRange: MutableMap<String, Flow<List<Transaction>>> = mutableMapOf()
-
     private var _categoriesMap: MutableMap<Long, Category> = mutableMapOf()
     var categoryMap: Map<Long, Category> = _categoriesMap
 
@@ -137,13 +134,9 @@ class Repository private constructor(val appContext: Context) {
 
     fun getTransaction(id: Long) = appDatabase.transactionDao.getTransaction(id)
 
-    suspend fun updateTransaction(transaction: Transaction) {
-        appDatabase.transactionDao.updateTransaction(transaction)
+    fun updateTransaction(newTransaction: Transaction, oldTransaction: Transaction) {
+        transactionRepository.updateTransaction(newTransaction, oldTransaction)
     }
-
-    /*suspend fun insertTransaction(transaction: Transaction) {
-        appDatabase.transactionDao.insertTransaction(transaction)
-    }*/
 
     fun insertTransaction(transaction: Transaction) {
         transactionRepository.insertTransaction(transaction)
@@ -159,32 +152,7 @@ class Repository private constructor(val appContext: Context) {
         start: Long,
         end: Long,
         walletId: Long
-    ): Flow<List<Transaction>> {
-
-        val key: String = if (walletId == 1L)
-            "all-$start-$end"
-        else
-            "$walletId-$start-$end"
-
-        return if (fetchedRange.containsKey(key))
-            fetchedRange[key]!!
-        else {
-
-            val transactions =
-                if (walletId == 1L)
-                    appDatabase.transactionDao.getTransactionsBetweenRange(start, end)
-                else
-                    appDatabase.transactionDao.getTransactionsBetweenRangeOfWallet(
-                        start,
-                        end,
-                        walletId
-                    )
-
-            fetchedRange[key] = transactions.distinctUntilChanged()
-
-            transactions
-        }
-    }
+    ): Flow<List<Transaction>>  = transactionRepository.getTransactionsBetweenRange(start, end, walletId)
 
     fun getCategoriesLiveData(): LiveData<List<Category>> = appDatabase.categoryDao.getCategories()
 

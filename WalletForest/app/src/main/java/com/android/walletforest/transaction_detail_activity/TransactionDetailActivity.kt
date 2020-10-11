@@ -117,7 +117,7 @@ class TransactionDetailActivity : AppCompatActivity() {
                 type = viewModel.categories[transactionCategoryId]?.type!!
             }
 
-            viewModel.updateTransaction(newTransaction!!, currentTransaction?.amount!!)
+            viewModel.updateTransaction(newTransaction!!)
 
         }
         //create a new transaction

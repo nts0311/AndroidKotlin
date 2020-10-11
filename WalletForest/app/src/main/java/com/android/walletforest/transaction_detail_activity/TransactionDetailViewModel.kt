@@ -20,31 +20,11 @@ class TransactionDetailViewModel(private val repository: Repository) : ViewModel
         transaction = repository.getTransaction(id)
     }
 
-    fun updateTransaction(transaction: Transaction, oldAmount: Long) {
+    fun updateTransaction(transaction: Transaction) {
         if (transaction == this.transaction.value)
             return
 
-        /*GlobalScope.launch {
-            val currentWallet = wallets[transaction.walletId]?.copy()
-            repository.updateTransaction(transaction)
-
-            if (currentWallet != null) {
-
-                if (transaction.type == this@TransactionDetailViewModel.transaction.value?.type) {
-                    if (transaction.type == Constants.TYPE_EXPENSE)
-                        currentWallet.amount += (oldAmount - transaction.amount)
-                    else
-                        currentWallet.amount -= (oldAmount - transaction.amount)
-                } else {
-                    if (transaction.type == Constants.TYPE_EXPENSE)
-                        currentWallet.amount -= (oldAmount + transaction.amount)
-                    else
-                        currentWallet.amount += (oldAmount + transaction.amount)
-                }
-
-                repository.updateWallet(currentWallet)
-            }
-        }*/
+        repository.updateTransaction(transaction, this.transaction.value!!)
     }
 
     fun insertTransaction(transaction: Transaction) {

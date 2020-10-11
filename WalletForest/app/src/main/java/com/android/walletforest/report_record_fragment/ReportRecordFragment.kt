@@ -26,7 +26,7 @@ class ReportRecordFragment : Fragment() {
     private var endTime: Long? = null
     private var walletId: Long? = null
     private var timeRange: String? = null
-    var viewModelKey = ""
+    private var viewModelKey = ""
 
     private lateinit var viewModel: ReportRecordViewModel
 
