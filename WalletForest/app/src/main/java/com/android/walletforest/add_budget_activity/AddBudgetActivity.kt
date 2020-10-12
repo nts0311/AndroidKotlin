@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.DatePicker
+import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.android.walletforest.*
@@ -44,6 +45,12 @@ class AddBudgetActivity : AppCompatActivity() {
 
         if (intent.hasExtra(BUDGET_ID))
             budgetId = intent.getLongExtra(BUDGET_ID, -1)
+
+        binding.amountTxt.addTextChangedListener {
+            val currentValue = NumberFormatter.toLong(binding.amountTxt.text.toString())
+            val formattedNumber = NumberFormatter.format(currentValue)
+            binding.amountTxt.setText(formattedNumber)
+        }
 
         registerObservers()
         registerClickListeners()

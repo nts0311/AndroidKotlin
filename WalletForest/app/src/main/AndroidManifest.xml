@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".add_budget_activity.AddBudgetActivity"></activity>
+        <activity android:name=".select_budget_range.SelectBudgetRangeActivity"></activity>
+        <activity android:name=".add_budget_activity.AddBudgetActivity" />
         <activity android:name=".budget_activity.BudgetActivity" />
         <activity
             android:name=".pie_chart_detail_activity.PieChartDetailActivity"

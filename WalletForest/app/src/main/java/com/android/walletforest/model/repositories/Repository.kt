@@ -174,6 +174,10 @@ class Repository private constructor(val appContext: Context) {
         budgetRepository.updateBudget(budget)
     }
 
+    suspend fun insertBudget(newBudget: Budget) {
+        budgetRepository.insertBudget(newBudget)
+    }
+
     companion object {
         private var instance: Repository? = null
 
