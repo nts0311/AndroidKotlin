@@ -1,12 +1,12 @@
 package com.android.walletforest
 
 import android.icu.text.NumberFormat
-import java.util.*
 
 class NumberFormatter {
     companion object
     {
-        private val nf = NumberFormat.getInstance(Locale.getDefault())
+        private val nf = NumberFormat.getInstance()
         fun format(number : Long) : String = nf.format(number)
+        fun toLong(source : String) : Long = nf.parse(source).toLong()
     }
 }

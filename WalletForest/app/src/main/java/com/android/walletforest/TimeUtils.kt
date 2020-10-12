@@ -25,6 +25,9 @@ fun LocalDate.toEpochMilli(): Long =
 fun toEpoch(ld: LocalDate): Long =
     ld.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
+fun dateToFullString(ld: LocalDate): String =
+    DateTimeFormatter.ofPattern("EEEE, dd/MM/yyyy").format(ld)
+
 fun getMonthAxisLabel(start: Long, end: Long): String {
     val startLD = toLocalDate(start)
     val endLD = toLocalDate(end)

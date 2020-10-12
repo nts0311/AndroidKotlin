@@ -193,8 +193,6 @@ class TransactionDetailActivity : AppCompatActivity() {
         binding.categoryTxt.text = category.name
     }
 
-    private fun dateToFullString(ld: LocalDate): String =
-        DateTimeFormatter.ofPattern("EEEE, dd/MM/yyyy").format(ld)
 
     private fun registerObservers() {
         if (transactionId != -1L) {

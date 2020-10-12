@@ -148,4 +148,7 @@
     <string name="overspent">Overspent</string>
     <string name="all_categories">All categories</string>
 
+
+    <string name="enter_goal_value">Enter goal value</string>
+
 </resources>
