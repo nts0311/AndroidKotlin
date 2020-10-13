@@ -3,6 +3,7 @@ package com.android.walletforest.add_budget_activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.databinding.DataBindingUtil
@@ -17,6 +18,7 @@ import com.android.walletforest.select_category_activity.RESULT_CATEGORY_ID
 import com.android.walletforest.select_category_activity.SelectCategoryActivity
 import com.android.walletforest.utils.AmountTextWatcher
 import com.android.walletforest.utils.NumberFormatter
+import com.android.walletforest.utils.toLocalDate
 import kotlinx.android.synthetic.main.activity_add_budget.*
 
 class AddBudgetActivity : AppCompatActivity() {
@@ -77,8 +79,8 @@ class AddBudgetActivity : AppCompatActivity() {
         //set new category to the current transaction which user have choice
         if (requestCode == LAUNCH_CATEGORY_SELECT_ACTIVITY) {
             if (resultCode == RESULT_OK) {
-                var categoryId = data?.getLongExtra(RESULT_CATEGORY_ID, 1)
-                categoryId = categoryId!!
+                val categoryId = data?.getLongExtra(RESULT_CATEGORY_ID, 1)
+                this.categoryId = categoryId!!
                 setCategory(categoryId)
             }
         } else if (requestCode == LAUNCH_SELECT_BUDGET_RANGE_ACTIVITY) {
@@ -125,13 +127,19 @@ class AddBudgetActivity : AppCompatActivity() {
 
     private fun saveBudget() {
         val amount = NumberFormatter.toLong(binding.amountTxt.text.toString())
-        val startDate = 0L
-        val endDate = 0L
-
         //create a new budget
         if (budgetId == -1L) {
-            val newBudget = Budget(-1L, categoryId, currentWalletId, amount, 0, startDate, endDate)
+            val newBudget = Budget(
+                0,
+                categoryId,
+                currentWalletId,
+                amount,
+                0,
+                budgetRange.startDate,
+                budgetRange.endDate
+            )
             viewModel.insertBudget(newBudget)
+            finish()
 
         } else {
 

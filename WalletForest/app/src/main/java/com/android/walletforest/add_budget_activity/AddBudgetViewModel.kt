@@ -6,31 +6,37 @@ import com.android.walletforest.model.Entities.Budget
 import com.android.walletforest.model.repositories.Repository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class AddBudgetViewModel(private val repository: Repository) : ViewModel() {
-    fun insertBudget(newBudget: Budget) {
-        var spent = 0L
 
+    val currentWallet = repository.currentWallet
+    val categoriesMap = repository.categoryMap
+
+    fun insertBudget(newBudget: Budget) {
         GlobalScope.launch {
-            repository.getTransactionsBetweenRange(0L, 0L, 0L)
+            newBudget.spent = repository.getTransactionsBetweenRange(
+                newBudget.startDate,
+                newBudget.endDate,
+                currentWallet.value!!.id
+            )
+                .map {
+                    it.filter { transaction ->
+                        transaction.categoryId == newBudget.categoryId
+                                || categoriesMap[transaction.categoryId]!!.parentId == newBudget.categoryId
+                    }
+                }
                 .map {
                     it.fold(0L) { sum, transaction -> sum + transaction.amount }
                 }
                 .flowOn(Dispatchers.Default)
-                .collect {
-                    spent = it
-                    return@collect
-                }
+                .first()
 
-            newBudget.spent = spent
             repository.insertBudget(newBudget)
         }
     }
 
-    val currentWallet = repository.currentWallet
-    val categoriesMap = repository.categoryMap
+
 }

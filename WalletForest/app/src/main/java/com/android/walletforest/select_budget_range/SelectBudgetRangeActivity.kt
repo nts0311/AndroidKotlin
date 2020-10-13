@@ -5,15 +5,13 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.walletforest.R
-import com.android.walletforest.utils.dateToString
-import com.android.walletforest.utils.toEpochMilli
-import com.android.walletforest.utils.toLocalDate
+import com.android.walletforest.utils.*
 import kotlinx.android.synthetic.main.activity_select_budget_range.*
 import java.time.LocalDate
 
 class SelectBudgetRangeActivity : AppCompatActivity() {
 
-    companion object{
+    companion object {
         const val RESULT_BUDGET_RANGE = "budgetRange"
     }
 
@@ -60,34 +58,53 @@ class SelectBudgetRangeActivity : AppCompatActivity() {
         addRange(getString(R.string.custom_range), now, now)
     }
 
-    private fun addRange(title:String,startDate:LocalDate, endDate: LocalDate)
-    {
+    private fun addRange(title: String, startDate: LocalDate, endDate: LocalDate) {
         val rangeDetail =
             "${dateToString(startDate)} - ${dateToString(endDate)}"
-        rangeList.add(BudgetRange(
-            title,
-            rangeDetail,
-            startDate.toEpochMilli(),
-            endDate.toEpochMilli()
-        ))
+        rangeList.add(
+            BudgetRange(
+                title,
+                rangeDetail,
+                startDate.toEpochMilli(),
+                endDate.toEpochMilli()
+            )
+        )
     }
 
-    private fun setUpRangeList()
-    {
+    private fun setUpRangeList() {
         budgetRangeAdapter.budgetRangeList = rangeList
 
         budgetRangeAdapter.rangeClickListener = {
-            val result = Intent()
-            result.putExtra(RESULT_BUDGET_RANGE, it)
-            setResult(RESULT_OK, result)
-            finish()
+            setResultAndFinish(it)
         }
 
         budgetRangeAdapter.customRangeClickListener = {
+            val selectRangeDialog = createRangeSelectDialog(this)
+            { startDate, endDate ->
 
+                it.startDate = startDate
+                it.endDate = endDate
+                it.rangeDetail =
+                    "${dateToString(toLocalDate(startDate))} - ${dateToString(toLocalDate(endDate))}"
+
+                setResultAndFinish(it)
+            }
+            showRangeSelectDialog(
+                this,
+                selectRangeDialog,
+                System.currentTimeMillis(),
+                System.currentTimeMillis()
+            )
         }
 
         range_list.adapter = budgetRangeAdapter
         range_list.layoutManager = LinearLayoutManager(this)
+    }
+
+    private fun setResultAndFinish(budgetRange: BudgetRange) {
+        val result = Intent()
+        result.putExtra(RESULT_BUDGET_RANGE, budgetRange)
+        setResult(RESULT_OK, result)
+        finish()
     }
 }
