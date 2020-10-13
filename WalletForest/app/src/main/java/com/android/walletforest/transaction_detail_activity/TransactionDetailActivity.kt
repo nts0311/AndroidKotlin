@@ -19,8 +19,10 @@ import com.android.walletforest.model.Entities.Transaction
 import com.android.walletforest.model.repositories.Repository
 import com.android.walletforest.select_category_activity.RESULT_CATEGORY_ID
 import com.android.walletforest.select_category_activity.SelectCategoryActivity
+import com.android.walletforest.utils.dateToFullString
+import com.android.walletforest.utils.toEpoch
+import com.android.walletforest.utils.toLocalDate
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 class TransactionDetailActivity : AppCompatActivity() {
 

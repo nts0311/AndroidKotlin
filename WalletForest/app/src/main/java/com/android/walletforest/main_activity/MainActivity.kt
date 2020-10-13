@@ -1,14 +1,11 @@
 package com.android.walletforest.main_activity
 
-import android.app.DatePickerDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.DatePicker
-import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -22,12 +19,11 @@ import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.repositories.Repository
 import com.android.walletforest.planning_fragment.PlanningFragment
 import com.android.walletforest.report_fragment.ReportFragment
-import com.android.walletforest.select_wallet_activity.RESULT_WALLET_ID
 import com.android.walletforest.select_wallet_activity.SelectWalletActivity
-import com.android.walletforest.viewpager2_fragment.ViewPager2Fragment
+import com.android.walletforest.utils.createRangeSelectDialog
+import com.android.walletforest.utils.showRangeSelectDialog
 import com.google.android.material.tabs.TabLayout
 import kotlinx.android.synthetic.main.activity_main.*
-import java.time.LocalDate
 
 
 class MainActivity : AppCompatActivity() {
@@ -68,7 +64,10 @@ class MainActivity : AppCompatActivity() {
         setUpBottomNav()
         registerObservers()
         registerClickListener()
-        createDialogs()
+
+        rangeSelectDialog = createRangeSelectDialog(this) { startDate, endDate ->
+            viewModel.onSelectCustomTimeRange(startDate, endDate)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -89,7 +88,12 @@ class MainActivity : AppCompatActivity() {
                 viewModel.onTimeRangeChanged(TimeRange.YEAR)
             }
 
-            R.id.range_custom_item -> showRangeSelectDialog()
+            R.id.range_custom_item -> showRangeSelectDialog(
+                this,
+                rangeSelectDialog,
+                viewModel.startTime,
+                viewModel.endTime
+            )
             R.id.switch_view_mode_item -> {
                 val newViewMode = viewModel.switchViewMode()
 
@@ -116,7 +120,7 @@ class MainActivity : AppCompatActivity() {
                     supportFragmentManager.beginTransaction().hide(activeFragment)
                         .show(fragmentTransactions).commit()
                     activeFragment = fragmentTransactions
-                    if(binding.tabLayout.visibility == View.GONE)
+                    if (binding.tabLayout.visibility == View.GONE)
                         binding.tabLayout.visibility = View.VISIBLE
                     true
                 }
@@ -125,7 +129,7 @@ class MainActivity : AppCompatActivity() {
                     supportFragmentManager.beginTransaction().hide(activeFragment)
                         .show(fragmentReport).commit()
                     activeFragment = fragmentReport
-                    if(binding.tabLayout.visibility == View.GONE)
+                    if (binding.tabLayout.visibility == View.GONE)
                         binding.tabLayout.visibility = View.VISIBLE
                     true
                 }
@@ -134,7 +138,7 @@ class MainActivity : AppCompatActivity() {
                     supportFragmentManager.beginTransaction().hide(activeFragment)
                         .show(fragmentPlanning).commit()
                     activeFragment = fragmentPlanning
-                    if(binding.tabLayout.visibility == View.VISIBLE)
+                    if (binding.tabLayout.visibility == View.VISIBLE)
                         binding.tabLayout.visibility = View.GONE
                     true
                 }
@@ -202,7 +206,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun createDialogs() {
+    /*private fun createDialogs() {
         rangeSelectDialog = AlertDialog.Builder(this).run {
 
             val inflater = layoutInflater
@@ -267,7 +271,7 @@ class MainActivity : AppCompatActivity() {
             ).show()
         }
 
-    }
+    }*/
 
     fun getTabLayout(): TabLayout = binding.tabLayout
 }

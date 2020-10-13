@@ -1,9 +1,8 @@
 package com.android.walletforest.main_activity
 
 import com.android.walletforest.enums.TimeRange
-import com.android.walletforest.main_activity.TabInfo
-import com.android.walletforest.toEpoch
-import com.android.walletforest.toLocalDate
+import com.android.walletforest.utils.toEpoch
+import com.android.walletforest.utils.toLocalDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.DayOfWeek

@@ -1,15 +1,21 @@
 package com.android.walletforest.select_budget_range
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.walletforest.R
-import com.android.walletforest.dateToString
-import com.android.walletforest.toEpochMilli
-import com.android.walletforest.toLocalDate
+import com.android.walletforest.utils.dateToString
+import com.android.walletforest.utils.toEpochMilli
+import com.android.walletforest.utils.toLocalDate
 import kotlinx.android.synthetic.main.activity_select_budget_range.*
 import java.time.LocalDate
 
 class SelectBudgetRangeActivity : AppCompatActivity() {
+
+    companion object{
+        const val RESULT_BUDGET_RANGE = "budgetRange"
+    }
 
     private val rangeList = mutableListOf<BudgetRange>()
     private val budgetRangeAdapter = BudgetRangeAdapter()
@@ -17,6 +23,8 @@ class SelectBudgetRangeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_select_budget_range)
+        setSupportActionBar(toolbar4)
+        supportActionBar?.title = getString(R.string.budget_range_activity_title)
 
         initList()
         setUpRangeList()
@@ -69,7 +77,10 @@ class SelectBudgetRangeActivity : AppCompatActivity() {
         budgetRangeAdapter.budgetRangeList = rangeList
 
         budgetRangeAdapter.rangeClickListener = {
-
+            val result = Intent()
+            result.putExtra(RESULT_BUDGET_RANGE, it)
+            setResult(RESULT_OK, result)
+            finish()
         }
 
         budgetRangeAdapter.customRangeClickListener = {
@@ -77,5 +88,6 @@ class SelectBudgetRangeActivity : AppCompatActivity() {
         }
 
         range_list.adapter = budgetRangeAdapter
+        range_list.layoutManager = LinearLayoutManager(this)
     }
 }

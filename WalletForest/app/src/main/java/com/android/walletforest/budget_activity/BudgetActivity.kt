@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.lifecycle.ViewModelProvider
 import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
+import com.android.walletforest.add_budget_activity.AddBudgetActivity
 import com.android.walletforest.main_activity.MainActivityViewModel
 import com.android.walletforest.model.repositories.Repository
 import com.android.walletforest.select_wallet_activity.SelectWalletActivity
@@ -28,12 +29,16 @@ class BudgetActivity : AppCompatActivity() {
 
         wallet_icon.setOnClickListener {
             val selectWalletActivity = Intent(this@BudgetActivity, SelectWalletActivity::class.java)
-            startActivity(selectWalletActivity,)
+            startActivity(selectWalletActivity)
         }
 
         viewModel.currentWallet.observe(this)
         {
             wallet_icon.setImageResource(it.imageId)
+        }
+
+        add_budget_fab.setOnClickListener {
+            startActivity(Intent(this, AddBudgetActivity::class.java))
         }
     }
 

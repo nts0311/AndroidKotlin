@@ -15,7 +15,7 @@ import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Entities.Category
 import com.android.walletforest.model.Entities.Transaction
-import com.android.walletforest.toLocalDate
+import com.android.walletforest.utils.toLocalDate
 import java.time.format.DateTimeFormatter
 
 class DataItemDiffCallbacks : DiffUtil.ItemCallback<DataItem>() {

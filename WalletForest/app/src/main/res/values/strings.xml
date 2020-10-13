@@ -155,5 +155,6 @@
 
 
     <string name="enter_goal_value">Enter goal value</string>
+    <string name="budget_range_activity_title">Budget range</string>
 
 </resources>

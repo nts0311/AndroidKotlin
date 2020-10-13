@@ -1,4 +1,4 @@
-package com.android.walletforest
+package com.android.walletforest.utils
 
 import android.icu.text.NumberFormat
 

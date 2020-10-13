@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.recyclerview.widget.RecyclerView
-import com.android.walletforest.NumberFormatter
+import com.android.walletforest.utils.NumberFormatter
 import com.android.walletforest.R
 import com.android.walletforest.databinding.ItemBudgetBinding
 import com.android.walletforest.model.Entities.Budget
