@@ -39,7 +39,7 @@ abstract class AppDatabase() : RoomDatabase() {
             }
 
         private fun buildDatabase(context: Context) =
-            Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+            Room.databaseBuilder(context, AppDatabase::class.java, "WalletForest_db")
                 .addCallback(object : Callback()
                 {
                     //TEST DATA
@@ -52,11 +52,11 @@ abstract class AppDatabase() : RoomDatabase() {
 
                         scope.launch {
                             database.walletDao.insertWallet(
-                                Wallet(1,"All", R.drawable.ic_category_all, 100000,"VND"))
+                                Wallet(1,"All", R.drawable.ic_category_all, 100000,"đ"))
                             database.walletDao.insertWallet(
-                                Wallet(2,"Cash", R.drawable.icon, 100000,"VND"))
+                                Wallet(2,"Cash", R.drawable.icon, 100000,"đ"))
                             database.walletDao.insertWallet(
-                                Wallet(3,"Cash2", R.drawable.icon, 1,"VND"))
+                                Wallet(3,"Cash2", R.drawable.icon, 1,"đ"))
 
 
                             database.categoryDao.insertCategory(

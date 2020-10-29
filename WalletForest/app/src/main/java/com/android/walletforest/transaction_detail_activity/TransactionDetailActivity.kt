@@ -19,9 +19,7 @@ import com.android.walletforest.model.Entities.Transaction
 import com.android.walletforest.model.repositories.Repository
 import com.android.walletforest.select_category_activity.RESULT_CATEGORY_ID
 import com.android.walletforest.select_category_activity.SelectCategoryActivity
-import com.android.walletforest.utils.dateToFullString
-import com.android.walletforest.utils.toEpoch
-import com.android.walletforest.utils.toLocalDate
+import com.android.walletforest.utils.*
 import java.time.LocalDate
 
 class TransactionDetailActivity : AppCompatActivity() {
@@ -51,6 +49,8 @@ class TransactionDetailActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this, vmFactory)
             .get(TransactionDetailViewModel::class.java)
+
+        binding.amountTxt.addTextChangedListener(AmountTextWatcher(binding.amountTxt))
 
         getArgs()
         registerObservers()
@@ -113,7 +113,7 @@ class TransactionDetailActivity : AppCompatActivity() {
 
             newTransaction?.apply {
                 categoryId = transactionCategoryId
-                amount = binding.amountTxt.text.toString().toLong()
+                amount = NumberFormatter.toLong(binding.amountTxt.text.toString())
                 note = binding.noteEdt.text.toString()
                 date = transactionDate
                 type = viewModel.categories[transactionCategoryId]?.type!!
@@ -129,7 +129,7 @@ class TransactionDetailActivity : AppCompatActivity() {
                 transactionCategoryId,
                 walletId,
                 viewModel.categories[transactionCategoryId]?.type!!,
-                binding.amountTxt.text.toString().toLong(),
+                NumberFormatter.toLong(binding.amountTxt.text.toString()),
                 binding.noteEdt.text.toString(),
                 transactionDate
             )

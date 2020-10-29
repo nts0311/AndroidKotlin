@@ -30,6 +30,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="TextView"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
             app:layout_constraintStart_toEndOf="@+id/category_image"
             app:layout_constraintTop_toTopOf="@+id/category_image" />
 
@@ -59,6 +61,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="TextView"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
             app:layout_constraintStart_toEndOf="@+id/day_of_month_text"
             app:layout_constraintTop_toTopOf="@+id/day_of_month_text" />
 

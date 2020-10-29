@@ -20,6 +20,7 @@ import com.android.walletforest.model.repositories.Repository
 import com.android.walletforest.planning_fragment.PlanningFragment
 import com.android.walletforest.report_fragment.ReportFragment
 import com.android.walletforest.select_wallet_activity.SelectWalletActivity
+import com.android.walletforest.utils.NumberFormatter
 import com.android.walletforest.utils.createRangeSelectDialog
 import com.android.walletforest.utils.showRangeSelectDialog
 import com.google.android.material.tabs.TabLayout
@@ -178,7 +179,7 @@ class MainActivity : AppCompatActivity() {
         {
             if (it != null) {
                 binding.walletName.text = it.name
-                binding.walletBalance.text = it.amount.toString()
+                binding.walletBalance.text = NumberFormatter.format(it.amount) + " " + it.currency
                 binding.walletImg.setImageResource(it.imageId)
 
                 if (!viewModel.initTabs) {

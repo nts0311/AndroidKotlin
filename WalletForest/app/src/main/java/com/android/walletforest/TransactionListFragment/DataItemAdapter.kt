@@ -15,6 +15,7 @@ import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
 import com.android.walletforest.model.Entities.Category
 import com.android.walletforest.model.Entities.Transaction
+import com.android.walletforest.utils.NumberFormatter
 import com.android.walletforest.utils.toLocalDate
 import java.time.format.DateTimeFormatter
 
@@ -104,7 +105,7 @@ class TransactionItemViewHolder(var binding: ItemTransactionBinding) :
             colorBlue
 
         binding.amountText.setTextColor(color)
-        binding.amountText.text = transaction.amount.toString()
+        binding.amountText.text = NumberFormatter.format(transaction.amount)
 
         binding.noteText.text = transaction.note
 
@@ -160,8 +161,7 @@ class DividerItemViewHolder(var binding: ItemDividerBinding) :
         timeRange: TimeRange,
         category: Category
     ) {
-        binding.amountText.text = dividerItem.totalAmount.toString()
-
+        binding.amountText.text = NumberFormatter.format(dividerItem.totalAmount)
         if (viewMode == ViewType.TRANSACTION) {
             bindWithTime(dividerItem, timeRange)
         } else

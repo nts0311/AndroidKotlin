@@ -54,6 +54,16 @@ class Repository private constructor(val appContext: Context) {
         _categoriesMap
     )
 
+    /**
+   * /\_____/\
+    /  o   o  \
+   ( ==  ^  == )
+    )         (
+   (           )
+  ( (  )   (  ) )
+ (__(__)___(__)__)
+     * **/
+
     fun getBarData(start: Long, end: Long, walletId: Long, timeRange: TimeRange) =
         getTransactionsBetweenRange(start, end, walletId)
             .map { ChartEntryGenerator.getBarChartData(it, start, end, timeRange) }
@@ -143,7 +153,7 @@ class Repository private constructor(val appContext: Context) {
     }
 
     fun deleteTransaction(transaction: Transaction) {
-       transactionRepository.deleteTransaction(transaction)
+        transactionRepository.deleteTransaction(transaction)
     }
 
     //Get the list of transactions in a specific wallet and specific period
@@ -152,7 +162,8 @@ class Repository private constructor(val appContext: Context) {
         start: Long,
         end: Long,
         walletId: Long
-    ): Flow<List<Transaction>>  = transactionRepository.getTransactionsBetweenRange(start, end, walletId)
+    ): Flow<List<Transaction>> =
+        transactionRepository.getTransactionsBetweenRange(start, end, walletId)
 
     fun getCategoriesLiveData(): LiveData<List<Category>> = appDatabase.categoryDao.getCategories()
 

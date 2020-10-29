@@ -14,6 +14,7 @@ import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.model.repositories.Repository
 import com.android.walletforest.report_record_fragment.ChartsDrawer
 import com.android.walletforest.transaction_list_activity.TransactionListActivity
+import com.android.walletforest.utils.NumberFormatter
 import kotlinx.android.synthetic.main.activity_pie_chart_detail.*
 import kotlinx.android.synthetic.main.activity_pie_chart_detail.root_layout
 
@@ -89,7 +90,7 @@ class PieChartDetailActivity : AppCompatActivity() {
             else
                 amountTxt.setTextColor(colorRed)
 
-            amountTxt.text = pair.second.toString()
+            amountTxt.text = NumberFormatter.format(pair.second)
 
             rootItem.setOnClickListener { _ ->
                 val transactionListIntent =

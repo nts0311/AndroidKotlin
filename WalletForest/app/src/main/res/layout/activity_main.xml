@@ -65,6 +65,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:text="TextView"
+                        android:textColor="@android:color/black"
+                        android:textSize="18sp"
                         app:layout_constraintBottom_toBottomOf="@+id/wallet_img"
                         app:layout_constraintStart_toEndOf="@+id/wallet_img" />
 

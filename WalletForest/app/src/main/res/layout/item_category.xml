@@ -23,6 +23,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:text="TextView"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="@+id/category_img"
         app:layout_constraintStart_toEndOf="@+id/category_img"
         app:layout_constraintTop_toTopOf="@+id/category_img" />

@@ -12,6 +12,7 @@ import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.report_record_fragment.BarChartData
 import com.android.walletforest.report_record_fragment.ChartsDrawer
 import com.android.walletforest.transaction_list_activity.TransactionListActivity
+import com.android.walletforest.utils.NumberFormatter
 import com.github.mikephil.charting.data.BarEntry
 import kotlinx.android.synthetic.main.activity_bar_chart_detail.*
 import kotlin.math.absoluteValue
@@ -48,11 +49,11 @@ class BarChartDetailActivity : AppCompatActivity() {
             val itemRoot = inflater.inflate(R.layout.item_bar_data, root_layout, false)
 
             itemRoot.findViewById<TextView>(R.id.range_label_txt).text = it.xAxisLabel
-            itemRoot.findViewById<TextView>(R.id.income_txt).text = it.totalIncome.toString()
+            itemRoot.findViewById<TextView>(R.id.income_txt).text = NumberFormatter.format(it.totalIncome)
             itemRoot.findViewById<TextView>(R.id.expense_txt).text =
-                it.totalExpense.absoluteValue.toString()
+                NumberFormatter.format(it.totalExpense.absoluteValue)
             itemRoot.findViewById<TextView>(R.id.net_income_txt).text =
-                (it.totalIncome - it.totalExpense.absoluteValue).toString()
+                NumberFormatter.format((it.totalIncome - it.totalExpense.absoluteValue))
 
             itemRoot.setOnClickListener { _ ->
                 val transactionListIntent =

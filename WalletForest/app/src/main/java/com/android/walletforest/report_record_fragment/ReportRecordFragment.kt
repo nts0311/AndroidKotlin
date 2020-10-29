@@ -12,6 +12,7 @@ import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.model.repositories.Repository
 import com.android.walletforest.pie_chart_detail_activity.PieChartDetailActivity
 import com.android.walletforest.pie_chart_detail_activity.PieChartDetailData
+import com.android.walletforest.utils.NumberFormatter
 import kotlinx.android.synthetic.main.fragment_report_record.*
 import java.io.Serializable
 import kotlin.math.absoluteValue
@@ -164,9 +165,9 @@ class ReportRecordFragment : Fragment() {
             expense += it.totalExpense.absoluteValue
         }
 
-        income_txt.text = income.toString()
-        expense_txt.text = expense.toString()
-        net_income_txt.text = (income - expense).toString()
+        income_txt.text = NumberFormatter.format(income)
+        expense_txt.text = NumberFormatter.format(expense)
+        net_income_txt.text = NumberFormatter.format((income - expense))
     }
 
     private fun drawPieCharts(pieChartData: PieChartData) {
