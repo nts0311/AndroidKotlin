@@ -32,7 +32,7 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
 
     var previousWalletId = -1L
 
-    var filteredList = flow<List<Transaction>> {  }
+    var filteredList = flow<List<Transaction>> { }
 
     fun switchViewMode(viewType: ViewType) {
         if (currentViewMode == viewType) return
@@ -40,11 +40,7 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
         currentViewMode = viewType
         /*if (transactionList.value != null)
             groupData(transactionList.value!!)*/
-
-        filteredList.map { dataGrouper.doGrouping(it, timeRange, currentViewMode) }
-            .flowOn(Dispatchers.Default)
-            .onEach { _dataItemList.value = it }
-            .launchIn(viewModelScope)
+        groupData()
     }
 
     /*fun onTransactionListChange(transactionList: List<Transaction>) {
@@ -127,12 +123,22 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
         }
             .flowOn(Dispatchers.Default)
 
-        filteredList.map { dataGrouper.doGrouping(it, timeRange, currentViewMode) }
-            .flowOn(Dispatchers.Default)
-            .onEach { _dataItemList.value = it }
-            .launchIn(viewModelScope)
-
+        groupData()
 
         previousWalletId = walletId
+    }
+
+    private fun groupData()
+    {
+        groupDataJob?.cancel()
+
+        groupDataJob = filteredList.map {
+            dataGrouper.doGrouping(it, timeRange, currentViewMode)
+        }
+            .flowOn(Dispatchers.Default)
+            .onEach {
+                _dataItemList.value = it
+            }
+            .launchIn(viewModelScope)
     }
 }

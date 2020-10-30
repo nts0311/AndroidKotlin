@@ -1,5 +1,6 @@
 package com.android.walletforest.budget_list_fragment
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
+import com.android.walletforest.budget_detail_activity.BudgetDetailActivity
 import com.android.walletforest.model.repositories.Repository
 import kotlinx.android.synthetic.main.fragment_budget_list.*
 
@@ -68,6 +70,11 @@ class BudgetListFragment : Fragment() {
     {
         budget_list_rv.layoutManager = LinearLayoutManager(requireContext())
         budget_list_rv.adapter = budgetAdapter
+        budgetAdapter.budgetClickListener = {
+            val startBudgetDetailActivity = Intent(this@BudgetListFragment.context, BudgetDetailActivity::class.java)
+            startBudgetDetailActivity.putExtra(BudgetDetailActivity.BUDGET_ID_KEY, it.id)
+            startActivity(startBudgetDetailActivity)
+        }
     }
 
     companion object {

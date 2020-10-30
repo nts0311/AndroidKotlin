@@ -12,7 +12,11 @@ import kotlinx.android.synthetic.main.item_transaction.*
 
 class BudgetDetailActivity : AppCompatActivity() {
 
-    val BUDGET_ID_KEY = "budgetId"
+    companion object{
+        val BUDGET_ID_KEY = "budgetId"
+    }
+
+
 
     private lateinit var viewModel: BudgetDetailViewModel
 
@@ -33,10 +37,13 @@ class BudgetDetailActivity : AppCompatActivity() {
     {
         viewModel.currentBudget.observe(this)
         {
+            if(it==null)
+                return@observe
+
             val category = viewModel.categoryMap[it.categoryId]!!
             val wallet = viewModel.walletMap[it.walletId]!!
 
-            category_image.setImageResource(category.imageId)
+            category_img.setImageResource(category.imageId)
             category_txt.text = category.name
             amount_txt.text = NumberFormatter.format(it.amount)
             amount_spent_txt.text = NumberFormatter.format(it.spent)

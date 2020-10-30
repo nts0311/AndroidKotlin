@@ -28,9 +28,9 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
-    private val fragmentTransactions = TransactionsFragment()
-    private val fragmentReport = ReportFragment()
-    private val fragmentPlanning = PlanningFragment()
+    private var fragmentTransactions = TransactionsFragment()
+    private var fragmentReport = ReportFragment()
+    private var fragmentPlanning = PlanningFragment()
     private var activeFragment: Fragment = fragmentTransactions
     private var rangeSelectDialog: AlertDialog? = null
 
