@@ -19,9 +19,9 @@ class BudgetRepository(private val budgetDao: BudgetDao) {
         }
 
 
-    fun getBudgetById(id: Long, walletId: Long): Flow<Budget> {
+    fun getBudgetById(id: Long): Flow<Budget> {
         if (!budgetsMap.containsKey(id))
-            budgetsMap[id] = budgetDao.getBudgetById(id, walletId).distinctUntilChanged()
+            budgetsMap[id] = budgetDao.getBudgetById(id).distinctUntilChanged()
 
         return budgetsMap[id]!!
     }

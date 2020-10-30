@@ -115,7 +115,7 @@ class TransactionListFragment : Fragment() {
 
         viewModel.currentWallet.observe(viewLifecycleOwner) { it ->
             if (it != null) {
-                viewModel.transactionList.removeObservers(viewLifecycleOwner)
+                //viewModel.transactionList.removeObservers(viewLifecycleOwner)
 
                 viewModel.setTimeRange(
                     startTime!!,
@@ -125,10 +125,10 @@ class TransactionListFragment : Fragment() {
                     filteringParams
                 )
 
-                viewModel.transactionList.observe(viewLifecycleOwner) {
+               /* viewModel.transactionList.observe(viewLifecycleOwner) {
                     if (it != null)
                         viewModel.onTransactionListChange(it)
-                }
+                }*/
 
             }
         }

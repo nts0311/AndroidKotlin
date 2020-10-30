@@ -68,86 +68,84 @@ class DataGrouper {
     private suspend fun group(belongToGroup: (DataItem.DividerItem, Transaction) -> Boolean) {
         if (transactions.isEmpty()) return
 
-        withContext(Dispatchers.Default)
-        {
-            if (result.isNotEmpty())
-                result.clear()
+        if (result.isNotEmpty())
+            result.clear()
 
-            transactions = if (viewType == ViewType.TRANSACTION) {
-                transactions.sortedWith { t1: Transaction, t2: Transaction ->
+        transactions = if (viewType == ViewType.TRANSACTION) {
+            transactions.sortedWith { t1: Transaction, t2: Transaction ->
 
-                    if (t1.date == t2.date)
+                if (t1.date == t2.date)
+                    cmpLong(t2.id, t1.id)
+                else
+                    cmpLong(t2.date, t1.date)
+            }
+        } else {
+            transactions.sortedWith { t1: Transaction, t2: Transaction ->
+
+                if (t1.categoryId == t2.categoryId) {
+                    if (t2.date == t1.date)
                         cmpLong(t2.id, t1.id)
                     else
                         cmpLong(t2.date, t1.date)
-                }
-            } else {
-                transactions.sortedWith { t1: Transaction, t2: Transaction ->
-
-                    if (t1.categoryId == t2.categoryId) {
-                        if (t2.date == t1.date)
-                            cmpLong(t2.id, t1.id)
-                        else
-                            cmpLong(t2.date, t1.date)
-                    } else
-                        cmpLong(t1.categoryId, t2.categoryId)
-                }
-            }
-
-
-            var totalAmount = 0L
-            var numOfTransaction = 0
-
-            var currentDividerItem = DataItem.DividerItem(
-                toLocalDate(transactions[0].date), transactions[0].categoryId,
-                totalAmount, numOfTransaction
-            )
-
-            result.add(currentDividerItem)
-
-            for (transaction in transactions) {
-
-                //check if the coroutine is canceled, stop the work immediately to prevent cases like
-                //rotating the device and it adds some excited transaction to the list
-                yield()
-
-                if (belongToGroup(currentDividerItem, transaction)) {
-                    result.add(DataItem.TransactionItem(transaction))
-
-                    if (transaction.type == Constants.TYPE_EXPENSE)
-                        totalAmount -= transaction.amount
-                    else
-                        totalAmount += transaction.amount
-
-                    numOfTransaction++
-
-                    if (transactions.last() === transaction) {
-                        currentDividerItem.numOfTransactions = numOfTransaction
-                        currentDividerItem.totalAmount = totalAmount
-                    }
-                } else {
-                    currentDividerItem.numOfTransactions = numOfTransaction
-                    currentDividerItem.totalAmount = totalAmount
-
-                    numOfTransaction = 1
-
-                    totalAmount = if (transaction.type == Constants.TYPE_EXPENSE)
-                        -transaction.amount
-                    else
-                        transaction.amount
-
-
-                    val dividerItem = DataItem.DividerItem(
-                        toLocalDate(transaction.date), transaction.categoryId,
-                        totalAmount, numOfTransaction
-                    )
-
-                    currentDividerItem = dividerItem
-
-                    result.add(dividerItem)
-                    result.add(DataItem.TransactionItem(transaction))
-                }
+                } else
+                    cmpLong(t1.categoryId, t2.categoryId)
             }
         }
+
+
+        var totalAmount = 0L
+        var numOfTransaction = 0
+
+        var currentDividerItem = DataItem.DividerItem(
+            toLocalDate(transactions[0].date), transactions[0].categoryId,
+            totalAmount, numOfTransaction
+        )
+
+        result.add(currentDividerItem)
+
+        for (transaction in transactions) {
+
+            //check if the coroutine is canceled, stop the work immediately to prevent cases like
+            //rotating the device and it adds some excited transaction to the list
+            yield()
+
+            if (belongToGroup(currentDividerItem, transaction)) {
+                result.add(DataItem.TransactionItem(transaction))
+
+                if (transaction.type == Constants.TYPE_EXPENSE)
+                    totalAmount -= transaction.amount
+                else
+                    totalAmount += transaction.amount
+
+                numOfTransaction++
+
+                if (transactions.last() === transaction) {
+                    currentDividerItem.numOfTransactions = numOfTransaction
+                    currentDividerItem.totalAmount = totalAmount
+                }
+            } else {
+                currentDividerItem.numOfTransactions = numOfTransaction
+                currentDividerItem.totalAmount = totalAmount
+
+                numOfTransaction = 1
+
+                totalAmount = if (transaction.type == Constants.TYPE_EXPENSE)
+                    -transaction.amount
+                else
+                    transaction.amount
+
+
+                val dividerItem = DataItem.DividerItem(
+                    toLocalDate(transaction.date), transaction.categoryId,
+                    totalAmount, numOfTransaction
+                )
+
+                currentDividerItem = dividerItem
+
+                result.add(dividerItem)
+                result.add(DataItem.TransactionItem(transaction))
+            }
+        }
+
     }
 }

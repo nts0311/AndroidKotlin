@@ -10,8 +10,8 @@ interface BudgetDao {
     @Query("SELECT * FROM budgets WHERE walletId=:walletId")
     fun getBudgetList(walletId: Long): Flow<List<Budget>>
 
-    @Query("SELECT * FROM budgets WHERE id = :id AND walletId=:walletId")
-    fun getBudgetById(id: Long, walletId: Long): Flow<Budget>
+    @Query("SELECT * FROM budgets WHERE id = :id")
+    fun getBudgetById(id: Long): Flow<Budget>
 
     @Query("SELECT * FROM budgets WHERE categoryId = :cateId AND walletId=:walletId")
     fun getBudgetByCategory(cateId: Long, walletId: Long): Flow<Budget>

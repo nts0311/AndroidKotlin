@@ -9,8 +9,7 @@ import com.android.walletforest.pie_chart_detail_activity.FilteringParams
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
@@ -26,26 +25,33 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
 
     private var groupDataJob: Job? = null
 
-    var transactionList: LiveData<List<Transaction>> = MutableLiveData()
+    //var transactionList: LiveData<List<Transaction>> = MutableLiveData()
 
     private var _dataItemList: MutableLiveData<List<DataItem>> = MutableLiveData()
     var dataItemList: LiveData<List<DataItem>> = _dataItemList
 
     var previousWalletId = -1L
 
+    var filteredList = flow<List<Transaction>> {  }
+
     fun switchViewMode(viewType: ViewType) {
         if (currentViewMode == viewType) return
 
         currentViewMode = viewType
-        if (transactionList.value != null)
-            groupData(transactionList.value!!)
+        /*if (transactionList.value != null)
+            groupData(transactionList.value!!)*/
+
+        filteredList.map { dataGrouper.doGrouping(it, timeRange, currentViewMode) }
+            .flowOn(Dispatchers.Default)
+            .onEach { _dataItemList.value = it }
+            .launchIn(viewModelScope)
     }
 
-    fun onTransactionListChange(transactionList: List<Transaction>) {
+    /*fun onTransactionListChange(transactionList: List<Transaction>) {
         groupData(transactionList)
-    }
+    }*/
 
-    private fun groupData(transactionList: List<Transaction>) {
+    /*private fun groupData(transactionList: List<Transaction>) {
         groupDataJob?.cancel()
 
         groupDataJob = viewModelScope.launch {
@@ -53,7 +59,7 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
                 async { dataGrouper.doGrouping(transactionList, timeRange, currentViewMode) }
             _dataItemList.value = result.await()
         }
-    }
+    }*/
 
     override fun onCleared() {
         super.onCleared()
@@ -79,7 +85,7 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
         endTime = end
         timeRange = TimeRange.valueOf(range)
 
-        val transactionsFlow = repo.getTransactionsBetweenRange(start, end, walletId)
+        /*val transactionsFlow = repo.getTransactionsBetweenRange(start, end, walletId)
 
         transactionList = if (filteringParams.categoryIdToFilter == -1L) transactionsFlow.asLiveData()
         else transactionsFlow.map {
@@ -99,7 +105,33 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
                         && transaction.type == filteringParams.transactionType
             }
         }
-            .flowOn(Dispatchers.Default).asLiveData()
+            .flowOn(Dispatchers.Default).asLiveData()*/
+
+        val transactionsFlow = repo.getTransactionsBetweenRange(start, end, walletId)
+
+        filteredList = if (filteringParams.categoryIdToFilter == -1L) transactionsFlow
+        else transactionsFlow.map {
+            //include transactions with sub category in parent category
+            val subCategoryId = mutableListOf<Long>()
+            subCategoryId.add(filteringParams.categoryIdToFilter)
+
+            if (!filteringParams.excludeSubCate)
+                repo.categoryMap.values.forEach { category ->
+                    if (category.parentId == filteringParams.categoryIdToFilter)
+                        subCategoryId.add(category.id)
+                }
+            it.filter { transaction ->
+                subCategoryId.contains(transaction.categoryId)
+                        && transaction.type == filteringParams.transactionType
+            }
+        }
+            .flowOn(Dispatchers.Default)
+
+        filteredList.map { dataGrouper.doGrouping(it, timeRange, currentViewMode) }
+            .flowOn(Dispatchers.Default)
+            .onEach { _dataItemList.value = it }
+            .launchIn(viewModelScope)
+
 
         previousWalletId = walletId
     }

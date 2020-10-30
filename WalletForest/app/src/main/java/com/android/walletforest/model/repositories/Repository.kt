@@ -189,6 +189,8 @@ class Repository private constructor(val appContext: Context) {
         budgetRepository.insertBudget(newBudget)
     }
 
+    fun getBudgetById(id: Long):Flow<Budget> = budgetRepository.getBudgetById(id)
+
     companion object {
         private var instance: Repository? = null
 
