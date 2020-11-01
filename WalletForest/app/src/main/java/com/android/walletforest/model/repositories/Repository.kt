@@ -178,13 +178,6 @@ class Repository private constructor(val appContext: Context) {
 
     fun getAllBudget(walletId: Long): Flow<List<Budget>> = budgetRepository.getAllBudgets(walletId)
 
-    suspend fun getBudgetByIdSync(cateId: Long, walletId: Long): Budget? =
-        budgetRepository.getBudgetByIdSync(cateId, walletId)
-
-    suspend fun updateBudget(budget: Budget) {
-        budgetRepository.updateBudget(budget)
-    }
-
     suspend fun insertBudget(newBudget: Budget) {
         budgetRepository.insertBudget(newBudget)
     }

@@ -26,8 +26,8 @@ class BudgetRepository(private val budgetDao: BudgetDao) {
         return budgetsMap[id]!!
     }
 
-    suspend fun getBudgetByIdSync(cateId: Long, walletId: Long): Budget? =
-        budgetDao.getBudgetByCategorySync(cateId, walletId)
+    suspend fun getBudgetByIdSync(cateId: Long, walletId: Long, transactionDate: Long): Budget? =
+        budgetDao.getBudgetByCategorySync(cateId, walletId, transactionDate)
 
     suspend fun updateBudget(budget: Budget) {
         budgetDao.updateBudget(budget)

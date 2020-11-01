@@ -44,8 +44,12 @@ class TransactionListFragment : Fragment() {
             walletId = it.getLong(WALLET_ID_PARAM)
             timeRange = it.getString(TIME_RANGE_PARAM, TimeRange.MONTH.value)
             if(it.containsKey(RANGE_PARAMS))
+            {
                 filteringParams = it.getSerializable(RANGE_PARAMS) as FilteringParams
-            key = "$startTime - $endTime"
+                key+= "filtered "
+            }
+
+            key += "$walletId - $startTime - $endTime"
         }
     }
 

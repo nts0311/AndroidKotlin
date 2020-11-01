@@ -40,15 +40,23 @@ class BudgetDetailActivity : AppCompatActivity() {
             if(it==null)
                 return@observe
 
-            val category = viewModel.categoryMap[it.categoryId]!!
-            val wallet = viewModel.walletMap[it.walletId]!!
+            if(it.categoryId==-1L)
+            {
+                category_img.setImageResource(R.drawable.ic_category_all)
+                category_txt.text = applicationContext.getString(R.string.all_categories)
+            }
+            else
+            {
+                val category = viewModel.categoryMap[it.categoryId]!!
+                category_img.setImageResource(category.imageId)
+                category_txt.text = category.name
+            }
 
-            category_img.setImageResource(category.imageId)
-            category_txt.text = category.name
             amount_txt.text = NumberFormatter.format(it.amount)
             amount_spent_txt.text = NumberFormatter.format(it.spent)
             amount_left_txt.text = NumberFormatter.format(it.amount - it.spent)
 
+            val wallet = viewModel.walletMap[it.walletId]!!
             wallet_name_txt.text = wallet.name
             wallet_icon.setImageResource(wallet.imageId)
         }

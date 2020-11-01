@@ -8,9 +8,12 @@ import com.android.walletforest.model.Entities.Category
 import com.android.walletforest.model.Entities.Transaction
 import com.android.walletforest.model.Entities.Wallet
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 class TransactionRepository(
     private val transactionDao: TransactionDao,
@@ -21,6 +24,7 @@ class TransactionRepository(
 ) {
     //caching list of transactions of each wallet, avoiding database query
     private var fetchedRange: MutableMap<String, Flow<List<Transaction>>> = mutableMapOf()
+    private val lock = Mutex()
 
     //Get the list of transactions in a specific wallet and specific period
     //If the list is not cached, fetch the list from database and cache it
@@ -55,7 +59,7 @@ class TransactionRepository(
         }
     }
 
-    fun insertTransaction(transaction: Transaction) {
+    fun insertTransaction(transaction: Transaction) : Job =
         GlobalScope.launch {
             val currentWallet = walletMap[transaction.walletId]!!.copy()
             transactionDao.insertTransaction(transaction)
@@ -68,11 +72,15 @@ class TransactionRepository(
             walletDao.updateWallet(currentWallet)
 
 
-            updateBudget(transaction.categoryId, currentWallet.id, transaction.amount)
+            updateBudget(
+                transaction.categoryId,
+                currentWallet.id,
+                transaction.amount,
+                transaction.date
+            )
         }
-    }
 
-    fun deleteTransaction(transaction: Transaction) {
+    fun deleteTransaction(transaction: Transaction) : Job =
         GlobalScope.launch {
             val currentWallet = walletMap[transaction.walletId]!!.copy()
             transactionDao.deleteTransaction(transaction)
@@ -84,14 +92,23 @@ class TransactionRepository(
 
             walletDao.updateWallet(currentWallet)
 
-            updateBudget(transaction.categoryId, currentWallet.id, transaction.amount * -1)
+            updateBudget(
+                transaction.categoryId,
+                currentWallet.id,
+                transaction.amount * -1,
+                transaction.date
+            )
         }
-    }
 
     fun updateTransaction(newTransaction: Transaction, oldTransaction: Transaction) {
 
+
         GlobalScope.launch {
-            val currentWallet = walletMap[newTransaction.walletId]!!.copy()
+
+            deleteTransaction(oldTransaction).join()
+            insertTransaction(newTransaction).join()
+
+            /*val currentWallet = walletMap[newTransaction.walletId]!!.copy()
             transactionDao.updateTransaction(newTransaction)
 
 
@@ -116,31 +133,35 @@ class TransactionRepository(
                 updateBudget(
                     oldTransaction.categoryId,
                     oldTransaction.walletId,
-                    oldTransaction.amount * -1
+                    oldTransaction.amount * -1,
+                    oldTransaction.date
                 )
             else if (newTransaction.type == Constants.TYPE_EXPENSE && oldTransaction.type == Constants.TYPE_INCOME)
                 updateBudget(
                     newTransaction.categoryId,
                     newTransaction.walletId,
-                    newTransaction.amount
+                    newTransaction.amount,
+                    newTransaction.date
                 )
             else if (newTransaction.type == Constants.TYPE_EXPENSE && oldTransaction.type == Constants.TYPE_EXPENSE) {
                 if (newTransaction.categoryId == oldTransaction.categoryId) {
                     val diff = newTransaction.amount - oldTransaction.amount
-                    updateBudget(newTransaction.categoryId, newTransaction.walletId, diff)
+                    updateBudget(newTransaction.categoryId, newTransaction.walletId, diff, newTransaction.date)
                 } else {
                     updateBudget(
                         oldTransaction.categoryId,
                         oldTransaction.walletId,
-                        oldTransaction.amount * -1
+                        oldTransaction.amount * -1,
+                        oldTransaction.date
                     )
                     updateBudget(
                         newTransaction.categoryId,
                         newTransaction.walletId,
-                        newTransaction.amount
+                        newTransaction.amount,
+                        newTransaction.date
                     )
                 }
-            }
+            }*/
         }
     }
 
@@ -148,33 +169,34 @@ class TransactionRepository(
     private suspend fun updateBudget(
         categoryId: Long,
         walletId: Long,
-        diff: Long
+        diff: Long,
+        transactionDate: Long
     ) {
-        val now = System.currentTimeMillis()
-
-        //update the transaction's category budget (if it exists)
-        val budget = budgetDao.getBudgetByCategorySync(categoryId, walletId)
-        if (budget != null && budget.endDate > now) {
-            budget.spent += diff
-            budgetDao.updateBudget(budget)
-        }
-
-        //update the transaction's parent category budget (if it exists)
-        val parentCategory = categoryMap[categoryId]!!
-        if (parentCategory.id != parentCategory.parentId) {
-            val parentCategoryBudget =
-                budgetDao.getBudgetByCategorySync(parentCategory.parentId, walletId)
-            if (parentCategoryBudget != null && parentCategoryBudget.endDate > now) {
-                parentCategoryBudget.spent += diff
-                budgetDao.updateBudget(parentCategoryBudget)
+        lock.withLock {
+            //update the transaction's category budget (if it exists)
+            val budget = budgetDao.getBudgetByCategorySync(categoryId, walletId, transactionDate)
+            if (budget != null) {
+                budget.spent += diff
+                budgetDao.updateBudget(budget)
             }
-        }
 
-        //update the all-categories budget (if it exists)
-        val allCategoryBudget = budgetDao.getAllCategoriesBudgetSync(walletId)
-        if (allCategoryBudget != null && allCategoryBudget.endDate > now) {
-            allCategoryBudget.spent += diff
-            budgetDao.updateBudget(allCategoryBudget)
+            //update the transaction's parent category budget (if it exists)
+            val category = categoryMap[categoryId]!!
+            if (category.id != category.parentId) {
+                val parentCategoryBudget =
+                    budgetDao.getBudgetByCategorySync(category.parentId, walletId, transactionDate)
+                if (parentCategoryBudget != null) {
+                    parentCategoryBudget.spent += diff
+                    budgetDao.updateBudget(parentCategoryBudget)
+                }
+            }
+
+            //update the all-categories budget (if it exists)
+            val allCategoryBudget = budgetDao.getAllCategoriesBudgetSync(walletId, transactionDate)
+            if (allCategoryBudget != null) {
+                allCategoryBudget.spent += diff
+                budgetDao.updateBudget(allCategoryBudget)
+            }
         }
     }
 }
