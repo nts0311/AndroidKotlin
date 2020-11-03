@@ -121,7 +121,6 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
                         && transaction.type == filteringParams.transactionType
             }
         }
-            .flowOn(Dispatchers.Default)
 
         groupData()
 
