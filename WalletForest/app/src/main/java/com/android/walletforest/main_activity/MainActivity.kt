@@ -189,7 +189,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.walletList.observe(this)
+        /*viewModel.walletList.observe(this)
         {
             if (it != null) {
                 viewModel.updateWallets(it)
@@ -204,7 +204,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-        }
+        }*/
     }
 
     /*private fun createDialogs() {

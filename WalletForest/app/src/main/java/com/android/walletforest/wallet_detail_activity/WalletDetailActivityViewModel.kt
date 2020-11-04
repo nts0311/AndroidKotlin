@@ -3,6 +3,7 @@ package com.android.walletforest.wallet_detail_activity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import com.android.walletforest.model.Entities.Wallet
 import com.android.walletforest.model.repositories.Repository
 import kotlinx.coroutines.GlobalScope
@@ -13,7 +14,7 @@ class WalletDetailActivityViewModel(private val repository: Repository) : ViewMo
     var wallet: LiveData<Wallet> = MutableLiveData()
 
     fun setCurrentWallet(id: Long) {
-        wallet = repository.getWalletById(id)
+        wallet = repository.getWalletById(id).asLiveData()
     }
 
     fun addWallet(wallet: Wallet) {

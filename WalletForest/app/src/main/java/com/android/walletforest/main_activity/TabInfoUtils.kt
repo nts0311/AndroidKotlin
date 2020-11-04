@@ -20,16 +20,16 @@ class TabInfoUtils {
             timeRange: TimeRange,
             walletId: Long
         ): Flow<List<TabInfo>> {
-            return flow<List<TabInfo>> {
+            return flow{
                 val dStart = toLocalDate(start)
                 val dEnd = toLocalDate(end)
 
-                when (timeRange) {
+                emit(when (timeRange) {
                     TimeRange.WEEK -> getTabInfoByWeek(dStart, dEnd, walletId)
                     TimeRange.MONTH -> getTabInfoByMonth(dStart, dEnd, walletId)
                     TimeRange.YEAR -> getTabInfoByYear(dStart, dEnd, walletId)
                     TimeRange.CUSTOM -> getTabInfoCustomRange(dStart, dEnd, walletId)
-                }
+                })
             }.flowOn(Dispatchers.Default)
         }
 

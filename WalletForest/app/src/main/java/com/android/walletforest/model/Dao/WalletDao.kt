@@ -10,13 +10,13 @@ import kotlinx.coroutines.flow.Flow
 interface WalletDao {
 
     @Query("SELECT * FROM wallet")
-    fun getWallets(): LiveData<List<Wallet>>
+    fun getWallets(): Flow<List<Wallet>>
 
     @Query("SELECT * FROM wallet LIMIT 1")
-    fun getWallet(): LiveData<Wallet>
+    fun getWallet(): Flow<Wallet>
 
     @Query("SELECT * FROM wallet WHERE id=:id")
-    fun getWalletById(id: Long): LiveData<Wallet>
+    fun getWalletById(id: Long): Flow<Wallet>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertWallet(wallet: Wallet)

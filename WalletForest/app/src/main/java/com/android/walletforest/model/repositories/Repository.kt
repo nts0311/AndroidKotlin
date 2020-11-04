@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import androidx.lifecycle.asLiveData
 import com.android.walletforest.main_activity.TabInfo
 import com.android.walletforest.enums.TimeRange
 import com.android.walletforest.enums.ViewType
@@ -13,6 +14,7 @@ import com.android.walletforest.model.Entities.Category
 import com.android.walletforest.model.Entities.Transaction
 import com.android.walletforest.model.Entities.Wallet
 import com.android.walletforest.report_record_fragment.ChartEntryGenerator
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -27,32 +29,42 @@ class Repository private constructor(val appContext: Context) {
     private var _categoriesMap: MutableMap<Long, Category> = mutableMapOf()
     var categoryMap: Map<Long, Category> = _categoriesMap
 
-    private var _walletsMap: MutableMap<Long, Wallet> = mutableMapOf()
-    var walletMap: Map<Long, Wallet> = _walletsMap
-
-    //tabInfoList: List of Tab with period for each fragment in viewpager to correctly fetch transactions
     private var _tabInfoList = MutableLiveData<List<TabInfo>>()
     var tabInfoList: LiveData<List<TabInfo>> = _tabInfoList
 
-    //current wallet
-    private var _currentWalletId: MutableLiveData<Long> = MutableLiveData()
-    var currentWallet: LiveData<Wallet> = Transformations.switchMap(_currentWalletId)
-    {
-        appDatabase.walletDao.getWalletById(it)
-    }
-
-    var walletList = appDatabase.walletDao.getWallets()
-
-    var currentPage = 0
+    private val walletRepository = WalletRepository(appDatabase.walletDao)
+    val walletMap: Map<Long, Wallet>
+        get() = walletRepository.walletMap
 
     private val budgetRepository = BudgetRepository(appDatabase.budgetDao)
     private val transactionRepository = TransactionRepository(
         appDatabase.transactionDao,
         appDatabase.walletDao,
         appDatabase.budgetDao,
-        _walletsMap,
+        walletMap,
         _categoriesMap
     )
+
+
+    //current wallet
+    fun setCurrentWallet(walletId: Long) {
+        _currentWalletId.value = walletId
+    }
+
+    private var _currentWalletId: MutableLiveData<Long> = MutableLiveData()
+    var currentWallet: LiveData<Wallet> = Transformations.switchMap(_currentWalletId)
+    {
+        walletRepository.getWalletById(it).asLiveData()
+    }
+
+
+    var walletList = appDatabase.walletDao.getWallets()
+
+    var currentPage = 0
+
+
+
+
 
     /**
    * /\_____/\
@@ -84,9 +96,7 @@ class Repository private constructor(val appContext: Context) {
         _tabInfoList.value = list
     }
 
-    fun setCurrentWallet(walletId: Long) {
-        _currentWalletId.value = walletId
-    }
+
 
     //timeRange: current timeRange
     private var _timeRange = MutableLiveData<TimeRange>()
@@ -97,50 +107,19 @@ class Repository private constructor(val appContext: Context) {
     }
 
     suspend fun insertWallet(wallet: Wallet) {
-        appDatabase.walletDao.insertWallet(wallet)
-
-        //update the master wallet
-        val masterWallet = walletMap[1L]
-        if (masterWallet != null) {
-            masterWallet.amount += wallet.amount
-            updateWallet(masterWallet)
-        }
+        walletRepository.insertWallet(wallet)
     }
 
     suspend fun updateWallet(wallet: Wallet) {
-        //update the master wallet
-        val masterWallet = walletMap[1L]
-        if (masterWallet != null) {
-            val oldAmount = walletMap[wallet.id]?.amount
-            masterWallet.amount += (wallet.amount - oldAmount!!)
-            appDatabase.walletDao.updateWallet(masterWallet)
-        }
-
-        appDatabase.walletDao.updateWallet(wallet)
+        walletRepository.updateWallet(wallet)
     }
 
     suspend fun deleteWallet(wallet: Wallet) {
-        val balance = walletMap[wallet.id]?.amount
-        appDatabase.walletDao.deleteWallet(wallet)
-
-        //update the master wallet
-        val masterWallet = walletMap[1L]
-        if (masterWallet != null) {
-
-            masterWallet.amount -= balance!!
-            appDatabase.walletDao.updateWallet(masterWallet)
-        }
+        walletRepository.updateWallet(wallet)
         _currentWalletId.postValue(1L)
     }
 
     fun getWalletById(id: Long) = appDatabase.walletDao.getWalletById(id)
-
-    fun updateWalletsMap(wallets: List<Wallet>) {
-        _walletsMap.clear()
-        for (wallet in wallets) {
-            _walletsMap[wallet.id] = wallet
-        }
-    }
 
     fun getTransaction(id: Long) = appDatabase.transactionDao.getTransaction(id)
 
