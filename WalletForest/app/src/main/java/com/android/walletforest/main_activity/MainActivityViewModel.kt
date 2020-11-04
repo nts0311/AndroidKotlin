@@ -11,6 +11,8 @@ import com.android.walletforest.model.repositories.Repository
 import com.android.walletforest.utils.toEpoch
 import com.android.walletforest.utils.toLocalDate
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -25,7 +27,6 @@ class MainActivityViewModel(private val repository: Repository) : ViewModel() {
 
     var currentWallet: LiveData<Wallet> = repository.currentWallet
 
-    private val tabInfoUtils = TabInfoUtils()
     private var timeRange = TimeRange.MONTH
 
     //determine if the tabs has been initialized and displayed
@@ -62,14 +63,18 @@ class MainActivityViewModel(private val repository: Repository) : ViewModel() {
         if (currentWallet.value == null)
             return
 
-        tabInfoUtils.setProperties(startTime, endTime, timeRange, currentWallet.value!!.id)
+        TabInfoUtils.getTabInfoList(startTime,endTime,timeRange,currentWallet.value!!.id)
+            .onEach { repository.setTabInfoList(it) }
+            .launchIn(viewModelScope)
+
+        /*tabInfoUtils.setProperties(startTime, endTime, timeRange, currentWallet.value!!.id)
 
         viewModelScope.launch {
             val result = async {
                 tabInfoUtils.getTabInfoList()
             }
             repository.setTabInfoList(result.await())
-        }
+        }*/
     }
 
     fun onSelectCustomTimeRange(start: Long, end: Long) {
