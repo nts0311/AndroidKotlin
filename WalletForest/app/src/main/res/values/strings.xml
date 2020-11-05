@@ -159,4 +159,9 @@
 
     <string name="spent">Spent</string>
 
+    <string name="budget_detail">Budget detail</string>
+
+    <string name="add_budget">Add budget</string>
+    <string name="edit_budget">Edit budget</string>
+
 </resources>

@@ -1,14 +1,17 @@
 package com.android.walletforest.budget_detail_activity
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.lifecycle.ViewModelProvider
 import com.android.walletforest.R
 import com.android.walletforest.RepoViewModelFactory
+import com.android.walletforest.add_budget_activity.AddBudgetActivity
 import com.android.walletforest.model.repositories.Repository
 import com.android.walletforest.utils.NumberFormatter
 import kotlinx.android.synthetic.main.activity_budget_detail.*
-import kotlinx.android.synthetic.main.item_transaction.*
 
 class BudgetDetailActivity : AppCompatActivity() {
 
@@ -30,7 +33,33 @@ class BudgetDetailActivity : AppCompatActivity() {
         ).get(BudgetDetailViewModel::class.java)
 
         viewModel.budgetId = intent.getLongExtra(BUDGET_ID_KEY, 0)
+        setSupportActionBar(budget_detail_toolbar)
         registerObservers()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.budget_detail_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        return when(item.itemId) {
+            R.id.item_edit_budget->{
+                val editBudgetIntent = Intent(this, AddBudgetActivity::class.java)
+                editBudgetIntent.putExtra(AddBudgetActivity.BUDGET_ID, viewModel.budgetId)
+                startActivity(editBudgetIntent)
+                true
+            }
+
+            R.id.item_delete_budget->{
+
+
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun registerObservers()
@@ -59,6 +88,8 @@ class BudgetDetailActivity : AppCompatActivity() {
             val wallet = viewModel.walletMap[it.walletId]!!
             wallet_name_txt.text = wallet.name
             wallet_icon.setImageResource(wallet.imageId)
+
+            range_title_txt.text = it.rangeDetail
         }
     }
 }

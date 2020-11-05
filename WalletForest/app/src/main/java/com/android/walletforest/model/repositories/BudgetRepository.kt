@@ -33,6 +33,11 @@ class BudgetRepository(private val budgetDao: BudgetDao) {
         budgetDao.updateBudget(budget)
     }
 
+    suspend fun deleteBudget(budget: Budget)
+    {
+        budgetDao.deleteBudget(budget)
+    }
+
     suspend fun insertBudget(budget: Budget)
     {
         budgetDao.insertBudget(budget)

@@ -163,6 +163,11 @@ class Repository private constructor(val appContext: Context) {
 
     fun getBudgetById(id: Long):Flow<Budget> = budgetRepository.getBudgetById(id)
 
+    suspend fun deleteBudget(budget: Budget)
+    {
+        budgetRepository.deleteBudget(budget)
+    }
+
     companion object {
         private var instance: Repository? = null
 

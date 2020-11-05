@@ -15,5 +15,6 @@ data class Budget(
     var id: Long,
     var categoryId: Long, var walletId: Long,
     var amount: Long, var spent: Long,
-    var startDate: Long, var endDate: Long
+    var startDate: Long, var endDate: Long,
+    var rangeDetail: String
 )

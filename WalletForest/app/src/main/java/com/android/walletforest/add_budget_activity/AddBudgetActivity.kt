@@ -3,7 +3,6 @@ package com.android.walletforest.add_budget_activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.databinding.DataBindingUtil
@@ -18,8 +17,12 @@ import com.android.walletforest.select_category_activity.RESULT_CATEGORY_ID
 import com.android.walletforest.select_category_activity.SelectCategoryActivity
 import com.android.walletforest.utils.AmountTextWatcher
 import com.android.walletforest.utils.NumberFormatter
-import com.android.walletforest.utils.toLocalDate
 import kotlinx.android.synthetic.main.activity_add_budget.*
+import kotlinx.android.synthetic.main.activity_add_budget.amount_txt
+import kotlinx.android.synthetic.main.activity_add_budget.category_img
+import kotlinx.android.synthetic.main.activity_add_budget.category_txt
+import kotlinx.android.synthetic.main.activity_add_budget.wallet_icon
+import kotlinx.android.synthetic.main.activity_add_budget.wallet_name_txt
 
 class AddBudgetActivity : AppCompatActivity() {
 
@@ -48,8 +51,16 @@ class AddBudgetActivity : AppCompatActivity() {
         val vmFactory = RepoViewModelFactory(Repository.getInstance(applicationContext))
         viewModel = ViewModelProvider(this, vmFactory).get(AddBudgetViewModel::class.java)
 
-        if (intent.hasExtra(BUDGET_ID))
-            budgetId = intent.getLongExtra(BUDGET_ID, -1)
+        if (intent.hasExtra(BUDGET_ID)) {
+            budgetId = intent.getLongExtra(BUDGET_ID, -10)
+            viewModel.setBudgetId(budgetId)
+        }
+
+
+        if (budgetId == -1L)
+            supportActionBar?.title = getString(R.string.add_budget)
+        else
+            supportActionBar?.title = getString(R.string.edit_budget)
 
         binding.amountTxt.addTextChangedListener(AmountTextWatcher(binding.amountTxt))
 
@@ -66,7 +77,7 @@ class AddBudgetActivity : AppCompatActivity() {
 
         if (item.itemId == R.id.item_save_budget) {
             //save the budget
-            saveBudget()
+            saveBtnClick()
             return true
         }
 
@@ -103,11 +114,39 @@ class AddBudgetActivity : AppCompatActivity() {
     }
 
     private fun registerObservers() {
-        viewModel.currentWallet.observe(this)
-        {
-            currentWalletId = it.id
-            wallet_icon.setImageResource(it.imageId)
-            wallet_name_txt.text = it.name
+
+        if (budgetId == -1L) {
+            viewModel.currentWallet.observe(this)
+            {
+                currentWalletId = it.id
+                wallet_icon.setImageResource(it.imageId)
+                wallet_name_txt.text = it.name
+            }
+        } else {
+            viewModel.currentBudget.observe(this)
+            {
+                if (it == null)
+                    return@observe
+
+                this.categoryId = it.categoryId
+
+                if (it.categoryId == -1L) {
+                    category_img.setImageResource(R.drawable.ic_category_all)
+                    category_txt.text = applicationContext.getString(R.string.all_categories)
+                } else {
+                    val category = viewModel.categoriesMap[it.categoryId]!!
+                    category_img.setImageResource(category.imageId)
+                    category_txt.text = category.name
+                }
+
+                amount_txt.setText(NumberFormatter.format(it.amount))
+
+                val wallet = viewModel.walletMap[it.walletId]!!
+                wallet_name_txt.text = wallet.name
+                wallet_icon.setImageResource(wallet.imageId)
+
+                range_txt.text = it.rangeDetail
+            }
         }
     }
 
@@ -125,24 +164,50 @@ class AddBudgetActivity : AppCompatActivity() {
         }
     }
 
-    private fun saveBudget() {
+    private fun saveBtnClick() {
         val amount = NumberFormatter.toLong(binding.amountTxt.text.toString())
         //create a new budget
+
+        val newBudget = Budget(
+            0,
+            categoryId,
+            currentWalletId,
+            amount,
+            0,
+            budgetRange.startDate,
+            budgetRange.endDate,
+            budgetRange.rangeDetail
+        )
+
         if (budgetId == -1L) {
-            val newBudget = Budget(
-                0,
-                categoryId,
-                currentWalletId,
-                amount,
-                0,
-                budgetRange.startDate,
-                budgetRange.endDate
-            )
             viewModel.insertBudget(newBudget)
-            finish()
-
         } else {
+            val currentBudget = viewModel.currentBudget.value!!
+            var updated = false
 
+            if(budgetRange.rangeDetail != "" && budgetRange.rangeDetail != currentBudget.rangeDetail)
+            {
+                currentBudget.startDate = budgetRange.startDate
+                currentBudget.endDate = budgetRange.endDate
+                currentBudget.rangeDetail = budgetRange.rangeDetail
+                updated = true
+            }
+
+            if(categoryId != currentBudget.categoryId)
+            {
+                currentBudget.categoryId = this.categoryId
+                updated = true
+            }
+
+            if(amount != currentBudget.amount)
+            {
+                currentBudget.amount = amount
+                updated = true
+            }
+
+            if(updated) viewModel.updateBudget(currentBudget)
         }
+
+        finish()
     }
 }

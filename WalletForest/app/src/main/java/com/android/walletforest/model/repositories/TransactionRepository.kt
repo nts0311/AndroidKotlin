@@ -101,67 +101,10 @@ class TransactionRepository(
         }
 
     fun updateTransaction(newTransaction: Transaction, oldTransaction: Transaction) {
-
-
         GlobalScope.launch {
 
             deleteTransaction(oldTransaction).join()
             insertTransaction(newTransaction).join()
-
-            /*val currentWallet = walletMap[newTransaction.walletId]!!.copy()
-            transactionDao.updateTransaction(newTransaction)
-
-
-            if (newTransaction.type == oldTransaction.type) {
-                if (newTransaction.type == Constants.TYPE_EXPENSE)
-                    currentWallet.amount += (oldTransaction.amount - newTransaction.amount)
-                else
-                    currentWallet.amount -= (oldTransaction.amount - newTransaction.amount)
-            } else {
-                if (newTransaction.type == Constants.TYPE_EXPENSE)
-                    currentWallet.amount -= (oldTransaction.amount + newTransaction.amount)
-                else
-                    currentWallet.amount += (oldTransaction.amount + newTransaction.amount)
-            }
-
-            walletDao.updateWallet(currentWallet)
-
-
-            //update budget
-
-            if (newTransaction.type == Constants.TYPE_INCOME && oldTransaction.type == Constants.TYPE_EXPENSE)
-                updateBudget(
-                    oldTransaction.categoryId,
-                    oldTransaction.walletId,
-                    oldTransaction.amount * -1,
-                    oldTransaction.date
-                )
-            else if (newTransaction.type == Constants.TYPE_EXPENSE && oldTransaction.type == Constants.TYPE_INCOME)
-                updateBudget(
-                    newTransaction.categoryId,
-                    newTransaction.walletId,
-                    newTransaction.amount,
-                    newTransaction.date
-                )
-            else if (newTransaction.type == Constants.TYPE_EXPENSE && oldTransaction.type == Constants.TYPE_EXPENSE) {
-                if (newTransaction.categoryId == oldTransaction.categoryId) {
-                    val diff = newTransaction.amount - oldTransaction.amount
-                    updateBudget(newTransaction.categoryId, newTransaction.walletId, diff, newTransaction.date)
-                } else {
-                    updateBudget(
-                        oldTransaction.categoryId,
-                        oldTransaction.walletId,
-                        oldTransaction.amount * -1,
-                        oldTransaction.date
-                    )
-                    updateBudget(
-                        newTransaction.categoryId,
-                        newTransaction.walletId,
-                        newTransaction.amount,
-                        newTransaction.date
-                    )
-                }
-            }*/
         }
     }
 

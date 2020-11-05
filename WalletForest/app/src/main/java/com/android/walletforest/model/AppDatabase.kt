@@ -39,7 +39,7 @@ abstract class AppDatabase() : RoomDatabase() {
             }
 
         private fun buildDatabase(context: Context) =
-            Room.databaseBuilder(context, AppDatabase::class.java, "WalletForest_db")
+            Room.databaseBuilder(context, AppDatabase::class.java, "Wallet_Forest_Database")
                 .addCallback(object : Callback()
                 {
                     //TEST DATA
@@ -189,7 +189,7 @@ abstract class AppDatabase() : RoomDatabase() {
                             database.categoryDao.insertCategory(
                                 Category(55,55,context.getString(R.string.other), Constants.TYPE_INCOME,R.drawable.icon_28))
 
-                            database.transactionDao.insertTransaction(
+                            /*database.transactionDao.insertTransaction(
                                 Transaction
                                     (12, 1, 2, Constants.TYPE_EXPENSE, 12, "aaa", 1599004800000))
 
@@ -273,16 +273,16 @@ abstract class AppDatabase() : RoomDatabase() {
                             database.transactionDao.insertTransaction(
                                 Transaction
                                     (14, 1, 2, Constants.TYPE_EXPENSE, 13, "aaa", 1598832000000)
-                            )
+                            )*/
 
-                            database.budgetDao.insertBudget(Budget(1,1,2,10000,1500,1598918400, 1601424000))
+
+                            /*database.budgetDao.insertBudget(Budget(1,1,2,10000,1500,1598918400, 1601424000))
                             database.budgetDao.insertBudget(Budget(2,12,2,500000,1000000,1598918400, 1601424000))
                             database.budgetDao.insertBudget(Budget(3,36,2,20000000,16000000,1598918400, 1601424000))
                             database.budgetDao.insertBudget(Budget(4,22,2,2000000,0,1601510401000, 1604102401000))
                             database.budgetDao.insertBudget(Budget(5,1,2,2000000,0,1601510401000, 1604102401000))
                             database.budgetDao.insertBudget(Budget(6,2,2,500000,0,1601510401000, 1604102401000))
-                            database.budgetDao.insertBudget(Budget(7,-1,2,50000000,0,1601510401000, 1604102401000))
-
+                            database.budgetDao.insertBudget(Budget(7,-1,2,50000000,0,1601510401000, 1604102401000))*/
                         }
                     }
                 })
