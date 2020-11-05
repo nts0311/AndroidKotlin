@@ -22,46 +22,52 @@ class WalletRepository(private val walletDao: WalletDao) {
     }
 
     suspend fun insertWallet(wallet: Wallet) {
-        walletDao.insertWallet(wallet)
-
-        _walletsMap[wallet.id] = wallet
+       val newId = walletDao.insertWallet(wallet)
 
         //update the master wallet
-        val masterWallet = walletMap[1L]
+        val masterWallet = _walletsMap[1L]
         if (masterWallet != null) {
             masterWallet.amount += wallet.amount
             updateWallet(masterWallet)
+
+            _walletsMap[1L] = masterWallet
         }
+
+        _walletsMap[newId] = wallet
     }
 
     suspend fun updateWallet(wallet: Wallet) {
         walletDao.updateWallet(wallet)
 
-        _walletsMap[wallet.id] = wallet
-
         //update the master wallet
-        val masterWallet = walletMap[1L]
+        val masterWallet = _walletsMap[1L]
         if (masterWallet != null) {
             val oldAmount = walletMap[wallet.id]?.amount
             masterWallet.amount += (wallet.amount - oldAmount!!)
+
             walletDao.updateWallet(masterWallet)
+
+            _walletsMap[1L] = masterWallet
+
         }
+        _walletsMap[wallet.id] = wallet
     }
 
     suspend fun deleteWallet(wallet: Wallet) {
         val balance = walletMap[wallet.id]?.amount
         walletDao.deleteWallet(wallet)
 
-        _walletsMap.remove(wallet.id)
-
         //update the master wallet
-        val masterWallet = walletMap[1L]
+        val masterWallet = _walletsMap[1L]
         if (masterWallet != null) {
 
             masterWallet.amount -= balance!!
             walletDao.updateWallet(masterWallet)
+
+            _walletsMap[1L] = masterWallet
         }
 
+        _walletsMap.remove(wallet.id)
     }
 
     fun getWalletById(id: Long) = walletDao.getWalletById(id)

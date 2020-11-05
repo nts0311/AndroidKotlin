@@ -39,7 +39,7 @@ class Repository private constructor(val appContext: Context) {
     private val budgetRepository = BudgetRepository(appDatabase.budgetDao)
     private val transactionRepository = TransactionRepository(
         appDatabase.transactionDao,
-        appDatabase.walletDao,
+        walletRepository,
         appDatabase.budgetDao,
         walletMap,
         _categoriesMap
@@ -115,7 +115,7 @@ class Repository private constructor(val appContext: Context) {
     }
 
     suspend fun deleteWallet(wallet: Wallet) {
-        walletRepository.updateWallet(wallet)
+        walletRepository.deleteWallet(wallet)
         _currentWalletId.postValue(1L)
     }
 

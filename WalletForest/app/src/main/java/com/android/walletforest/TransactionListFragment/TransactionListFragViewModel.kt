@@ -25,8 +25,6 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
 
     private var groupDataJob: Job? = null
 
-    //var transactionList: LiveData<List<Transaction>> = MutableLiveData()
-
     private var _dataItemList: MutableLiveData<List<DataItem>> = MutableLiveData()
     var dataItemList: LiveData<List<DataItem>> = _dataItemList
 
@@ -38,24 +36,9 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
         if (currentViewMode == viewType) return
 
         currentViewMode = viewType
-        /*if (transactionList.value != null)
-            groupData(transactionList.value!!)*/
+
         groupData()
     }
-
-    /*fun onTransactionListChange(transactionList: List<Transaction>) {
-        groupData(transactionList)
-    }*/
-
-    /*private fun groupData(transactionList: List<Transaction>) {
-        groupDataJob?.cancel()
-
-        groupDataJob = viewModelScope.launch {
-            val result =
-                async { dataGrouper.doGrouping(transactionList, timeRange, currentViewMode) }
-            _dataItemList.value = result.await()
-        }
-    }*/
 
     override fun onCleared() {
         super.onCleared()
@@ -80,28 +63,6 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
         startTime = start
         endTime = end
         timeRange = TimeRange.valueOf(range)
-
-        /*val transactionsFlow = repo.getTransactionsBetweenRange(start, end, walletId)
-
-        transactionList = if (filteringParams.categoryIdToFilter == -1L) transactionsFlow.asLiveData()
-        else transactionsFlow.map {
-            //include transactions with sub category in parent category
-            val subCategoryId = mutableListOf<Long>()
-            subCategoryId.add(filteringParams.categoryIdToFilter)
-
-            if (!filteringParams.excludeSubCate)
-                repo.categoryMap.values.forEach { category ->
-                    if (category.parentId == filteringParams.categoryIdToFilter)
-                        subCategoryId.add(category.id)
-                }
-
-
-            it.filter { transaction ->
-                subCategoryId.contains(transaction.categoryId)
-                        && transaction.type == filteringParams.transactionType
-            }
-        }
-            .flowOn(Dispatchers.Default).asLiveData()*/
 
         val transactionsFlow = repo.getTransactionsBetweenRange(start, end, walletId)
 

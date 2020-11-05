@@ -53,9 +53,9 @@ class MainActivityViewModel(private val repository: Repository) : ViewModel() {
         repository.updateCategoriesMap(categories)
     }
 
-    fun selectWallet(walletId: Long) {
+    /*fun selectWallet(walletId: Long) {
         repository.setCurrentWallet(walletId)
-    }
+    }*/
 
     fun getTabInfoList() {
         if (currentWallet.value == null)

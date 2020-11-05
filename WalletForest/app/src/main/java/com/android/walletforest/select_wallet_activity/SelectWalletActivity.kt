@@ -67,7 +67,7 @@ class SelectWalletActivity : AppCompatActivity() {
         viewModel.walletList.observe(this)
         {
             if (it != null) {
-                viewModel.updateWalletMap(it)
+                //viewModel.updateWalletMap(it)
                 walletAdapter.walletList = it
             }
         }

@@ -17,7 +17,7 @@ import kotlinx.coroutines.sync.withLock
 
 class TransactionRepository(
     private val transactionDao: TransactionDao,
-    private val walletDao: WalletDao,
+    private val walletRepository: WalletRepository,
     private val budgetDao: BudgetDao,
     private val walletMap: Map<Long, Wallet>,
     private val categoryMap: Map<Long, Category>
@@ -69,7 +69,7 @@ class TransactionRepository(
             else
                 currentWallet.amount += transaction.amount
 
-            walletDao.updateWallet(currentWallet)
+            walletRepository.updateWallet(currentWallet)
 
 
             updateBudget(
@@ -90,7 +90,7 @@ class TransactionRepository(
             else
                 currentWallet.amount -= transaction.amount
 
-            walletDao.updateWallet(currentWallet)
+            walletRepository.updateWallet(currentWallet)
 
             updateBudget(
                 transaction.categoryId,

@@ -19,7 +19,7 @@ interface WalletDao {
     fun getWalletById(id: Long): Flow<Wallet>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertWallet(wallet: Wallet)
+    suspend fun insertWallet(wallet: Wallet) : Long
 
     @Update
     suspend fun updateWallet(wallet: Wallet)
