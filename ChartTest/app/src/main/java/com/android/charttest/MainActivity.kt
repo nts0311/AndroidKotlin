@@ -13,17 +13,16 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
-    val rainFall = listOf(11.25f, 22.4f, 55.6f, 74.14f, 24.16f,15.46f)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        setUpChart()
-        setupBarChart()
+
     }
 
-    private fun setupBarChart() {
+    /*private fun setupBarChart() {
         barChart.xAxis.apply {
             setDrawGridLines(true)
         }
@@ -98,5 +97,5 @@ class MainActivity : AppCompatActivity() {
         val list = mutableListOf<Int>()
         onEach { list.add(it) }
         return list
-    }
+    }*/
 }
