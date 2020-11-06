@@ -94,7 +94,12 @@ class ReportRecordFragment : Fragment() {
         viewModel.currentWallet.observe(viewLifecycleOwner)
         {
             viewModel.setTimeRange(startTime!!, endTime!!, timeRange!!, it.id)
-            viewModel.getPieEntries(startTime!!, endTime!!, walletId!!)
+            viewModel.getPieEntries(startTime!!, endTime!!, it.id)
+
+            income_expense_chart.clear()
+            income_chart.clear()
+            expense_chart.clear()
+
             observeBarChartData()
             observePieChartData()
         }

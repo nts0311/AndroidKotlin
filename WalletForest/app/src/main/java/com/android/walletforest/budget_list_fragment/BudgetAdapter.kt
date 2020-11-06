@@ -12,6 +12,7 @@ import com.android.walletforest.R
 import com.android.walletforest.databinding.ItemBudgetBinding
 import com.android.walletforest.model.Entities.Budget
 import com.android.walletforest.model.repositories.Repository
+import com.android.walletforest.utils.setProgressProgressBar
 
 class BudgetAdapter : RecyclerView.Adapter<BudgetViewHolder>() {
 
@@ -73,15 +74,7 @@ class BudgetViewHolder(private val binding: ItemBudgetBinding) :
         }
     }
 
-    private fun setProgressProgressBar(progressBar: ProgressBar, progress: Int) {
-        progressBar.progress = progress
-        progressBar.scaleY = 1.5f
-        progressBar.progressTintList = when (progress) {
-            in 0..69 -> ColorStateList.valueOf(Color.rgb(0, 153, 51))
-            in 70..89 -> ColorStateList.valueOf(Color.rgb(255, 153, 51))
-            else -> ColorStateList.valueOf(Color.RED)
-        }
-    }
+
 
     companion object {
         fun from(parent: ViewGroup): BudgetViewHolder {

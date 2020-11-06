@@ -11,6 +11,7 @@ import com.android.walletforest.RepoViewModelFactory
 import com.android.walletforest.add_budget_activity.AddBudgetActivity
 import com.android.walletforest.model.repositories.Repository
 import com.android.walletforest.utils.NumberFormatter
+import com.android.walletforest.utils.setProgressProgressBar
 import kotlinx.android.synthetic.main.activity_budget_detail.*
 
 class BudgetDetailActivity : AppCompatActivity() {
@@ -18,8 +19,6 @@ class BudgetDetailActivity : AppCompatActivity() {
     companion object{
         val BUDGET_ID_KEY = "budgetId"
     }
-
-
 
     private lateinit var viewModel: BudgetDetailViewModel
 
@@ -51,10 +50,9 @@ class BudgetDetailActivity : AppCompatActivity() {
                 startActivity(editBudgetIntent)
                 true
             }
-
             R.id.item_delete_budget->{
-
-
+                viewModel.deleteBudget(viewModel.currentBudget.value!!)
+                finish()
                 true
             }
 
@@ -90,6 +88,8 @@ class BudgetDetailActivity : AppCompatActivity() {
             wallet_icon.setImageResource(wallet.imageId)
 
             range_title_txt.text = it.rangeDetail
+
+            setProgressProgressBar(progressBar2, (it.spent.toFloat() / it.amount * 100).toInt())
         }
     }
 }
