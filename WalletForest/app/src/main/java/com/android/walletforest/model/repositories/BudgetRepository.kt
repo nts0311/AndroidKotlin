@@ -1,11 +1,12 @@
 package com.android.walletforest.model.repositories
 
 import com.android.walletforest.model.Dao.BudgetDao
+import com.android.walletforest.model.Dao.TransactionDao
 import com.android.walletforest.model.Entities.Budget
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 
-class BudgetRepository(private val budgetDao: BudgetDao) {
+class BudgetRepository(private val budgetDao: BudgetDao, private val transactionDao: TransactionDao) {
     private val budgetsMap = mutableMapOf<Long, Flow<Budget>>()
     private var budgetList: MutableMap<Long, Flow<List<Budget>>> = mutableMapOf()
 

@@ -12,11 +12,13 @@ class CategorySelectStateAdapter(fragmentManager: FragmentManager, lifecycle: Li
 
     var categoryClickListener: (category: Category) -> Unit = {}
 
+    var addAllCategory = false
+
     override fun getItemCount(): Int = 2
 
     override fun createFragment(position: Int): Fragment {
         val frag = when (position) {
-            0 -> CategoryListFragment.newInstance(Constants.TYPE_EXPENSE)
+            0 -> CategoryListFragment.newInstance(Constants.TYPE_EXPENSE, addAllCategory)
             1 -> CategoryListFragment.newInstance(Constants.TYPE_INCOME)
             else -> CategoryListFragment.newInstance(Constants.TYPE_EXPENSE)
         }

@@ -21,6 +21,7 @@ import kotlinx.coroutines.withContext
 
 
 private const val ARG_CATEGORY_TYPE = "category_type"
+private const val ARG_ADD_ALL_CATEGORY = "add_all_category_type"
 
 
 class CategoryListFragment : Fragment() {
@@ -31,6 +32,7 @@ class CategoryListFragment : Fragment() {
     private var currentList: List<Category> = listOf()
     private var filteredList: List<Category> = listOf()
     private var filterListJob: Job? = null
+    private var addAllCategory = false
 
     var categoryClickListener: (category: Category) -> Unit = {}
 
@@ -38,6 +40,9 @@ class CategoryListFragment : Fragment() {
         super.onCreate(savedInstanceState)
         arguments?.let {
             categoryType = it.getString(ARG_CATEGORY_TYPE)
+
+            if(it.containsKey(ARG_ADD_ALL_CATEGORY))
+                addAllCategory = it.getBoolean(ARG_ADD_ALL_CATEGORY, false)
         }
     }
 
@@ -66,7 +71,16 @@ class CategoryListFragment : Fragment() {
     private fun registerObservers() {
         viewModel.categories.observe(viewLifecycleOwner)
         {
-            adapter.categories = it
+
+            if(addAllCategory)
+            {
+                val list = mutableListOf( Category(-1, -1, getString(R.string.all_categories),Constants.TYPE_EXPENSE,R.drawable.ic_category_all))
+                list.addAll(it)
+                adapter.categories = list
+            }
+            else
+                adapter.categories = it
+
             currentList = it
         }
 
@@ -99,10 +113,11 @@ class CategoryListFragment : Fragment() {
 
     companion object {
         @JvmStatic
-        fun newInstance(categoryType: String) =
+        fun newInstance(categoryType: String, addAllCategory : Boolean = false) =
             CategoryListFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_CATEGORY_TYPE, categoryType)
+                    putBoolean(ARG_ADD_ALL_CATEGORY, addAllCategory)
                 }
             }
     }

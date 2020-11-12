@@ -18,9 +18,9 @@ class AddBudgetViewModel(private val repository: Repository) : ViewModel() {
     val walletMap = repository.walletMap
 
     private var currentBudgetId = -1L
-    lateinit var currentBudget : LiveData<Budget>
+    lateinit var currentBudget: LiveData<Budget>
 
-    fun insertBudget(newBudget: Budget) : Job {
+    fun insertBudget(newBudget: Budget): Job {
         return GlobalScope.launch {
             newBudget.spent = repository.getTransactionsBetweenRange(
                 newBudget.startDate,
@@ -28,10 +28,12 @@ class AddBudgetViewModel(private val repository: Repository) : ViewModel() {
                 currentWallet.value!!.id
             )
                 .map {
-                    it.filter { transaction ->
-                        transaction.categoryId == newBudget.categoryId
-                                || categoriesMap[transaction.categoryId]!!.parentId == newBudget.categoryId
-                    }
+                    if (newBudget.categoryId != -1L)
+                        it.filter { transaction ->
+                            transaction.categoryId == newBudget.categoryId
+                                    || categoriesMap[transaction.categoryId]!!.parentId == newBudget.categoryId
+                        }
+                    else it
                 }
                 .map {
                     it.fold(0L) { sum, transaction -> sum + transaction.amount }
@@ -43,23 +45,20 @@ class AddBudgetViewModel(private val repository: Repository) : ViewModel() {
         }
     }
 
-    fun updateBudget(budget: Budget)
-    {
+    fun updateBudget(budget: Budget) {
         GlobalScope.launch {
             deleteBudget(budget).join()
             insertBudget(budget).join()
         }
     }
 
-    private fun deleteBudget(budget: Budget) : Job
-    {
+    private fun deleteBudget(budget: Budget): Job {
         return GlobalScope.launch {
             repository.deleteBudget(budget)
         }
     }
 
-    fun setBudgetId(id:Long)
-    {
+    fun setBudgetId(id: Long) {
         currentBudgetId = id
         currentBudget = repository.getBudgetById(id).asLiveData()
     }

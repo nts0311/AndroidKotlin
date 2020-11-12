@@ -18,10 +18,16 @@ import kotlinx.android.synthetic.main.activity_select_category.*
 
 const val RESULT_CATEGORY_ID = "result_category_id"
 
+
 class SelectCategoryActivity : AppCompatActivity() {
+
+    companion object{
+        const val ARG_ADD_ALL_CATEGORY = "add_all_category_type"
+    }
 
     private var viewPagerAdapter: CategorySelectStateAdapter? = null
     private lateinit var vmFactory: RepoViewModelFactory
+    private var addAllCategory = false
 
     //when clicking on a category, return it's id as the result
     var categoryClickListener: (category: Category) -> Unit = { category ->
@@ -34,6 +40,9 @@ class SelectCategoryActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_select_category)
+
+        if(intent.hasExtra(ARG_ADD_ALL_CATEGORY))
+            addAllCategory = intent.getBooleanExtra(ARG_ADD_ALL_CATEGORY, false)
 
         setSupportActionBar(select_category_toolbar)
 
@@ -76,6 +85,7 @@ class SelectCategoryActivity : AppCompatActivity() {
         viewPagerAdapter = CategorySelectStateAdapter(supportFragmentManager, lifecycle)
         viewPagerAdapter?.categoryClickListener = categoryClickListener
         category_viewpager.adapter = viewPagerAdapter
+        viewPagerAdapter?.addAllCategory = this.addAllCategory
 
         category_type_tab.tabMode = TabLayout.MODE_FIXED
 

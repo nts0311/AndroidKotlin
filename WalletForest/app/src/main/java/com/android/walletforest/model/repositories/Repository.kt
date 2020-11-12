@@ -36,7 +36,7 @@ class Repository private constructor(val appContext: Context) {
     val walletMap: Map<Long, Wallet>
         get() = walletRepository.walletMap
 
-    private val budgetRepository = BudgetRepository(appDatabase.budgetDao)
+    private val budgetRepository = BudgetRepository(appDatabase.budgetDao, appDatabase.transactionDao)
     private val transactionRepository = TransactionRepository(
         appDatabase.transactionDao,
         walletRepository,

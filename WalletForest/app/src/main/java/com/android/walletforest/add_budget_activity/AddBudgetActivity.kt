@@ -23,6 +23,7 @@ import kotlinx.android.synthetic.main.activity_add_budget.category_img
 import kotlinx.android.synthetic.main.activity_add_budget.category_txt
 import kotlinx.android.synthetic.main.activity_add_budget.wallet_icon
 import kotlinx.android.synthetic.main.activity_add_budget.wallet_name_txt
+import kotlinx.android.synthetic.main.activity_budget_detail.*
 
 class AddBudgetActivity : AppCompatActivity() {
 
@@ -104,9 +105,17 @@ class AddBudgetActivity : AppCompatActivity() {
     }
 
     private fun setCategory(categoryId: Long) {
-        val category = viewModel.categoriesMap[categoryId]
-        binding.categoryImg.setImageResource(category!!.imageId)
-        binding.categoryTxt.text = category.name
+        if(categoryId==-1L)
+        {
+            binding.categoryImg.setImageResource(R.drawable.ic_category_all)
+            binding.categoryTxt.text = applicationContext.getString(R.string.all_categories)
+        }
+        else
+        {
+            val category = viewModel.categoriesMap[categoryId]
+            binding.categoryImg.setImageResource(category!!.imageId)
+            binding.categoryTxt.text = category.name
+        }
     }
 
     private fun setRange(budgetRange: BudgetRange) {
@@ -154,6 +163,7 @@ class AddBudgetActivity : AppCompatActivity() {
         //select category
         binding.categoryTxt.setOnClickListener {
             val selectCategory = Intent(this, SelectCategoryActivity::class.java)
+            selectCategory.putExtra(SelectCategoryActivity.ARG_ADD_ALL_CATEGORY, true)
             startActivityForResult(selectCategory, LAUNCH_CATEGORY_SELECT_ACTIVITY)
         }
 
