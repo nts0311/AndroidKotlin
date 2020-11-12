@@ -20,8 +20,6 @@ class BudgetDetailViewModel(private val repository: Repository) : ViewModel() {
 
     fun deleteBudget(budget: Budget)
     {
-        GlobalScope.launch {
-            repository.deleteBudget(budget)
-        }
+        repository.deleteBudget(budget)
     }
 }

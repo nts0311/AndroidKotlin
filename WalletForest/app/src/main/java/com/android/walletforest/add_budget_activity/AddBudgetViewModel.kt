@@ -20,42 +20,12 @@ class AddBudgetViewModel(private val repository: Repository) : ViewModel() {
     private var currentBudgetId = -1L
     lateinit var currentBudget: LiveData<Budget>
 
-    fun insertBudget(newBudget: Budget): Job {
-        return GlobalScope.launch {
-            newBudget.spent = repository.getTransactionsBetweenRange(
-                newBudget.startDate,
-                newBudget.endDate,
-                currentWallet.value!!.id
-            )
-                .map {
-                    if (newBudget.categoryId != -1L)
-                        it.filter { transaction ->
-                            transaction.categoryId == newBudget.categoryId
-                                    || categoriesMap[transaction.categoryId]!!.parentId == newBudget.categoryId
-                        }
-                    else it
-                }
-                .map {
-                    it.fold(0L) { sum, transaction -> sum + transaction.amount }
-                }
-                .flowOn(Dispatchers.Default)
-                .first()
-
-            repository.insertBudget(newBudget)
-        }
+    fun insertBudget(newBudget: Budget){
+        repository.insertBudget(newBudget)
     }
 
-    fun updateBudget(budget: Budget) {
-        GlobalScope.launch {
-            deleteBudget(budget).join()
-            insertBudget(budget).join()
-        }
-    }
-
-    private fun deleteBudget(budget: Budget): Job {
-        return GlobalScope.launch {
-            repository.deleteBudget(budget)
-        }
+    fun updateBudget(Budget: Budget) {
+        repository.updateBudget(Budget)
     }
 
     fun setBudgetId(id: Long) {

@@ -36,7 +36,7 @@ class Repository private constructor(val appContext: Context) {
     val walletMap: Map<Long, Wallet>
         get() = walletRepository.walletMap
 
-    private val budgetRepository = BudgetRepository(appDatabase.budgetDao, appDatabase.transactionDao)
+    private val budgetRepository = BudgetRepository(appDatabase.budgetDao, appDatabase.transactionDao, _categoriesMap)
     private val transactionRepository = TransactionRepository(
         appDatabase.transactionDao,
         walletRepository,
@@ -96,9 +96,6 @@ class Repository private constructor(val appContext: Context) {
         _tabInfoList.value = list
     }
 
-
-
-    //timeRange: current timeRange
     private var _timeRange = MutableLiveData<TimeRange>()
     var timeRange: LiveData<TimeRange> = _timeRange
 
@@ -157,15 +154,19 @@ class Repository private constructor(val appContext: Context) {
 
     fun getAllBudget(walletId: Long): Flow<List<Budget>> = budgetRepository.getAllBudgets(walletId)
 
-    suspend fun insertBudget(newBudget: Budget) {
+    fun getBudgetById(id: Long):Flow<Budget> = budgetRepository.getBudgetById(id)
+
+    fun insertBudget(newBudget: Budget) {
         budgetRepository.insertBudget(newBudget)
     }
 
-    fun getBudgetById(id: Long):Flow<Budget> = budgetRepository.getBudgetById(id)
-
-    suspend fun deleteBudget(budget: Budget)
+    fun deleteBudget(budget: Budget)
     {
         budgetRepository.deleteBudget(budget)
+    }
+
+    fun updateBudget(Budget: Budget) {
+        budgetRepository.updateBudget(Budget)
     }
 
     companion object {

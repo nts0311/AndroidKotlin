@@ -164,4 +164,9 @@
     <string name="add_budget">Add budget</string>
     <string name="edit_budget">Edit budget</string>
 
+    <string name="transactions_list">Transactions List</string>
+    <string name="recommend_daily_spending">Recommend daily spending</string>
+    <string name="projected_spending">Projected spending</string>
+    <string name="actual_daily_spending">Actual daily spending</string>
+
 </resources>
