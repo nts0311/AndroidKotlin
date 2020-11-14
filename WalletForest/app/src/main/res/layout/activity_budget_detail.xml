@@ -167,7 +167,7 @@
             app:layout_constraintTop_toTopOf="@+id/wallet_icon" />
 
         <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/lineChart2"
+            android:id="@+id/budget_chart"
             android:layout_width="0dp"
             android:layout_height="250dp"
             android:layout_marginStart="16dp"
@@ -201,7 +201,7 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/lineChart2" />
+            app:layout_constraintTop_toBottomOf="@+id/budget_chart" />
 
         <TextView
             android:id="@+id/textView13"

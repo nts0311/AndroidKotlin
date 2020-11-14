@@ -11,7 +11,7 @@ import com.github.mikephil.charting.utils.MPPointF
 
 class ChartsDrawer {
     companion object{
-        fun setUpBarChart(barChart : BarChart) {
+        fun setupBarChart(barChart: BarChart) {
             barChart.apply {
                 xAxis.setDrawGridLines(true)
                 legend.isEnabled = false

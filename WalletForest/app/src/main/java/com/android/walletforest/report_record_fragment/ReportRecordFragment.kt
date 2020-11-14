@@ -67,7 +67,7 @@ class ReportRecordFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        ChartsDrawer.setUpBarChart(income_expense_chart)
+        ChartsDrawer.setupBarChart(income_expense_chart)
 
         registerObservers()
         registerClickListeners()

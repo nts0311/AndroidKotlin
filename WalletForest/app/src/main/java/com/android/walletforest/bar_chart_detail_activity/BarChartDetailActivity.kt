@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.TextView
-import android.widget.Toast
 import com.android.walletforest.R
 import com.android.walletforest.TransactionListFragment.*
 import com.android.walletforest.enums.TimeRange
@@ -13,7 +12,6 @@ import com.android.walletforest.report_record_fragment.BarChartData
 import com.android.walletforest.report_record_fragment.ChartsDrawer
 import com.android.walletforest.transaction_list_activity.TransactionListActivity
 import com.android.walletforest.utils.NumberFormatter
-import com.github.mikephil.charting.data.BarEntry
 import kotlinx.android.synthetic.main.activity_bar_chart_detail.*
 import kotlin.math.absoluteValue
 
@@ -36,7 +34,7 @@ class BarChartDetailActivity : AppCompatActivity() {
         val barDataList = intent.getSerializableExtra(BAR_DATA_KEY) as List<BarChartData>
         walletId = intent.getLongExtra(WALLET_ID_KEY, 1L)
 
-        ChartsDrawer.setUpBarChart(bar_chart)
+        ChartsDrawer.setupBarChart(bar_chart)
         ChartsDrawer.drawBarChartChart(bar_chart, barDataList)
 
         addRangeData(barDataList)
