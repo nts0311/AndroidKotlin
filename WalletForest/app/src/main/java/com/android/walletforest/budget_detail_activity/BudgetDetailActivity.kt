@@ -96,7 +96,7 @@ class BudgetDetailActivity : AppCompatActivity() {
             description.isEnabled = false
 
             xAxis.axisMinimum = 0.0f
-            xAxis.setDrawLabels(false)
+            //xAxis.setDrawLabels(false)
 
             axisLeft.valueFormatter = LargeValueFormatter().apply {
                 setSuffix(arrayOf("", "K", "M", "B", "T"))

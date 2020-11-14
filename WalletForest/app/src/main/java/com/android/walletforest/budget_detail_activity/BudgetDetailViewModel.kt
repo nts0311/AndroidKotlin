@@ -9,6 +9,7 @@ import com.github.mikephil.charting.data.Entry
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import java.time.temporal.ChronoUnit
+import kotlin.math.max
 
 class BudgetDetailViewModel(private val repository: Repository) : ViewModel() {
 
@@ -37,7 +38,7 @@ class BudgetDetailViewModel(private val repository: Repository) : ViewModel() {
         val dayRemaining = ChronoUnit.DAYS.between(
             toLocalDate(System.currentTimeMillis()),
             toLocalDate(budget.endDate)
-        ).toInt()
+        ).toInt() + 1
 
         this.totalDay.value = totalDay
         this.dayRemaining.value = dayRemaining
@@ -62,7 +63,12 @@ class BudgetDetailViewModel(private val repository: Repository) : ViewModel() {
                     ).toInt()
                 }
 
-                var maxIndex = transactionMap.keys.maxOrNull() ?: 0
+                val dayPassed = ChronoUnit.DAYS.between(
+                    toLocalDate(budget.startDate),
+                    toLocalDate(System.currentTimeMillis())
+                ).toInt()
+
+                var maxIndex = max(transactionMap.keys.maxOrNull() ?: 0, dayPassed)
 
                 val entries1 = List(maxIndex + 1) { i -> Entry(i.toFloat(), 0.0f) }
                 var totalSpent = 0L
@@ -84,9 +90,11 @@ class BudgetDetailViewModel(private val repository: Repository) : ViewModel() {
                 projectedSpending.postValue((totalSpent + actualDailySpent * dayRemaining))
 
 
+                //forecasting how much user will spent
+
                 var lastSpent = entries1.last().y
 
-                val entries2 = List(totalDay - maxIndex - 1) { i ->
+                val entries2 = List(totalDay - maxIndex + 1) { i ->
                     val entry = Entry((maxIndex++).toFloat(), lastSpent)
                     lastSpent += actualDailySpent
                     entry
