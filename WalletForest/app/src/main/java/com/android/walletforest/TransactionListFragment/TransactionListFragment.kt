@@ -2,7 +2,6 @@ package com.android.walletforest.TransactionListFragment
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,7 +29,7 @@ class TransactionListFragment : Fragment() {
     private var walletId: Long? = null
     private var timeRange: String? = null
     private var itemAdapter: DataItemAdapter? = null
-    private var filteringParams = FilteringParams()
+    private var filteringParams :FilteringParams? = null
     private lateinit var repo: Repository
     var key = ""
 
@@ -46,7 +45,9 @@ class TransactionListFragment : Fragment() {
             timeRange = it.getString(TIME_RANGE_PARAM, TimeRange.MONTH.value)
             if(it.containsKey(RANGE_PARAMS))
             {
-                filteringParams = it.getSerializable(RANGE_PARAMS) as FilteringParams
+                val fp = it.getSerializable(RANGE_PARAMS)
+                if(fp!=null)
+                    filteringParams = it.getSerializable(RANGE_PARAMS) as FilteringParams
                 key+= "filtered "
             }
 
@@ -139,7 +140,7 @@ class TransactionListFragment : Fragment() {
             endTime: Long,
             walletId: Long,
             timeRange: TimeRange,
-            filteringParams: FilteringParams = FilteringParams()
+            filteringParams: FilteringParams? = FilteringParams()
         ) =
             TransactionListFragment().apply {
                 arguments = Bundle().apply {

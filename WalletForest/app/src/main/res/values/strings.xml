@@ -169,4 +169,6 @@
     <string name="projected_spending">Projected spending</string>
     <string name="actual_daily_spending">Actual daily spending</string>
 
+    <string name="days_left"> day(s) left</string>
+
 </resources>

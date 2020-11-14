@@ -33,7 +33,7 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
     var filteredList = flow<List<Transaction>> { }
 
     fun switchViewMode(viewType: ViewType) {
-        if (currentViewMode == viewType) return
+        if (currentViewMode==viewType) return
 
         currentViewMode = viewType
 
@@ -50,13 +50,13 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
         end: Long,
         range: String,
         walletId: Long,
-        filteringParams: FilteringParams
+        filteringParams: FilteringParams? = null
     ) {
 
-        if (startTime == start
-            && endTime == end
-            && range == timeRange.value
-            && walletId == previousWalletId
+        if (startTime==start
+            && endTime==end
+            && range==timeRange.value
+            && walletId==previousWalletId
         )
             return
 
@@ -66,30 +66,33 @@ class TransactionListFragViewModel(val repo: Repository) : ViewModel() {
 
         val transactionsFlow = repo.getTransactionsBetweenRange(start, end, walletId)
 
-        filteredList = if (filteringParams.categoryIdToFilter == -1L) transactionsFlow
-        else transactionsFlow.map {
-            //include transactions with sub category in parent category
-            val subCategoryId = mutableListOf<Long>()
-            subCategoryId.add(filteringParams.categoryIdToFilter)
+        filteredList = if (filteringParams==null) transactionsFlow
+        else {
+            if (filteringParams.categoryIdToFilter==-1L)
+                transactionsFlow.map { it.filter { transaction -> transaction.type==filteringParams.transactionType } }
+            else
+                transactionsFlow.map {
+                    //include transactions with sub category in parent category
+                    val subCategoryId = mutableListOf<Long>()
+                    subCategoryId.add(filteringParams.categoryIdToFilter)
 
-            if (!filteringParams.excludeSubCate)
-                repo.categoryMap.values.forEach { category ->
-                    if (category.parentId == filteringParams.categoryIdToFilter)
-                        subCategoryId.add(category.id)
+                    if (!filteringParams.excludeSubCate)
+                        repo.categoryMap.values.forEach { category ->
+                            if (category.parentId==filteringParams.categoryIdToFilter)
+                                subCategoryId.add(category.id)
+                        }
+                    it.filter { transaction ->
+                        subCategoryId.contains(transaction.categoryId)
+                                && transaction.type==filteringParams.transactionType
+                    }
                 }
-            it.filter { transaction ->
-                subCategoryId.contains(transaction.categoryId)
-                        && transaction.type == filteringParams.transactionType
-            }
         }
-
         groupData()
 
         previousWalletId = walletId
     }
 
-    private fun groupData()
-    {
+    private fun groupData() {
         groupDataJob?.cancel()
 
         groupDataJob = filteredList.map {

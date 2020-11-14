@@ -7,6 +7,7 @@ class NumberFormatter {
     {
         private val nf = NumberFormat.getInstance()
         fun format(number : Long) : String = nf.format(number)
+        fun format(number : Float) : String = nf.format(number)
         fun toLong(source : String) : Long = nf.parse(source).toLong()
     }
 }

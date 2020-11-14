@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.android.walletforest.R
 import com.android.walletforest.model.Entities.Wallet
+import com.android.walletforest.utils.NumberFormatter
 
 
 class WalletAdapter : RecyclerView.Adapter<WalletViewHolder>() {
@@ -42,7 +43,7 @@ class WalletViewHolder(private val root: View) : RecyclerView.ViewHolder(root) {
 
         walletIcon.setImageResource(wallet.imageId)
         walletName.text = wallet.name
-        walletBalance.text = wallet.amount.toString()
+        walletBalance.text = NumberFormatter.format(wallet.amount)
     }
 
     companion object {

@@ -38,6 +38,9 @@ class BudgetRepository(
 
     fun insertBudget(newBudget: Budget): Job {
         return GlobalScope.launch {
+
+
+
             newBudget.spent = transactionDao.getTransactionsBetweenRangeOfWallet(
                 newBudget.startDate,
                 newBudget.endDate,

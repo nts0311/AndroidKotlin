@@ -13,7 +13,7 @@ class TransactionListActivity : AppCompatActivity() {
     private var endTime: Long? = null
     private var walletId: Long? = null
     private var timeRange: String? = null
-    private var filteringParams = FilteringParams()
+    private var filteringParams : FilteringParams? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
