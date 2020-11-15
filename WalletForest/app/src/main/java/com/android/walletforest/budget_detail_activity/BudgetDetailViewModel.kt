@@ -38,7 +38,7 @@ class BudgetDetailViewModel(private val repository: Repository) : ViewModel() {
         val dayRemaining = ChronoUnit.DAYS.between(
             toLocalDate(System.currentTimeMillis()),
             toLocalDate(budget.endDate)
-        ).toInt() + 1
+        ).toInt()
 
         this.totalDay.value = totalDay
         this.dayRemaining.value = dayRemaining
@@ -84,11 +84,18 @@ class BudgetDetailViewModel(private val repository: Repository) : ViewModel() {
                 }
 
                 val actualDailySpent = (totalSpent / (totalDay - dayRemaining)).toFloat()
-
                 actualDailySpending.postValue(actualDailySpent)
-                recommendDailySpending.postValue(((budget.amount - budget.spent) / dayRemaining).toFloat())
-                projectedSpending.postValue((totalSpent + actualDailySpent * dayRemaining))
 
+                var recommendSpend = 0f
+                var projectedSpend = 0f
+
+                if (dayRemaining > 0) {
+                    recommendSpend = ((budget.amount - budget.spent) / dayRemaining).toFloat()
+                    projectedSpend = totalSpent + actualDailySpent * dayRemaining
+                }
+
+                recommendDailySpending.postValue(recommendSpend)
+                projectedSpending.postValue(projectedSpend)
 
                 //forecasting how much user will spent
 
