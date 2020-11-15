@@ -66,7 +66,7 @@ class BudgetDetailViewModel(private val repository: Repository) : ViewModel() {
                 val dayPassed = ChronoUnit.DAYS.between(
                     toLocalDate(budget.startDate),
                     toLocalDate(System.currentTimeMillis())
-                ).toInt()
+                ).toInt() + 1
 
                 var maxIndex = max(transactionMap.keys.maxOrNull() ?: 0, dayPassed)
 
