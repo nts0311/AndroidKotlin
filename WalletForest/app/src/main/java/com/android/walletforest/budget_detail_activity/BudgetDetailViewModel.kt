@@ -23,7 +23,6 @@ class BudgetDetailViewModel(private val repository: Repository) : ViewModel() {
     var projectedSpending = MutableLiveData(0.0f)
     var actualDailySpending = MutableLiveData(0.0f)
     var lineEntries = MutableLiveData<Pair<List<Entry>, List<Entry>>>()
-    var totalDay = MutableLiveData(0)
     var dayRemaining = MutableLiveData(0)
 
     var categoryMap = repository.categoryMap
@@ -32,15 +31,15 @@ class BudgetDetailViewModel(private val repository: Repository) : ViewModel() {
 
     fun setBudgetInfo(budget: Budget) {
 
+        val now = System.currentTimeMillis()
         val totalDay =
             ChronoUnit.DAYS.between(toLocalDate(budget.startDate), toLocalDate(budget.endDate))
                 .toInt() + 1
-        val dayRemaining = ChronoUnit.DAYS.between(
-            toLocalDate(System.currentTimeMillis()),
-            toLocalDate(budget.endDate)
-        ).toInt()
 
-        this.totalDay.value = totalDay
+        val dayRemaining = if (now > budget.endDate) 0
+        else
+            ChronoUnit.DAYS.between(toLocalDate(now), toLocalDate(budget.endDate)).toInt()
+
         this.dayRemaining.value = dayRemaining
 
         repository.getTransactionsBetweenRange(budget.startDate, budget.endDate, budget.walletId)
@@ -63,24 +62,29 @@ class BudgetDetailViewModel(private val repository: Repository) : ViewModel() {
                     ).toInt()
                 }
 
-                val dayPassed = ChronoUnit.DAYS.between(
-                    toLocalDate(budget.startDate),
-                    toLocalDate(System.currentTimeMillis())
-                ).toInt() + 1
+                val dayPassed = if (now < budget.endDate) {
+                    ChronoUnit.DAYS.between(
+                        toLocalDate(budget.startDate), toLocalDate(now)
+                    ).toInt() + 1
+                } else {
+                    ChronoUnit.DAYS.between(
+                        toLocalDate(budget.startDate), toLocalDate(budget.endDate)
+                    ).toInt() + 1
+                }
 
                 var maxIndex = max(transactionMap.keys.maxOrNull() ?: 0, dayPassed)
 
-                val entries1 = List(maxIndex + 1) { i -> Entry(i.toFloat(), 0.0f) }
+                val actualSpentEntries = List(maxIndex + 1) { i -> Entry(i.toFloat(), 0.0f) }
                 var totalSpent = 0L
 
-                for (i in entries1.indices) {
+                for (i in actualSpentEntries.indices) {
                     if (transactionMap.containsKey(i)) {
                         val sum =
                             transactionMap[i]!!.fold(0L) { acc, transaction -> acc + transaction.amount }
-                        entries1[i].y += sum
+                        actualSpentEntries[i].y += sum
                         totalSpent += sum
                     }
-                    if (i > 0) entries1[i].y += entries1[i - 1].y
+                    if (i > 0) actualSpentEntries[i].y += actualSpentEntries[i - 1].y
                 }
 
                 val actualDailySpent = (totalSpent / (totalDay - dayRemaining)).toFloat()
@@ -99,15 +103,15 @@ class BudgetDetailViewModel(private val repository: Repository) : ViewModel() {
 
                 //forecasting how much user will spent
 
-                var lastSpent = entries1.last().y
+                var lastSpent = actualSpentEntries.last().y
 
-                val entries2 = List(totalDay - maxIndex + 1) { i ->
+                val forecastingEntries = List(totalDay - maxIndex + 1) { i ->
                     val entry = Entry((maxIndex++).toFloat(), lastSpent)
                     lastSpent += actualDailySpent
                     entry
                 }
 
-                val resultPair = Pair(entries1, entries2)
+                val resultPair = Pair(actualSpentEntries, forecastingEntries)
 
                 lineEntries.postValue(resultPair)
             }
