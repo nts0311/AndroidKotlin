@@ -95,7 +95,8 @@ class TabInfoUtils {
         ): List<TabInfo> {
             val result = mutableListOf<TabInfo>()
             var dStart = LocalDate.of(start.year, start.monthValue, 1)
-            val dEnd = LocalDate.of(end.year, end.monthValue + 1, 1).minusDays(1)
+            //val dEnd = LocalDate.of(end.year, end.monthValue + 1, 1).minusDays(1)
+            val dEnd = LocalDate.of(end.year, end.month,1).plusMonths(1).minusDays(1)
 
             val monthDiff = ChronoUnit.MONTHS.between(dStart, dEnd)
 

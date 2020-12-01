@@ -39,12 +39,10 @@ class WalletDetailActivity : AppCompatActivity() {
 
         getArgs()
 
-        if (walletId != -1L) {
+        if (walletId!=-1L) {
             deleteWalletBtn.visibility = View.VISIBLE
             viewModel.setCurrentWallet(walletId)
-        }
-        else
-        {
+        } else {
             wallet_icon_img.setImageResource(iconId)
         }
 
@@ -74,8 +72,8 @@ class WalletDetailActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == LAUNCH_ICON_SELECT_ACTIVITY) {
-            if (resultCode == RESULT_OK) {
+        if (requestCode==LAUNCH_ICON_SELECT_ACTIVITY) {
+            if (resultCode==RESULT_OK) {
                 iconId = data?.getIntExtra(RESULT_ICON_ID, iconId)!!
                 wallet_icon_img.setImageResource(iconId)
             }
@@ -88,7 +86,7 @@ class WalletDetailActivity : AppCompatActivity() {
 
     private fun setupToolbar() {
         wallet_detail_toolbar.title =
-            if (walletId == -1L) getString(R.string.add_wallet)
+            if (walletId==-1L) getString(R.string.add_wallet)
             else getString(R.string.edit_wallet)
         setSupportActionBar(wallet_detail_toolbar)
     }
@@ -96,10 +94,9 @@ class WalletDetailActivity : AppCompatActivity() {
     private fun registerObservers() {
         viewModel.wallet.observe(this) {
 
-            if (it == null) return@observe
+            if (it==null) return@observe
 
             wallet_name_edt.setText(it.name)
-            wallet_balance_edt.setText(it.amount.toString())
             wallet_currency_edt.setText(it.currency)
             wallet_icon_img.setImageResource(it.imageId)
         }
@@ -129,24 +126,16 @@ class WalletDetailActivity : AppCompatActivity() {
             return
         }
 
-        //check amount is valid number
-        balance_input_layout.error = null
-        try {
-            wallet_balance_edt.text.toString().toLong()
-        } catch (e: NumberFormatException) {
-            balance_input_layout.error = getString(R.string.error_invalid_amount)
-            return
-        }
 
         val newWallet = Wallet(
             0,
             wallet_name_edt.text.toString(),
             iconId,
-            wallet_balance_edt.text.toString().toLong(),
+            0L,
             wallet_currency_edt.text.toString()
         )
 
-        if (walletId == -1L) {
+        if (walletId==-1L) {
             viewModel.addWallet(newWallet)
         } else {
             newWallet.id = walletId
@@ -157,7 +146,7 @@ class WalletDetailActivity : AppCompatActivity() {
     }
 
     private fun deleteCurrentWallet() {
-        if (walletId == -1L) return
+        if (walletId==-1L) return
 
         AlertDialog.Builder(this).run {
 

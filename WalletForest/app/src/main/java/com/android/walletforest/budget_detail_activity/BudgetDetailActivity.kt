@@ -189,7 +189,8 @@ class BudgetDetailActivity : AppCompatActivity() {
     }
 
     private fun drawChart(results: Pair<List<Entry>, List<Entry>>) {
-        val limit = max(viewModel.currentBudget.value!!.amount.toFloat(), viewModel.projectedSpending.value!!)
+        var limit = max(viewModel.currentBudget.value!!.amount.toFloat(), viewModel.projectedSpending.value!!)
+        limit = max(limit, viewModel.currentBudget.value!!.spent.toFloat())
         budget_chart.axisLeft.axisMaximum = limit + limit / 10
 
         val set1 = LineDataSet(results.first, "")
