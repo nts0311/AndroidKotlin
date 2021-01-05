@@ -1,5 +1,6 @@
 package app.vtcnews.myapplication
 
+import android.content.Context
 import android.widget.Toast
 import com.airbnb.epoxy.TypedEpoxyController
 import com.airbnb.epoxy.VisibilityState
@@ -11,6 +12,7 @@ class CatController : TypedEpoxyController<List<DataItem>>() {
 
     private var visibleItemIndex: Int = 0
     private var dotTabLayout : dtlWrapper = dtlWrapper()
+    var context : Context? = null
 
     override fun buildModels(data1: List<DataItem>?) {
         data1?.take(4)?.forEach {
@@ -45,13 +47,6 @@ class CatController : TypedEpoxyController<List<DataItem>>() {
                     }
                 )
             }
-            dotTabLayout {
-                id("tabs")
-                count(data1!!.size / 2)
-                checked(visibleItemIndex)
-                 getThisFuckingView(dotTabLayout)
-            }
-
         }
 
         data1?.take(3)?.forEach {
@@ -63,6 +58,19 @@ class CatController : TypedEpoxyController<List<DataItem>>() {
                     Toast.makeText(parentView.imgView.context, "$position", Toast.LENGTH_SHORT)
                         .show()
                 }
+            }
+        }
+
+        val videos = data1!!.take(5).mapIndexed { index, dataItem ->
+            DataItem(title = dataItem.title + index.toString())
+        }
+
+        videoSection {
+            id("videos")
+            videoList(videos)
+            clickListener {
+                Toast.makeText(context, it.title, Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }
