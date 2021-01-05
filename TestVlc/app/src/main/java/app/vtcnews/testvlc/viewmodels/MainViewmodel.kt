@@ -57,35 +57,6 @@ class MainViewmodel @ViewModelInject constructor(
                         })
                 }
             }
-
-            /*for (i in 0 until mainViewModel.lstLiveData.getValue().size()) {
-                Log.d("pathhhhhhhhhhhh", storagePath)
-                val playlist: Playlist = mainViewModel.lstLiveData.getValue().get(i)
-                val url: String = playlist.getPath()
-                if (url != null && !url.isEmpty() && url.startsWith("http")) {
-                    val fileName: String = mainViewModel.lstLiveData.getValue().get(i)
-                        .getId() + mainViewModel.lstLiveData.getValue().get(i).getIndex()
-                        .toString() + ".mp4"
-                    PRDownloader.download(
-                        url,
-                        Utils.getRootDirPath(getApplicationContext()),
-                        fileName
-                    )
-                        .build()
-                        .setOnStartOrResumeListener {}
-                        .setOnPauseListener {}
-                        .setOnCancelListener {}
-                        .setOnProgressListener { progress: Progress? -> }
-                        .start(object : OnDownloadListener {
-                            override fun onDownloadComplete() {
-                                Log.d("complete", "complete")
-                                playlist.setPath("$storagePath/$fileName")
-                            }
-
-                            override fun onError(error: Error) {}
-                        })
-                }
-            }*/
         }
     }
 }
