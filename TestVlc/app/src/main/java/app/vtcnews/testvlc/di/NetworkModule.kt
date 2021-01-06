@@ -1,6 +1,7 @@
 package app.vtcnews.testvlc.di
 
 import app.vtcnews.testvlc.network.PlaylistService
+import app.vtcnews.testvlc.utils.NetworkUtils
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -26,7 +27,7 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(moshi: Moshi): Retrofit =
         Retrofit.Builder()
-            .baseUrl("https://iotdevice.tek4tv.vn/")
+            .baseUrl(NetworkUtils.BASE_URL)
             .addConverterFactory(MoshiConverterFactory.create(moshi).asLenient())
             .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .build()

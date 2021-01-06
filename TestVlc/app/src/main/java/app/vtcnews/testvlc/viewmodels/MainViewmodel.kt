@@ -34,7 +34,7 @@ class MainViewmodel @ViewModelInject constructor(
     }
 
     fun download(appContext : Context) {
-        val storagePath: String = Utils.getRootDirPath(appContext)
+        val storagePath = "/data/data/app.vtcnews.testvlc"//Utils.getRootDirPath(appContext)
         if (!playlist.value.isNullOrEmpty()) {
             val listVideo = playlist.value!!
             listVideo.forEach {

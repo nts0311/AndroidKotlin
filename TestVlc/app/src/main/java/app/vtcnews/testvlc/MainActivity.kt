@@ -65,7 +65,10 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.playlist.observe(this)
         {
-            val media = Media(mLibVLC, Uri.parse(it[viewModel.playlistIndex].path))
+            viewModel.download(applicationContext)
+            val videoPath = it[viewModel.playlistIndex].path!!
+            val media = if(videoPath.startsWith("http")) Media(mLibVLC, Uri.parse(videoPath))
+            else Media(mLibVLC, Uri.parse("file://$videoPath"))
             media.addOption(":fullscreen")
             mMediaPlayer!!.play(media)
 
@@ -82,7 +85,9 @@ class MainActivity : AppCompatActivity() {
             if (viewModel.playlistIndex >= playlist.size)
                 viewModel.playlistIndex = 0
 
-            val media = Media(mLibVLC, Uri.parse(playlist[viewModel.playlistIndex].path))
+            val videoPath = playlist[viewModel.playlistIndex].path!!
+            val media = if(videoPath.startsWith("http")) Media(mLibVLC, Uri.parse(videoPath))
+            else Media(mLibVLC, Uri.parse("file://$videoPath"))
             media.addOption(":fullscreen")
 
             mMediaPlayer!!.media = media
