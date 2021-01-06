@@ -1,0 +1,7 @@
+info/androidhive/androidvideostreaming/BuildConfig.java
+ info.androidhive.androidvideostreaming.BuildConfig
+info/androidhive/androidvideostreaming/AppConfig.java
+ info.androidhive.androidvideostreaming.AppConfig
+info/androidhive/androidvideostreaming/MainActivity.java
+ info.androidhive.androidvideostreaming.MainActivity
+ info.androidhive.androidvideostreaming.MainActivity$1

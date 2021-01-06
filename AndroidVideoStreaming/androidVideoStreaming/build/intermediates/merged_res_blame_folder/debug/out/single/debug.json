@@ -1,0 +1,82 @@
+[
+    {
+        "merged": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\build\\intermediates\\res\\merged\\debug\\menu_main.xml.flat",
+        "source": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\src\\main\\res\\menu\\main.xml"
+    },
+    {
+        "merged": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\build\\intermediates\\res\\merged\\debug\\drawable_ico_pause.png.flat",
+        "source": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\src\\main\\res\\drawable\\ico_pause.png"
+    },
+    {
+        "merged": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi_ico_screen_resolution.png.flat",
+        "source": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\src\\main\\res\\drawable-xxhdpi\\ico_screen_resolution.png"
+    },
+    {
+        "merged": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\src\\main\\res\\drawable-hdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\build\\intermediates\\res\\merged\\debug\\drawable_ico_play.png.flat",
+        "source": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\src\\main\\res\\drawable\\ico_play.png"
+    },
+    {
+        "merged": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\build\\intermediates\\res\\merged\\debug\\drawable_ico_settings.png.flat",
+        "source": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\src\\main\\res\\drawable\\ico_settings.png"
+    },
+    {
+        "merged": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\src\\main\\res\\drawable-xhdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi_ico_play.png.flat",
+        "source": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\src\\main\\res\\drawable-xxhdpi\\ico_play.png"
+    },
+    {
+        "merged": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\build\\intermediates\\res\\merged\\debug\\drawable_ico_mute.png.flat",
+        "source": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\src\\main\\res\\drawable\\ico_mute.png"
+    },
+    {
+        "merged": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi_ico_pause.png.flat",
+        "source": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\src\\main\\res\\drawable-xxhdpi\\ico_pause.png"
+    },
+    {
+        "merged": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi_ico_unmute.png.flat",
+        "source": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\src\\main\\res\\drawable-xxhdpi\\ico_unmute.png"
+    },
+    {
+        "merged": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\build\\intermediates\\res\\merged\\debug\\drawable-mdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\src\\main\\res\\drawable-mdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi_ico_settings.png.flat",
+        "source": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\src\\main\\res\\drawable-xxhdpi\\ico_settings.png"
+    },
+    {
+        "merged": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\build\\intermediates\\res\\merged\\debug\\layout_activity_main.xml.flat",
+        "source": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\src\\main\\res\\layout\\activity_main.xml"
+    },
+    {
+        "merged": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi_ico_mute.png.flat",
+        "source": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\src\\main\\res\\drawable-xxhdpi\\ico_mute.png"
+    },
+    {
+        "merged": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\build\\intermediates\\res\\merged\\debug\\drawable_bg.xml.flat",
+        "source": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\src\\main\\res\\drawable\\bg.xml"
+    },
+    {
+        "merged": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\build\\intermediates\\res\\merged\\debug\\drawable_ico_unmute.png.flat",
+        "source": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\src\\main\\res\\drawable\\ico_unmute.png"
+    },
+    {
+        "merged": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\build\\intermediates\\res\\merged\\debug\\drawable_ico_stop.png.flat",
+        "source": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\src\\main\\res\\drawable\\ico_stop.png"
+    },
+    {
+        "merged": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi_ic_launcher.png.flat",
+        "source": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\src\\main\\res\\drawable-xxhdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\build\\intermediates\\res\\merged\\debug\\drawable_ico_screen_resolution.png.flat",
+        "source": "C:\\Users\\xxxx9\\Documents\\GitHub\\AndroidKotlin\\AndroidVideoStreaming\\androidVideoStreaming\\src\\main\\res\\drawable\\ico_screen_resolution.png"
+    }
+]
