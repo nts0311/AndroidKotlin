@@ -31,20 +31,6 @@ package net.majorkernelpanic.streaming.fix;
  *
  */
 
-/**
- * Indicates a parse error.
- * Parse errors when receiving a message will typically trigger
- * {@link ProtocolException}. Parse errors that do not occur during
- * protocol execution may be handled differently.
- * This is an unchecked exceptions, since there are cases where
- * the data to be parsed has been generated and is therefore
- * known to be parseable.
- *
- * @since 4.0
- * @deprecated Please use {@link java.net.URL#openConnection} instead.
- * Please visit <a href="http://android-developers.blogspot.com/2011/09/androids-http-clients.html">this webpage</a>
- * for further details.
- */
 public class ParseException extends RuntimeException
 {
     private static final long serialVersionUID = -7288819855864183578L;

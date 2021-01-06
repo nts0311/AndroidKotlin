@@ -18,7 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class NetworkUtils {
-    public static final String BASE_URL = "https://iotdevice.tek4tv.vn/";
+    public static final String BASE_URL = "https://dev.device.tek4tv.vn/";
     public static final String URL_HUB = "https://hub.iot.tek4tv.vn/iothub";
     private final String TAG = "NetworkUtils";
     private static NetworkUtils INSTANCE;

@@ -7,6 +7,7 @@ import com.google.gson.annotations.SerializedName
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import okhttp3.ResponseBody
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.Headers
 import retrofit2.http.POST
@@ -16,5 +17,5 @@ import retrofit2.http.POST
 interface PlaylistService {
     @Headers("Content-Type: application/json")
     @POST("api/device/imei")
-    suspend fun getPlaylist(@Body body: Map<String, String>) : ResponseList
+    suspend fun getPlaylist(@Body body: Map<String, String>) : Response<ResponseList>
 }

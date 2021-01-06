@@ -1,59 +1,53 @@
 package app.vtcnews.testvlc.model
 
-import com.google.gson.annotations.Expose
-import com.google.gson.annotations.SerializedName
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import java.io.Serializable
-import java.util.*
 
-class Playlist : Serializable {
+@JsonClass(generateAdapter = true)
+data class Playlist(
     @Json(name = "Index")
-    
-     var index: String? = null
+    var index: String? = null,
 
     @Json(name = "Name")
-    
-     var name: String? = null
+    var name: String? = null,
+
 
     @Json(name = "ID")
-    
-     var id: Long? = null
+    var id: Long = 0,
 
     @Json(name = "Duration")
-    
-     var duration: String? = null
+    var duration: String? = null,
 
     @Json(name = "Path")
-    
-     var path: String? = null
+    var path: String? = null,
 
     @Json(name = "Start")
-    
-     var start: String? = null
+    var start: String? = null,
 
     @Json(name = "End")
-    
-     var end: String? = null
+    var end: String? = null,
 
     @Json(name = "Edit")
-    
-     var edit = false
+    var edit: Boolean = false,
 
     @Json(name = "Category")
-    
-     var category: Category? = null
-     var isCheck = false
-}
+    var category: Category? = null,
 
-class Category : Serializable {
+    var isCheck: Boolean = false,
+) : Serializable
+
+@JsonClass(generateAdapter = true)
+data class Category(
+
     @Json(name = "ID")
-    
-     var id: Long? = null
+    var id: Long = 0,
 
     @Json(name = "Name")
-    
-     var name: String? = null
-}
+    var name: String? = null
+)
+
+
 class ResponseList {
     @Json(name = "Playlist")
     var playlists: List<Playlist>? = null

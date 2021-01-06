@@ -56,8 +56,7 @@
     <string name="status_bar_notification_info_overflow">999+</string>
     <string name="uri">Wowza URL</string>
     <string name="username">Username</string>
-    <style name="AppBaseTheme" parent="android:Theme.Light">    
-    </style>
+    <style name="AppBaseTheme" parent="android:Theme.Light"/>
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>

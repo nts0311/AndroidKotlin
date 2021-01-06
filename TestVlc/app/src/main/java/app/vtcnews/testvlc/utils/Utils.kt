@@ -9,6 +9,7 @@ import java.util.*
 
 class Utils {
     companion object {
+        const val ping = "Ping"
         const val DEVICE_ID = "device_id"
 
         @SuppressLint("HardwareIds")

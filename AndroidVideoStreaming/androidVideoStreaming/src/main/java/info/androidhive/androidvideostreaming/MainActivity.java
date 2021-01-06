@@ -1,19 +1,23 @@
 package info.androidhive.androidvideostreaming;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.SurfaceHolder;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import net.majorkernelpanic.streaming.Session;
 import net.majorkernelpanic.streaming.SessionBuilder;
 import net.majorkernelpanic.streaming.audio.AudioQuality;
 import net.majorkernelpanic.streaming.gl.SurfaceView;
 import net.majorkernelpanic.streaming.rtsp.RtspClient;
+import net.majorkernelpanic.streaming.video.VideoQuality;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,6 +38,13 @@ public class MainActivity extends Activity implements RtspClient.Callback,
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+
+		requestPermissions(new String[]{Manifest.permission.CAMERA,
+				Manifest.permission.WRITE_EXTERNAL_STORAGE,
+				Manifest.permission.RECORD_AUDIO,
+				Manifest.permission.INTERNET
+		}, 1);
+
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		// getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -47,6 +58,31 @@ public class MainActivity extends Activity implements RtspClient.Callback,
 		// Initialize RTSP client
 		initRtspClient();
 
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode,
+										   String permissions[], int[] grantResults) {
+		switch (requestCode) {
+			case 1: {
+
+				// If request is cancelled, the result arrays are empty.
+				if (grantResults.length > 0
+						&& grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+
+				} else {
+
+					// permission denied, boo! Disable the
+					// functionality that depends on this permission.
+					Toast.makeText(MainActivity.this, "Permission denied to read your External storage", Toast.LENGTH_SHORT).show();
+				}
+				return;
+			}
+
+			// other 'case' lines to check for other
+			// permissions this app might request
+		}
 	}
 
 	@Override
@@ -71,7 +107,7 @@ public class MainActivity extends Activity implements RtspClient.Callback,
 		mSession = SessionBuilder.getInstance()
 				.setContext(getApplicationContext())
 				.setAudioEncoder(SessionBuilder.AUDIO_NONE)
-				.setAudioQuality(new AudioQuality(8000, 16000))
+				//.setAudioQuality(new AudioQuality(8000, 16000))
 				.setVideoEncoder(SessionBuilder.VIDEO_H264)
 				.setSurfaceView(mSurfaceView).setPreviewOrientation(0)
 				.setCallback(this).build();
@@ -91,8 +127,8 @@ public class MainActivity extends Activity implements RtspClient.Callback,
 		port = m.group(2);
 		path = m.group(3);
 
-		mClient.setCredentials(AppConfig.PUBLISHER_USERNAME,
-				AppConfig.PUBLISHER_PASSWORD);
+		/*mClient.setCredentials(AppConfig.PUBLISHER_USERNAME,
+				AppConfig.PUBLISHER_PASSWORD);*/
 		mClient.setServerAddress(ip, Integer.parseInt(port));
 		mClient.setStreamPath("/" + path);
 	}

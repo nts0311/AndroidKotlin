@@ -11,8 +11,6 @@ class CustomPlayer(libVlc: LibVLC) : MediaPlayer(libVlc) {
     override fun onEventNative(eventType: Int, arg1: Long, arg2: Long, argf1: Float): Event {
         val res = super.onEventNative(eventType, arg1, arg2, argf1)
 
-        Log.d("event", eventType.toString())
-
         if(eventType == Event.EndReached)
             endListener.invoke()
 
