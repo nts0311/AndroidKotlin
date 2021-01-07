@@ -17,7 +17,6 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import app.vtcnews.testvlc.model.PingHubRequest
 import app.vtcnews.testvlc.model.ReponseHub
@@ -33,6 +32,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import org.videolan.libvlc.LibVLC
 import org.videolan.libvlc.Media
+import org.videolan.libvlc.MediaPlayer
 import org.videolan.libvlc.util.VLCVideoLayout
 import java.io.File
 import java.text.SimpleDateFormat
@@ -92,19 +92,24 @@ class MainActivity : AppCompatActivity() {
             requestAppPermission()*/
 
         connectToHub()
+        startPlayingMedia()
 
-        viewModel.getPlaylist(this@MainActivity)
 
+    }
+
+    private fun startPlayingMedia() {
+        viewModel.getPlaylist(applicationContext, false)
+        viewModel.checkPlaylist(applicationContext)
 
         viewModel.playlist.observe(this)
         {
+            Log.d("Main", it.size.toString())
             viewModel.downloadMedias(applicationContext)
 
             if (viewModel.playlistIndex >= viewModel.playlist.value!!.size)
                 viewModel.playlistIndex = 0
             playVideoByIndex(viewModel.playlistIndex)
         }
-
     }
 
     private fun needGrantPermission() : Boolean
@@ -138,6 +143,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun playVideoByIndex(index: Int) {
+
+        val playlist = viewModel.playlist.value
+
+        if (playlist == null || playlist.isEmpty()) return
+
         val videoPath = viewModel.playlist.value!![index].path!!
         val media = if (videoPath.startsWith("http")) {
             Log.d("link", "online: $videoPath")
@@ -171,8 +181,12 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         mMediaPlayer!!.attachViews(mVideoLayout!!, null, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
 
-        mMediaPlayer!!.endListener = {
-            nextVideo()
+        mMediaPlayer!!.eventListener = { event ->
+
+            if (event == MediaPlayer.Event.EndReached)
+                nextVideo()
+            else if (event == MediaPlayer.Event.EncounteredError)
+                nextVideo()
         }
     }
 
@@ -223,6 +237,9 @@ class MainActivity : AppCompatActivity() {
                         Log.d("vaoday111", "vaoday111")
                         //mainViewModel.getPlayList(this) { playlists -> createRecyclerView(playlists) }
                     }*/
+
+
+
                     HubConnectionTask { connectionId ->
                         if (connectionId != null) {
                             Log.d("Connected", connectionId)
@@ -232,8 +249,10 @@ class MainActivity : AppCompatActivity() {
                     }.execute(hubConnection)
                     onMessage()
                 }
-            } else
+            } else {
                 hubConnection = null
+            }
+
         }
     }
 
@@ -324,7 +343,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     Status.RESTART -> {
                     }
-                    Status.RELOAD -> viewModel.getPlaylist(applicationContext)
+                    Status.RELOAD -> viewModel.getPlaylist(applicationContext, true)
                     Status.SWITCH_MODE_FM -> {
                     }
                     Status.SET_MUTE_DEVICE -> {

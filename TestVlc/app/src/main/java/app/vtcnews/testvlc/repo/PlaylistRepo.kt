@@ -4,7 +4,7 @@ import android.util.Log
 import app.vtcnews.testvlc.model.Playlist
 import app.vtcnews.testvlc.network.PlaylistService
 import app.vtcnews.testvlc.utils.PLAYLIST_FILE_NAME
-import app.vtcnews.testvlc.utils.isFileExsisted
+import app.vtcnews.testvlc.utils.isFileExisted
 import app.vtcnews.testvlc.utils.readFile
 import app.vtcnews.testvlc.utils.writeFile
 import com.squareup.moshi.JsonAdapter
@@ -12,6 +12,7 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -29,13 +30,28 @@ class PlaylistRepo @Inject constructor(
         "IMEI" to "8A:65:48:62:36:1D"
     )
 
-    suspend fun getPlaylist(storagePath: String): List<Playlist> {
-        var result = listOf<Playlist>()
-        if (isFileExsisted(storagePath, PLAYLIST_FILE_NAME)) {
-            Log.d("readplaylist","local")
-            result = readPlaylistFromFile(storagePath)
+    suspend fun getPlaylist(storagePath: String, needUpdate: Boolean): List<Playlist> {
+        val res = if (needUpdate) {
+            updatePlaylist(storagePath)
         } else {
-            Log.d("readplaylist","online")
+
+            var result: List<Playlist>
+            if (isFileExisted(storagePath, PLAYLIST_FILE_NAME)) {
+                Log.d("readplaylist", "local")
+                result = readPlaylistFromFile(storagePath)
+            } else {
+                result = updatePlaylist(storagePath)
+            }
+            result
+        }
+
+        return res
+    }
+
+    suspend fun updatePlaylist(storagePath: String): List<Playlist> {
+        var result = listOf<Playlist>()
+
+        try {
             val res = playlistService.getPlaylist(body)
             if (res.isSuccessful) {
                 val resBody = res.body()
@@ -45,6 +61,8 @@ class PlaylistRepo @Inject constructor(
                     savePlaylistToFile(result, storagePath)
                 }
             }
+        } catch (e: Exception) {
+            Log.d("yee", e.toString())
         }
 
         return result
@@ -56,7 +74,12 @@ class PlaylistRepo @Inject constructor(
             val filePath = "$storagePath/$PLAYLIST_FILE_NAME"
             val json = jsonAdapter.toJson(playlist)
             Log.d("writefile", json)
-            writeFile(filePath, json)
+
+            try {
+                writeFile(filePath, json)
+            } catch (e: IOException) {
+                Log.d(LOG_TAG, "error writing playlist!!!")
+            }
         }
     }
 
@@ -67,9 +90,19 @@ class PlaylistRepo @Inject constructor(
         withContext(Dispatchers.IO)
         {
             val filePath = "$storagePath/$PLAYLIST_FILE_NAME"
-            var contentFromFile = readFile(filePath)
-            result = jsonAdapter.fromJson(contentFromFile) ?: listOf()
+
+            try {
+                var contentFromFile = readFile(filePath)
+                result = jsonAdapter.fromJson(contentFromFile) ?: listOf()
+            } catch (e: IOException) {
+                Log.d(LOG_TAG, "error reading playlist!!!")
+            }
+
         }
         return result
+    }
+
+    companion object {
+        private const val LOG_TAG = "PlaylistRepo"
     }
 }

@@ -1,10 +1,7 @@
 package app.vtcnews.testvlc.viewmodels
 
-import android.content.ContentResolver
 import android.content.Context
-import android.database.Cursor
 import android.net.Uri
-import android.provider.OpenableColumns
 import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
@@ -12,11 +9,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.vtcnews.testvlc.model.Playlist
 import app.vtcnews.testvlc.repo.PlaylistRepo
-import app.vtcnews.testvlc.utils.isFileExsisted
+import app.vtcnews.testvlc.utils.isFileExisted
 import com.downloader.Error
 import com.downloader.OnDownloadListener
 import com.downloader.PRDownloader
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -31,9 +29,28 @@ class MainViewmodel @ViewModelInject constructor(
 
     var playlistIndex = 1
 
-    fun getPlaylist(context: Context) {
+    fun getPlaylist(context: Context, needUpdate: Boolean) {
         viewModelScope.launch {
-            playlist.value = playlistRepo.getPlaylist(context.filesDir.path)
+            val res = playlistRepo.getPlaylist(context.filesDir.path, needUpdate)
+            playlist.value = res
+        }
+    }
+
+    fun checkPlaylist(appContext: Context) {
+        viewModelScope.launch {
+            while (true) {
+                if (playlist.value != null && playlist.value!!.isNotEmpty()) {
+                    val needDownload = playlist.value!!.any {
+                        it.path!!.startsWith("http")
+                    }
+
+                    if (needDownload)
+                        downloadMedias(appContext)
+                    Log.d("checkplaylist", needDownload.toString())
+                }
+
+                delay(30000)
+            }
         }
     }
 
@@ -53,7 +70,7 @@ class MainViewmodel @ViewModelInject constructor(
                         fileName = fileName.substring(slash + 1)
                     }
 
-                    if (!isFileExsisted(storagePath, fileName)) {
+                    if (!isFileExisted(storagePath, fileName)) {
                         PRDownloader.download(url, storagePath, fileName).build()
                             .start(object : OnDownloadListener {
                                 override fun onDownloadComplete() {
@@ -75,8 +92,20 @@ class MainViewmodel @ViewModelInject constructor(
                                 override fun onError(error: Error?) {
 
                                 }
+
+
                             })
                     } else {
+                        it.path = "$storagePath/$fileName"
+                        viewModelScope.launch {
+                            saveFileJob?.join()
+                            saveFileJob = launch {
+                                playlistRepo.savePlaylistToFile(
+                                    listVideo,
+                                    storagePath
+                                )
+                            }
+                        }
                         /*it.path = "$storagePath/$fileName"
                         Log.d(
                             "file-video",
