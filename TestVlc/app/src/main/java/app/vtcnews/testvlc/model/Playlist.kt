@@ -35,6 +35,8 @@ data class Playlist(
     var category: Category? = null,
 
     var isCheck: Boolean = false,
+
+    var pathBackup: String = ""
 ) : Serializable
 
 @JsonClass(generateAdapter = true)

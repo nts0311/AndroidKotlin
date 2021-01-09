@@ -1,15 +1,14 @@
 package app.vtcnews.testvlc.repo
 
+import android.content.Context
 import android.util.Log
 import app.vtcnews.testvlc.model.Playlist
 import app.vtcnews.testvlc.network.PlaylistService
-import app.vtcnews.testvlc.utils.PLAYLIST_FILE_NAME
-import app.vtcnews.testvlc.utils.isFileExisted
-import app.vtcnews.testvlc.utils.readFile
-import app.vtcnews.testvlc.utils.writeFile
+import app.vtcnews.testvlc.utils.*
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
@@ -19,7 +18,8 @@ import javax.inject.Singleton
 @Singleton
 class PlaylistRepo @Inject constructor(
     private val playlistService: PlaylistService,
-    private val moshi: Moshi
+    private val moshi: Moshi,
+    @ApplicationContext private val appContext: Context
 ) {
     var playlist = listOf<Playlist>()
 
@@ -27,25 +27,22 @@ class PlaylistRepo @Inject constructor(
     private val jsonAdapter: JsonAdapter<List<Playlist>> = moshi.adapter(type)
 
     var body = mapOf(
-        "IMEI" to "8A:65:48:62:36:1D"
+        "IMEI" to Utils.getDeviceId(appContext)!!
     )
 
     suspend fun getPlaylist(storagePath: String, needUpdate: Boolean): List<Playlist> {
-        val res = if (needUpdate) {
+
+        return if (needUpdate) {
             updatePlaylist(storagePath)
         } else {
-
-            var result: List<Playlist>
-            if (isFileExisted(storagePath, PLAYLIST_FILE_NAME)) {
+            val result = if (isFileExisted(storagePath, PLAYLIST_FILE_NAME)) {
                 Log.d("readplaylist", "local")
-                result = readPlaylistFromFile(storagePath)
+                readPlaylistFromFile(storagePath)
             } else {
-                result = updatePlaylist(storagePath)
+                updatePlaylist(storagePath)
             }
             result
         }
-
-        return res
     }
 
     suspend fun updatePlaylist(storagePath: String): List<Playlist> {
@@ -71,6 +68,8 @@ class PlaylistRepo @Inject constructor(
     suspend fun savePlaylistToFile(playlist: List<Playlist>, storagePath: String) {
         withContext(Dispatchers.IO)
         {
+
+
             val filePath = "$storagePath/$PLAYLIST_FILE_NAME"
             val json = jsonAdapter.toJson(playlist)
             Log.d("writefile", json)

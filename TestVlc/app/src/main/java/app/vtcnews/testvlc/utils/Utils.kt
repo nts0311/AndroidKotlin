@@ -16,7 +16,6 @@ class Utils {
         fun getDeviceId(context: Context?): String? {
             var deviceId: String? =
                 ConfigUtil.getString(context, DEVICE_ID, null)
-            //deviceId = "8A:65:48:62:36:1D";
             if (deviceId == null) {
                 deviceId = getMacAddr()
                 ConfigUtil.putString(context, DEVICE_ID, deviceId)

@@ -30,9 +30,8 @@ import com.microsoft.signalr.HubConnectionBuilder
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
-import org.videolan.libvlc.LibVLC
-import org.videolan.libvlc.Media
-import org.videolan.libvlc.MediaPlayer
+import org.videolan.libvlc.*
+import org.videolan.libvlc.interfaces.IMedia
 import org.videolan.libvlc.util.VLCVideoLayout
 import java.io.File
 import java.text.SimpleDateFormat
@@ -79,12 +78,17 @@ class MainActivity : AppCompatActivity() {
 
         NetworkUtils.getInstance().startNetworkListener(this)
 
+        NetworkUtils.getInstance().mNetworkLive.observe(this)
+        { isConnected ->
+            if (isConnected)
+                connectToHub()
+        }
+
         btnUpdate = findViewById(R.id.btn_update)
         btnUpdate.setOnClickListener {
             if (needGrantPermission()) {
                 requestAppPermission()
-            }
-            else
+            } else
                 download("https://mam.tek4tv.vn/download/player_203.apk")
         }
 
@@ -93,17 +97,14 @@ class MainActivity : AppCompatActivity() {
 
         connectToHub()
         startPlayingMedia()
+        registerObservers()
 
 
     }
 
-    private fun startPlayingMedia() {
-        viewModel.getPlaylist(applicationContext, false)
-        viewModel.checkPlaylist(applicationContext)
-
+    private fun registerObservers() {
         viewModel.playlist.observe(this)
         {
-            Log.d("Main", it.size.toString())
             viewModel.downloadMedias(applicationContext)
 
             if (viewModel.playlistIndex >= viewModel.playlist.value!!.size)
@@ -112,8 +113,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun needGrantPermission() : Boolean
-    {
+    private fun startPlayingMedia() {
+        viewModel.getPlaylist(applicationContext, false)
+        viewModel.checkPlaylist(applicationContext)
+    }
+
+    private fun needGrantPermission(): Boolean {
         val permissions = arrayOf(
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -132,8 +137,7 @@ class MainActivity : AppCompatActivity() {
         return needGrantPermission
     }
 
-    private fun requestAppPermission()
-    {
+    private fun requestAppPermission() {
         val permissions = arrayOf(
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.REQUEST_INSTALL_PACKAGES,
@@ -142,22 +146,52 @@ class MainActivity : AppCompatActivity() {
         requestPermissions(permissions, 1)
     }
 
+
     private fun playVideoByIndex(index: Int) {
 
         val playlist = viewModel.playlist.value
 
         if (playlist == null || playlist.isEmpty()) return
 
-        val videoPath = viewModel.playlist.value!![index].path!!
-        val media = if (videoPath.startsWith("http")) {
+        var mediaPath = viewModel.playlist.value!![index].path!!
+
+        /*val media = if (videoPath.startsWith("http")) {
             Log.d("link", "online: $videoPath")
             Media(mLibVLC, Uri.parse(videoPath))
         } else {
             Log.d("link", "local: $videoPath")
             Media(mLibVLC, Uri.parse("file://$videoPath"))
+        }*/
+
+        val media1 =
+            if (mediaPath.isNotEmpty() && File(mediaPath).exists()) {
+                Log.d("link", "local: $mediaPath")
+                Media(mLibVLC, Uri.parse("file://$mediaPath"))
+            } else {
+                Log.d("link", "online: $mediaPath")
+                Media(mLibVLC, Uri.parse(viewModel.playlist.value!![index].pathBackup))
+            }
+
+        val imgExt = listOf(".jpg", ".png", ".gif")
+        val isPicture = imgExt.any { mediaPath.endsWith(it) }
+
+        media1.addOption(":fullscreen")
+
+
+        if (isPicture) {
+            val url =
+                "file:///data/user/0/app.vtcnews.testvlc/files/CanYouFeelTheLoveTonight-ChristopherPhillips-5274433_hq.mp3"
+            val audio = Media(mLibVLC, Uri.parse(url))
+            audio.addSlave(IMedia.Slave(IMedia.Type.Unknown, 0, "file://$mediaPath"))
+
+            mMediaPlayer!!.play(audio)
+
+        } else {
+            mMediaPlayer!!.play(media1)
         }
-        media.addOption(":fullscreen")
-        mMediaPlayer!!.play(media)
+
+
+        //media1.addSlave()
     }
 
     private fun nextVideo() {
@@ -183,10 +217,12 @@ class MainActivity : AppCompatActivity() {
 
         mMediaPlayer!!.eventListener = { event ->
 
-            if (event == MediaPlayer.Event.EndReached)
-                nextVideo()
-            else if (event == MediaPlayer.Event.EncounteredError)
-                nextVideo()
+            when (event) {
+                MediaPlayer.Event.EndReached -> nextVideo()
+                MediaPlayer.Event.EncounteredError -> nextVideo()
+                MediaPlayer.Event.Stopped -> viewModel.isPlaying = false
+                MediaPlayer.Event.Playing -> viewModel.isPlaying = true
+            }
         }
     }
 
@@ -225,6 +261,10 @@ class MainActivity : AppCompatActivity() {
         NetworkUtils.getInstance().mNetworkLive.observe(this)
         { isConnected ->
             if (isConnected) {
+
+                if (!viewModel.isPlaying)
+                    startPlayingMedia()
+
                 if (hubConnection == null) {
                     hubConnection = HubConnectionBuilder.create(NetworkUtils.URL_HUB).build()
 
@@ -237,13 +277,9 @@ class MainActivity : AppCompatActivity() {
                         Log.d("vaoday111", "vaoday111")
                         //mainViewModel.getPlayList(this) { playlists -> createRecyclerView(playlists) }
                     }*/
-
-
-
                     HubConnectionTask { connectionId ->
                         if (connectionId != null) {
                             Log.d("Connected", connectionId)
-
                             pingTimer()
                         }
                     }.execute(hubConnection)
@@ -281,13 +317,13 @@ class MainActivity : AppCompatActivity() {
     // ham gui du lieu
     private fun sendMessage(mess: String, command: String) {
         try {
-            hubConnection!!.invoke(command, "8A:65:48:62:36:1D", mess)
+            hubConnection!!.invoke(command, Utils.getDeviceId(applicationContext), mess)
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    fun playURLVideo(index: Int) {
+    private fun playURLVideo(index: Int) {
         viewModel.playlistIndex = index
         playVideoByIndex(viewModel.playlistIndex)
     }
@@ -308,7 +344,7 @@ class MainActivity : AppCompatActivity() {
                 val jsonAdapter = moshi.adapter(ReponseHub::class.java)
                 reponseHub = jsonAdapter.fromJson(message)!!
             }
-            val isImei = "8A:65:48:62:36:1D" == reponseHub.imei
+            val isImei = Utils.getDeviceId(applicationContext) == reponseHub.imei
             if (isImei) {
                 //deviceAdrress = ""
                 when (commamd) {
@@ -391,7 +427,16 @@ class MainActivity : AppCompatActivity() {
                 val i = viewModel.playlistIndex
                 Log.d("player:", java.lang.String.valueOf(i))
                 //if (i >= 0 && i < mainViewModel.lstLiveData.getValue().size()) {
-                video = Video("" + i, "-1")
+
+                var mode = "-1"
+
+                if (!viewModel.playlist.value.isNullOrEmpty()) {
+                    val path = viewModel.playlist.value!![i].path!!
+                    mode = if (path.isNotEmpty() && !File(path).exists()) "1"
+                    else "0"
+                }
+
+                video = Video("" + i, mode)
                 /*request = PingHubRequest.builder().connectionId(hubConnection!!.connectionId)
                     .imei(Utils.getDeviceId(this)).status(if (isPlaying()) "START" else "STOP")
                     .startTine(date)
@@ -402,7 +447,7 @@ class MainActivity : AppCompatActivity() {
                 val videoAdater = moshi.adapter(Video::class.java)
 
                 request = PingHubRequest().apply {
-                    imei = "8A:65:48:62:36:1D"
+                    imei = Utils.getDeviceId(applicationContext)
                     status = "START"
                     connectionId = (hubConnection!!.connectionId)
                     this.video = videoAdater.toJson(video)
