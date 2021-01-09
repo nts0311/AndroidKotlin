@@ -29,9 +29,8 @@ import com.microsoft.signalr.HubConnection
 import com.microsoft.signalr.HubConnectionBuilder
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import org.videolan.libvlc.*
-import org.videolan.libvlc.interfaces.IMedia
 import org.videolan.libvlc.util.VLCVideoLayout
 import java.io.File
 import java.text.SimpleDateFormat
@@ -46,8 +45,9 @@ class MainActivity : AppCompatActivity() {
 
     private var mVideoLayout: VLCVideoLayout? = null
 
-    private var mLibVLC: LibVLC? = null
-    private var mMediaPlayer: CustomPlayer? = null
+    private lateinit var mLibVLC: LibVLC
+    private lateinit var visualPlayer: CustomPlayer
+    private lateinit var audioPlayer: CustomPlayer
 
     val viewModel by viewModels<MainViewmodel>()
 
@@ -57,6 +57,10 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var moshi: Moshi
+
+    private var presentImageJob: Job? = null
+    var mainPlayer: CustomPlayer? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,7 +77,8 @@ class MainActivity : AppCompatActivity() {
 
 
         mLibVLC = LibVLC(this, args)
-        mMediaPlayer = CustomPlayer(mLibVLC!!)
+        visualPlayer = CustomPlayer(mLibVLC)
+        audioPlayer = CustomPlayer(mLibVLC)
         mVideoLayout = findViewById(R.id.video_layout)
 
         NetworkUtils.getInstance().startNetworkListener(this)
@@ -109,7 +114,7 @@ class MainActivity : AppCompatActivity() {
 
             if (viewModel.playlistIndex >= viewModel.playlist.value!!.size)
                 viewModel.playlistIndex = 0
-            playVideoByIndex(viewModel.playlistIndex)
+            playMediaByIndex(viewModel.playlistIndex)
         }
     }
 
@@ -147,83 +152,142 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun playVideoByIndex(index: Int) {
+    private fun playMediaByIndex(index: Int) {
 
         val playlist = viewModel.playlist.value
 
         if (playlist == null || playlist.isEmpty()) return
 
-        var mediaPath = viewModel.playlist.value!![index].path!!
+        val mediaItem = viewModel.playlist.value!![index]
+        val filePath = mediaItem.path!!
 
-        /*val media = if (videoPath.startsWith("http")) {
-            Log.d("link", "online: $videoPath")
-            Media(mLibVLC, Uri.parse(videoPath))
-        } else {
-            Log.d("link", "local: $videoPath")
-            Media(mLibVLC, Uri.parse("file://$videoPath"))
-        }*/
+        val mediaName = if (filePath.startsWith("http")) File(Uri.parse(filePath).path).name
+        else File("file://$filePath").name
+
 
         val media1 =
-            if (mediaPath.isNotEmpty() && File(mediaPath).exists()) {
-                Log.d("link", "local: $mediaPath")
-                Media(mLibVLC, Uri.parse("file://$mediaPath"))
+            if (filePath.isNotEmpty() && File(filePath).exists()) {
+                Log.d("link", "local: $filePath")
+                Media(mLibVLC, Uri.parse("file://$filePath"))
             } else {
-                Log.d("link", "online: $mediaPath")
+                Log.d("link", "online: $filePath")
                 Media(mLibVLC, Uri.parse(viewModel.playlist.value!![index].pathBackup))
             }
 
-        val imgExt = listOf(".jpg", ".png", ".gif")
-        val isPicture = imgExt.any { mediaPath.endsWith(it) }
+        val audioExt = listOf(".mp3")
+        val videoExt = listOf(".mp4")
 
-        media1.addOption(":fullscreen")
+        val isAudio = audioExt.any { mediaName.endsWith(it) }
+        val isVideo = videoExt.any { mediaName.endsWith(it) }
 
 
-        if (isPicture) {
-            val url =
-                "file:///data/user/0/app.vtcnews.testvlc/files/CanYouFeelTheLoveTonight-ChristopherPhillips-5274433_hq.mp3"
-            val audio = Media(mLibVLC, Uri.parse(url))
-            audio.addSlave(IMedia.Slave(IMedia.Type.Unknown, 0, "file://$mediaPath"))
-
-            mMediaPlayer!!.play(audio)
-
-        } else {
-            mMediaPlayer!!.play(media1)
+        presentImageJob?.cancel()
+        if (isAudio) {
+            mainPlayer = audioPlayer
+            audioPlayer.play(media1)
+            presentImage(mediaItem.duration!!)
+        } else if (isVideo) {
+            audioPlayer.stop()
+            media1.addOption(":fullscreen")
+            mainPlayer = visualPlayer
+            visualPlayer.play(media1)
         }
 
+        mainPlayer!!.eventListener = { event ->
+            when (event) {
+                MediaPlayer.Event.EndReached -> {
+                    playNextMedia()
+                    //remove callback
+                    mainPlayer!!.eventListener = {}
+                }
 
-        //media1.addSlave()
+                MediaPlayer.Event.EncounteredError -> {
+                    presentImageJob?.cancel()
+                    presentImageJob = null
+
+                    playNextMedia()
+                    //remove callback
+                    mainPlayer!!.eventListener = {}
+                }
+                MediaPlayer.Event.Stopped -> viewModel.isPlaying = false
+                MediaPlayer.Event.Playing -> viewModel.isPlaying = true
+            }
+
+
+        }
     }
 
-    private fun nextVideo() {
+    private fun presentImage(duration: String) {
+
+        val imageList = listOf(
+            Uri.parse("https://picsum.photos/600/600"),
+            Uri.parse("https://picsum.photos/600/600"),
+            Uri.parse("https://picsum.photos/600/600"),
+            Uri.parse("https://picsum.photos/600/600"),
+            Uri.parse("https://picsum.photos/600/600"),
+            Uri.parse("https://picsum.photos/600/600"),
+            Uri.parse("https://picsum.photos/600/600"),
+            Uri.parse("https://picsum.photos/600/600"),
+            Uri.parse("https://picsum.photos/600/600"),
+            Uri.parse("https://picsum.photos/600/600")
+        )
+
+        val imageDuration = try {
+            (duration.split(":").mapIndexed { index, s ->
+                when (index) {
+                    0 -> s.toInt() * 3600
+                    1 -> s.toInt() * 60
+                    2 -> s.toInt()
+                    else -> 0
+                }
+            }
+                .fold(0L) { acc, it -> acc + it } * 1000) / imageList.size
+        } catch (e: Exception) {
+            5000
+        }
+
+        presentImageJob = lifecycleScope.launch {
+            var i = 0
+            while (i < imageList.size && isActive) {
+                Log.d("presentimage", imageList[i].path!! + this.coroutineContext.toString())
+                val media = Media(mLibVLC, imageList[i++])
+                visualPlayer.play(media)
+                delay(imageDuration)
+            }
+        }
+    }
+
+
+    private fun playNextMedia() {
         mVideoLayout!!.post {
             val playlist = viewModel.playlist.value!!
             viewModel.playlistIndex++
             if (viewModel.playlistIndex >= playlist.size)
                 viewModel.playlistIndex = 0
 
-            playVideoByIndex(viewModel.playlistIndex)
+            playMediaByIndex(viewModel.playlistIndex)
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        mMediaPlayer!!.release()
+        visualPlayer!!.release()
         mLibVLC!!.release()
     }
 
     override fun onStart() {
         super.onStart()
-        mMediaPlayer!!.attachViews(mVideoLayout!!, null, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
+        visualPlayer!!.attachViews(mVideoLayout!!, null, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
 
-        mMediaPlayer!!.eventListener = { event ->
+        /*visualPlayer!!.eventListener = { event ->
 
             when (event) {
-                MediaPlayer.Event.EndReached -> nextVideo()
-                MediaPlayer.Event.EncounteredError -> nextVideo()
+                MediaPlayer.Event.EndReached -> playNextMedia()
+                MediaPlayer.Event.EncounteredError -> playNextMedia()
                 MediaPlayer.Event.Stopped -> viewModel.isPlaying = false
                 MediaPlayer.Event.Playing -> viewModel.isPlaying = true
             }
-        }
+        }*/
     }
 
     override fun onRequestPermissionsResult(
@@ -295,8 +359,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        mMediaPlayer!!.stop()
-        mMediaPlayer!!.detachViews()
+        visualPlayer!!.stop()
+        visualPlayer!!.detachViews()
     }
 
     private fun onMessage() {
@@ -325,7 +389,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun playURLVideo(index: Int) {
         viewModel.playlistIndex = index
-        playVideoByIndex(viewModel.playlistIndex)
+        playMediaByIndex(viewModel.playlistIndex)
     }
 
     private fun handleFromCommandServer(commamd: String?, message: String?) {

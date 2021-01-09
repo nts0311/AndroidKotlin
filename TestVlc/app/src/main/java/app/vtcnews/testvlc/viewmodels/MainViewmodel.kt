@@ -30,6 +30,7 @@ class MainViewmodel @ViewModelInject constructor(
     private var saveFileJob: Job? = null
     private var getPlaylistJob: Job? = null
     private var checkPlaylistJob: Job? = null
+    private var downloadMediaJob: Job? = null
 
     var playlistIndex = 0
 
@@ -55,7 +56,8 @@ class MainViewmodel @ViewModelInject constructor(
                     curPlaylist.forEach {
                         val mediaPath = it.path!!
                         if (mediaPath.isNotEmpty() && !File(mediaPath).exists()) {
-                            it.path = it.pathBackup
+                            if (it.pathBackup.startsWith("http"))
+                                it.path = it.pathBackup
                             foundBrokenPath = true
                         }
                     }
@@ -63,7 +65,7 @@ class MainViewmodel @ViewModelInject constructor(
                     if (foundBrokenPath) savePlaylist(curPlaylist, appContext.filesDir.path)
 
                     val needDownload = playlist.value!!.any {
-                        it.path!!.startsWith("http")
+                        it.path!!.startsWith("http") || it.path.isNullOrEmpty()
                     }
 
                     if (needDownload)
@@ -79,6 +81,15 @@ class MainViewmodel @ViewModelInject constructor(
 
     @Synchronized
     fun downloadMedias(appContext: Context) {
+        viewModelScope.launch {
+            downloadMediaJob?.join()
+            downloadMediaJob = launch {
+                startDownloadMedia(appContext)
+            }
+        }
+    }
+
+    private fun startDownloadMedia(appContext: Context) {
         val storagePath = appContext.filesDir.path
         if (!playlist.value.isNullOrEmpty()) {
             val listVideo = playlist.value!!
