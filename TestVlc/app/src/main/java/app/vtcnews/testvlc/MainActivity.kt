@@ -2,19 +2,16 @@ package app.vtcnews.testvlc
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.media.AudioManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import app.vtcnews.testvlc.model.*
-import app.vtcnews.testvlc.utils.NetworkUtils
-import app.vtcnews.testvlc.utils.Status
-import app.vtcnews.testvlc.utils.Utils
-import app.vtcnews.testvlc.utils.downloadUpdateApk
+import app.vtcnews.testvlc.utils.*
 import app.vtcnews.testvlc.viewmodels.MainViewmodel
 import com.microsoft.signalr.HubConnection
 import com.microsoft.signalr.HubConnectionBuilder
@@ -43,17 +40,18 @@ class MainActivity : AppCompatActivity() {
     private lateinit var audioPlayer: CustomPlayer
     var mainPlayer: CustomPlayer? = null
 
-    val viewModel by viewModels<MainViewmodel>()
+    private val viewModel by viewModels<MainViewmodel>()
 
     private var hubConnection: HubConnection? = null
 
-    lateinit var btnUpdate: Button
 
     @Inject
     lateinit var moshi: Moshi
 
     private var presentImageJob: Job? = null
     var checkScheduledMediaJob: Job? = null
+
+    private lateinit var audioManager: AudioManager
 
 
     private lateinit var playlist: Playlist
@@ -77,21 +75,23 @@ class MainActivity : AppCompatActivity() {
         audioPlayer = CustomPlayer(mLibVLC)
         mVideoLayout = findViewById(R.id.video_layout)
 
-        NetworkUtils.getInstance().startNetworkListener(this)
+        NetworkUtils.instance.startNetworkListener(this)
 
-        NetworkUtils.getInstance().mNetworkLive.observe(this)
+        NetworkUtils.instance.mNetworkLive.observe(this)
         { isConnected ->
             if (isConnected)
                 connectToHub()
         }
 
-        btnUpdate = findViewById(R.id.btn_update)
+        /*btnUpdate = findViewById(R.id.btn_update)
         btnUpdate.setOnClickListener {
             if (needGrantPermission()) {
                 requestUpdatePermission()
             } else
                 downloadUpdateApk("https://mam.tek4tv.vn/download/player_203.apk", this)
-        }
+        }*/
+
+        audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
 
         playlist = Playlist(lifecycleScope)
         playlist.playMediaByIndex = {
@@ -100,7 +100,6 @@ class MainActivity : AppCompatActivity() {
 
 
         connectToHub()
-        startPlayingMedia()
         registerObservers()
     }
 
@@ -127,6 +126,7 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         visualPlayer.attachViews(mVideoLayout!!, null, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
+        startPlayingMedia()
     }
 
     override fun onRequestPermissionsResult(
@@ -193,10 +193,6 @@ class MainActivity : AppCompatActivity() {
         viewModel.playlist.observe(this)
         {
             playlist.mediaItems = it
-
-
-            it[3].fixTime = "10:44:00"
-
             checkScheduledMedia()
 
             viewModel.downloadMedias(applicationContext)
@@ -217,40 +213,27 @@ class MainActivity : AppCompatActivity() {
         val playlist = viewModel.playlist.value
 
         if (playlist == null || playlist.isEmpty()) return
-
         val mediaItem = viewModel.playlist.value!![index]
-        val filePath = mediaItem.path!!
-
-        val mediaName = if (filePath.startsWith("http")) File(Uri.parse(filePath).path).name
-        else File("file://$filePath").name
-
-
-        val media1 =
-            if (filePath.isNotEmpty() && File(filePath).exists()) {
-                Log.d("link", "local: $filePath")
-                Media(mLibVLC, Uri.parse("file://$filePath"))
-            } else {
-                Log.d("link", "online: $filePath")
-                Media(mLibVLC, Uri.parse(viewModel.playlist.value!![index].pathBackup))
-            }
-
-        val audioExt = listOf(".mp3")
-        val videoExt = listOf(".mp4")
-
-        val isAudio = audioExt.any { mediaName.endsWith(it) }
-        val isVideo = videoExt.any { mediaName.endsWith(it) }
-
-
+        val media = mediaItem.getVlcMedia(mLibVLC)
         presentImageJob?.cancel()
-        if (isAudio) {
-            mainPlayer = audioPlayer
-            audioPlayer.play(media1)
-            presentImage(mediaItem.duration!!)
-        } else if (isVideo) {
-            audioPlayer.stop()
-            media1.addOption(":fullscreen")
-            mainPlayer = visualPlayer
-            visualPlayer.play(media1)
+        when (mediaItem.getMediaType()) {
+            /*isAudio -> {
+                mainPlayer = audioPlayer
+                audioPlayer.play(media1)
+                presentImage(mediaItem.duration!!)
+            }*/
+            MediaType.VIDEO -> {
+                audioPlayer.stop()
+                media.addOption(":fullscreen")
+                mainPlayer = visualPlayer
+                visualPlayer.play(media)
+            }
+            MediaType.IMAGE -> {
+                presentImage(mediaItem)
+                mainPlayer = audioPlayer
+            }
+            else -> {
+            }
         }
 
         mainPlayer!!.eventListener = { event ->
@@ -275,55 +258,30 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun presentImage(duration: String) {
 
-        val imageList = listOf(
-            Uri.parse("https://picsum.photos/600/600"),
-            Uri.parse("https://picsum.photos/600/600"),
-            Uri.parse("https://picsum.photos/600/600"),
-            Uri.parse("https://picsum.photos/600/600"),
-            Uri.parse("https://picsum.photos/600/600"),
-            Uri.parse("https://picsum.photos/600/600"),
-            Uri.parse("https://picsum.photos/600/600"),
-            Uri.parse("https://picsum.photos/600/600"),
-            Uri.parse("https://picsum.photos/600/600"),
-            Uri.parse("https://picsum.photos/600/600")
+    private fun presentImage(mediaItem: MediaItem) {
+
+        val imageList = mutableListOf(mediaItem)
+
+        imageList.addAll(viewModel.playlist.value!!.filter { it.getMediaType() == MediaType.IMAGE })
+
+        val delayDuration = 15000L//getDurationInSecond(duration) * 1000 / imageList.size
+
+        val backgroundAudio = Media(
+            mLibVLC,
+            Uri.parse("https://aredir.nixcdn.com/Unv_Audio59/AsTheDeer-StanWhitmire-4910230_hq.mp3?st=S4VtE_dmjGuQBCtRGbhpkg&e=1610428729")
         )
-
-        /*val imageList = listOf(
-            Uri.parse("file:///data/data/app.vtcnews.testvlc/files/1.jpg"),
-            Uri.parse("file:///data/data/app.vtcnews.testvlc/files/2.jpg"),
-            Uri.parse("file:///data/data/app.vtcnews.testvlc/files/3.jpg"),
-            Uri.parse("file:///data/data/app.vtcnews.testvlc/files/4.jpg"),
-            Uri.parse("file:///data/data/app.vtcnews.testvlc/files/5.jpg"),
-            Uri.parse("file:///data/data/app.vtcnews.testvlc/files/6.jpg"),
-            Uri.parse("file:///data/data/app.vtcnews.testvlc/files/7.jpg"),
-            Uri.parse("file:///data/data/app.vtcnews.testvlc/files/8.jpg"),
-            Uri.parse("file:///data/data/app.vtcnews.testvlc/files/9.jpg"),
-            Uri.parse("file:///data/data/app.vtcnews.testvlc/files/11.jpg"),
-        )*/
-
-        val imageDuration = try {
-            (duration.split(":").mapIndexed { index, s ->
-                when (index) {
-                    0 -> s.toInt() * 3600
-                    1 -> s.toInt() * 60
-                    2 -> s.toInt()
-                    else -> 0
-                }
-            }
-                .fold(0L) { acc, it -> acc + it } * 1000) / imageList.size
-        } catch (e: Exception) {
-            5000
-        }
+        audioPlayer.play(backgroundAudio)
 
         presentImageJob = lifecycleScope.launch {
             var i = 0
             while (i < imageList.size && isActive) {
-                Log.d("presentimage", imageList[i].path!! + this.coroutineContext.toString())
-                val media = Media(mLibVLC, imageList[i++])
-                visualPlayer.play(media)
-                delay(imageDuration)
+                val media = imageList[i++]
+                visualPlayer.play(media.getVlcMedia(mLibVLC))
+                delay(delayDuration)
+
+                if (i >= imageList.size)
+                    i = 0
             }
         }
     }
@@ -340,38 +298,41 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun checkScheduledMedia() {
+    private fun checkScheduledMedia() {
         checkScheduledMediaJob?.cancel()
         checkScheduledMediaJob = lifecycleScope.launch(Dispatchers.Default) {
 
             val playlist = viewModel.playlist.value ?: listOf()
             val scheduledItems: MutableList<MediaItem> = mutableListOf()
-            scheduledItems.addAll(playlist.filter { it.fixTime.isNotEmpty() })
+            scheduledItems.addAll(playlist.filter { it.fixTime.isNotEmpty() && it.fixTime != "00:00:00" })
 
             while (true) {
 
+                if (scheduledItems.isEmpty())
+                    checkScheduledMediaJob?.cancel()
+
                 Log.d("Playlist", "check scheduled")
                 scheduledItems.forEachIndexed { index, mediaItem ->
-                    if (mediaItem.fixTime.isNotEmpty()) {
+                    if (mediaItem.fixTime.isNotEmpty() && mediaItem.fixTime != "00:00:00") {
                         try {
                             val time = mediaItem.fixTime.split(":").map { it.toInt() }
 
-                            val now = Calendar.getInstance()
-                            val currentHour = now.get(Calendar.HOUR_OF_DAY)
-                            val currentMin = now.get(Calendar.MINUTE)
-                            val currentSecond = now.get(Calendar.SECOND)
+                            val now = Calendar.getInstance().timeInMillis
 
-                            if (time[0] <= currentHour
-                                && time[1] <= currentMin
-                                && time[2] <= currentSecond
-                            ) {
+                            val scheduledTime = Calendar.getInstance().apply {
+                                set(Calendar.HOUR_OF_DAY, time[0])
+                                set(Calendar.MINUTE, time[1])
+                                set(Calendar.SECOND, time[2])
+                            }.timeInMillis
+
+                            if (scheduledTime <= now) {
 
                                 withContext(Dispatchers.Main)
                                 {
+                                    scheduledItems.removeAt(index)
                                     val indexToPlay = playlist.indexOf(mediaItem)
                                     playMediaByIndex(indexToPlay)
                                     Log.d("Playlist", "play $index at $time")
-                                    scheduledItems.removeAt(index)
                                     viewModel.playlistIndex = indexToPlay
                                 }
                             }
@@ -388,7 +349,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun connectToHub() {
-        NetworkUtils.getInstance().mNetworkLive.observe(this)
+        NetworkUtils.instance.mNetworkLive.observe(this)
         { isConnected ->
             if (isConnected) {
 
@@ -401,12 +362,12 @@ class MainActivity : AppCompatActivity() {
                     Log.d("Connected", "Connected")
 
                     /*mainViewModel = AndroidViewModelFactory(application).create(MainViewModel::class.java)
-                    if (mainViewModel.lstLiveData == null || mainViewModel.lstLiveData.getValue() == null || mainViewModel.lstLiveData.getValue()
-                            .size() === 0
-                    ) {
-                        Log.d("vaoday111", "vaoday111")
-                        //mainViewModel.getPlayList(this) { playlists -> createRecyclerView(playlists) }
-                    }*/
+                        if (mainViewModel.lstLiveData == null || mainViewModel.lstLiveData.getValue() == null || mainViewModel.lstLiveData.getValue()
+                                .size() === 0
+                        ) {
+                            Log.d("vaoday111", "vaoday111")
+                            //mainViewModel.getPlayList(this) { playlists -> createRecyclerView(playlists) }
+                        }*/
                     HubConnectionTask { connectionId ->
                         if (connectionId != null) {
                             Log.d("Connected", connectionId)
@@ -503,8 +464,12 @@ class MainActivity : AppCompatActivity() {
                     Status.SWITCH_MODE_FM -> {
                     }
                     Status.SET_MUTE_DEVICE -> {
+                        if (reponseHub.message != null)
+                            setMute(reponseHub.message!!)
                     }
                     Status.SET_VOLUME_DEVICE -> {
+                        if (reponseHub.message != null)
+                            setVolume(reponseHub.message!!)
                     }
                     Status.GET_VOLUME_DEVICE -> {
                     }
@@ -590,5 +555,27 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun setMute(mute: String) {
+        val direction = if (mute == "1") AudioManager.ADJUST_MUTE
+        else AudioManager.ADJUST_UNMUTE
 
+        audioManager.adjustStreamVolume(
+            AudioManager.STREAM_MUSIC,
+            direction,
+            AudioManager.FLAG_SHOW_UI
+        )
+    }
+
+    private fun setVolume(message: String) {
+        var volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
+        var maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+
+        try {
+            volume = ((maxVolume.toFloat() / 100) * message.toInt()).toInt()
+        } catch (e: NumberFormatException) {
+
+        }
+
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, AudioManager.FLAG_SHOW_UI)
+    }
 }

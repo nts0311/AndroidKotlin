@@ -1,138 +1,144 @@
-package app.vtcnews.testvlc.utils;
+package app.vtcnews.testvlc.utils
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkCapabilities;
-import android.net.NetworkInfo;
-import android.net.NetworkRequest;
-import android.os.Build;
-import android.util.Log;
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.ConnectivityManager.NetworkCallback
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
+import android.os.Build
+import android.telephony.TelephonyManager
+import android.util.Log
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import java.util.*
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 
-import java.util.LinkedList;
-import java.util.List;
-
-public class NetworkUtils {
-    public static final String BASE_URL = "https://dev.device.tek4tv.vn/";
-    public static final String URL_HUB = "https://hub.iot.tek4tv.vn/iothub";
-    private final String TAG = "NetworkUtils";
-    private static NetworkUtils INSTANCE;
-    private boolean isConnected = false;
-
-    private List<ConnectionCallback> mCallbacks = new LinkedList<>();
-    public MutableLiveData<Boolean> mNetworkLive = new MutableLiveData<>();
-
-    private NetworkRequest mNetRequest = new NetworkRequest.Builder()
-            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-            .build();
-
-    private ConnectivityManager.NetworkCallback mNetCallback = new ConnectivityManager.NetworkCallback() {
-
-        @Override
-        public void onAvailable(@NonNull Network network) {
-            super.onAvailable(network);
-            Log.d(TAG, "available");
-            mNetworkLive.postValue(true);
-            isConnected = true;
-            for (ConnectionCallback callback : mCallbacks) {
-                if (callback != null) {
-                    callback.onChange(true);
-                }
+class NetworkUtils private constructor() {
+    private val TAG = "NetworkUtils"
+    var isNetworkConnected = false
+        private set
+    private val mCallbacks: MutableList<ConnectionCallback> = LinkedList()
+    var mNetworkLive = MutableLiveData<Boolean>()
+    private val mNetRequest = NetworkRequest.Builder()
+        .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        .build()
+    private val mNetCallback: NetworkCallback = object : NetworkCallback() {
+        override fun onAvailable(network: Network) {
+            super.onAvailable(network)
+            Log.d(TAG, "available")
+            mNetworkLive.postValue(true)
+            isNetworkConnected = true
+            for (callback in mCallbacks) {
+                callback?.onChange(true)
             }
         }
 
-        @Override
-        public void onLost(@NonNull Network network) {
-            super.onLost(network);
-            Log.d(TAG, "lost");
-            mNetworkLive.postValue(false);
-            isConnected = false;
-            for (NetworkUtils.ConnectionCallback callback : mCallbacks) {
-                if (callback != null) {
-                    callback.onChange(false);
-                }
+        override fun onLost(network: Network) {
+            super.onLost(network)
+            Log.d(TAG, "lost")
+            mNetworkLive.postValue(false)
+            isNetworkConnected = false
+            for (callback in mCallbacks) {
+                callback?.onChange(false)
             }
         }
-    };
-
-    private NetworkUtils() {
-        // This class is not publicly instantiable
     }
 
-    public static NetworkUtils getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new NetworkUtils();
-        }
-        return INSTANCE;
-    }
-
-    public static boolean isNetworkConnected(Context context) {
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (cm != null) {
-            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-            return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-        }
-        return false;
-    }
-
-    public boolean isNetworkConnected() {
-        return isConnected;
-    }
-
-    public void startNetworkListener(Context context) {
-        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    fun startNetworkListener(context: Context) {
+        val manager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         if (manager != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                manager.registerDefaultNetworkCallback(mNetCallback);
+                manager.registerDefaultNetworkCallback(mNetCallback)
             } else {
-                manager.registerNetworkCallback(mNetRequest, mNetCallback);
+                manager.registerNetworkCallback(mNetRequest, mNetCallback)
             }
-            Log.d(TAG, "#startNetworkListener() success");
+            Log.d(TAG, "#startNetworkListener() success")
         } else {
-            Log.d(TAG, "#startNetworkListener() failed");
+            Log.d(TAG, "#startNetworkListener() failed")
         }
     }
 
-    public void stopNetworkListener(Context context) {
-        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    fun stopNetworkListener(context: Context) {
+        val manager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         if (manager != null) {
-            manager.unregisterNetworkCallback(mNetCallback);
-            Log.d(TAG, "#stopNetworkListener() success");
+            manager.unregisterNetworkCallback(mNetCallback)
+            Log.d(TAG, "#stopNetworkListener() success")
         } else {
-            Log.d(TAG, "#stopNetworkListener() failed");
+            Log.d(TAG, "#stopNetworkListener() failed")
         }
     }
 
-    public void addObserver(LifecycleOwner owner, Observer<Boolean> observer) {
-        mNetworkLive.observe(owner, observer);
+    fun addObserver(owner: LifecycleOwner?, observer: Observer<Boolean>?) {
+        mNetworkLive.observe(owner!!, observer!!)
     }
 
-    public void removeObserver(Observer<Boolean> observer) {
-        mNetworkLive.removeObserver(observer);
+    fun removeObserver(observer: Observer<Boolean>?) {
+        mNetworkLive.removeObserver(observer!!)
     }
 
-    public void addCallback(ConnectionCallback callback) {
+    fun addCallback(callback: ConnectionCallback?) {
         if (callback != null) {
-            mCallbacks.add(callback);
+            mCallbacks.add(callback)
         }
     }
 
-    public void removeCallback(ConnectionCallback callback) {
+    fun removeCallback(callback: ConnectionCallback?) {
         if (callback != null && !mCallbacks.isEmpty()) {
-            mCallbacks.remove(callback);
+            mCallbacks.remove(callback)
         }
     }
 
-    public void clearCallbacks() {
-        mCallbacks.clear();
+    fun clearCallbacks() {
+        mCallbacks.clear()
     }
 
-    public interface ConnectionCallback {
-        void onChange(boolean netWorkState);
+    interface ConnectionCallback {
+        fun onChange(netWorkState: Boolean)
+    }
+
+    companion object {
+        const val BASE_URL = "https://dev.device.tek4tv.vn/"
+        const val URL_HUB = "https://hub.iot.tek4tv.vn/iothub"
+        private var INSTANCE: NetworkUtils? = null
+        val instance: NetworkUtils
+            get() {
+                if (INSTANCE == null) {
+                    INSTANCE = NetworkUtils()
+                }
+                return INSTANCE!!
+            }
+
+        fun isNetworkConnected(context: Context): Boolean {
+            val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            if (cm != null) {
+                val activeNetwork = cm.activeNetworkInfo
+                return activeNetwork != null && activeNetwork.isConnectedOrConnecting
+            }
+            return false
+        }
+
+        fun getNetworkClass(context: Context): String {
+            val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val info = cm.activeNetworkInfo
+            if (info == null || !info.isConnected) return "-" // not connected
+            if (info.type == ConnectivityManager.TYPE_WIFI) return "WIFI"
+            if (info.type == ConnectivityManager.TYPE_MOBILE) {
+                return when (info.subtype) {
+                    TelephonyManager.NETWORK_TYPE_GPRS, TelephonyManager.NETWORK_TYPE_EDGE, TelephonyManager.NETWORK_TYPE_CDMA, TelephonyManager.NETWORK_TYPE_1xRTT, TelephonyManager.NETWORK_TYPE_IDEN, TelephonyManager.NETWORK_TYPE_GSM -> "2G"
+                    TelephonyManager.NETWORK_TYPE_UMTS, TelephonyManager.NETWORK_TYPE_EVDO_0, TelephonyManager.NETWORK_TYPE_EVDO_A, TelephonyManager.NETWORK_TYPE_HSDPA, TelephonyManager.NETWORK_TYPE_HSUPA, TelephonyManager.NETWORK_TYPE_HSPA, TelephonyManager.NETWORK_TYPE_EVDO_B, TelephonyManager.NETWORK_TYPE_EHRPD, TelephonyManager.NETWORK_TYPE_HSPAP, TelephonyManager.NETWORK_TYPE_TD_SCDMA -> "3G"
+                    TelephonyManager.NETWORK_TYPE_LTE, TelephonyManager.NETWORK_TYPE_IWLAN, 19 -> "4G"
+                    TelephonyManager.NETWORK_TYPE_NR -> "5G"
+                    else -> "?"
+                }
+            }
+            return "?"
+        }
+
+        fun getSimNumber(context: Context): String {
+            val tm = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+            return tm.line1Number ?: ""
+        }
     }
 }

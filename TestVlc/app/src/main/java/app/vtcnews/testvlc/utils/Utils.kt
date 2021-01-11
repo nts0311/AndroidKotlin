@@ -13,7 +13,7 @@ class Utils {
         const val DEVICE_ID = "device_id"
 
         @SuppressLint("HardwareIds")
-        fun getDeviceId(context: Context?): String? {
+        fun getDeviceId(context: Context): String? {
             var deviceId: String? =
                 ConfigUtil.getString(context, DEVICE_ID, null)
             if (deviceId == null) {

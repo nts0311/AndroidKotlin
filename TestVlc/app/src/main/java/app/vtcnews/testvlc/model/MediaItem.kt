@@ -1,7 +1,12 @@
 package app.vtcnews.testvlc.model
 
+import android.net.Uri
+import android.util.Log
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import org.videolan.libvlc.LibVLC
+import org.videolan.libvlc.Media
+import java.io.File
 import java.io.Serializable
 
 @JsonClass(generateAdapter = true)
@@ -35,6 +40,7 @@ data class MediaItem(
 
     var isCheck: Boolean = false,
 
+    @Json(name = "FixTime")
     var fixTime: String = ""
 ) : Serializable {
 
@@ -46,6 +52,62 @@ data class MediaItem(
 
     init {
         pathBackup = path
+    }
+
+    fun getFileName() = if (path.startsWith("http")) File(Uri.parse(path).path).name
+    else File("file://$path").name
+
+    fun getMediaType(): MediaType {
+        val mediaName = getFileName()
+
+        val audioExt = listOf(".mp3")
+        val videoExt = listOf(".mp4")
+        val imageExt = listOf(".jpg", ".png", ".gif")
+
+        val isAudio = audioExt.any { mediaName.endsWith(it) }
+        val isVideo = videoExt.any { mediaName.endsWith(it) }
+        val isImage = imageExt.any { mediaName.endsWith(it) }
+
+        return when {
+            isAudio -> MediaType.AUDIO
+            isVideo -> MediaType.VIDEO
+            isImage -> MediaType.IMAGE
+            else -> MediaType.UNKNOWN
+        }
+    }
+
+    fun getVlcMedia(mLibVLC: LibVLC): Media {
+        return if (path.isNotEmpty() && File(path).exists()) {
+            Log.d("link", "local: $path")
+            Media(mLibVLC, Uri.parse("file://$path"))
+        } else {
+            Log.d("link", "online: $pathBackup")
+            Media(mLibVLC, Uri.parse(pathBackup))
+        }
+    }
+}
+
+enum class MediaType {
+    IMAGE,
+    VIDEO,
+    AUDIO,
+    UNKNOWN
+}
+
+
+fun getDurationInSecond(duration: String): Long {
+    return try {
+        (duration.split(":").mapIndexed { index, s ->
+            when (index) {
+                0 -> s.toInt() * 3600
+                1 -> s.toInt() * 60
+                2 -> s.toInt()
+                else -> 0
+            }
+        }
+            .fold(0L) { acc, it -> acc + it })
+    } catch (e: Exception) {
+        0
     }
 }
 

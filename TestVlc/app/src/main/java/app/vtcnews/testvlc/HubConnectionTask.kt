@@ -1,37 +1,26 @@
-package app.vtcnews.testvlc;
+package app.vtcnews.testvlc
 
-import android.os.AsyncTask;
-import android.util.Log;
+import android.os.AsyncTask
+import android.util.Log
+import com.microsoft.signalr.HubConnection
 
-import com.microsoft.signalr.HubConnection;
+class HubConnectionTask(private val hubCallBack: HubCallBack) :
+    AsyncTask<HubConnection?, Void?, String?>() {
+    private val LOG_TAG = "HubConnectionTask"
 
-
-public class HubConnectionTask extends AsyncTask<HubConnection, Void, String> {
-    private HubCallBack hubCallBack;
-    private String LOG_TAG = "HubConnectionTask";
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-    }
-    public HubConnectionTask(HubCallBack callBack){
-        this.hubCallBack = callBack;
-    }
-    @Override
-    protected String doInBackground(HubConnection... hubConnections) {
-
-        try {
-            HubConnection hubConnection = hubConnections[0];
-            hubConnection.start().blockingAwait();
-            return hubConnection.getConnectionId();
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "error connecting tto hub");
-            return null;
+    override fun doInBackground(vararg hubConnections: HubConnection?): String? {
+        return try {
+            val hubConnection = hubConnections[0]
+            hubConnection!!.start().blockingAwait()
+            hubConnection!!.connectionId
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "error connecting tto hub")
+            null
         }
     }
 
-    @Override
-    protected void onPostExecute(String aVoid) {
-        super.onPostExecute(aVoid);
-        hubCallBack.onCallBack(aVoid);
+    override fun onPostExecute(aVoid: String?) {
+        super.onPostExecute(aVoid)
+        hubCallBack.onCallBack(aVoid)
     }
 }
