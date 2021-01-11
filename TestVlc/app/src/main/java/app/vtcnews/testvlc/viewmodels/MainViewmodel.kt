@@ -7,7 +7,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import app.vtcnews.testvlc.model.Playlist
+import app.vtcnews.testvlc.model.MediaItem
 import app.vtcnews.testvlc.repo.PlaylistRepo
 import app.vtcnews.testvlc.utils.isFileExisted
 import com.downloader.Error
@@ -24,7 +24,7 @@ class MainViewmodel @ViewModelInject constructor(
 ) : ViewModel() {
 
     var isPlaying: Boolean = false
-    val playlist = MutableLiveData<List<Playlist>>()
+    val playlist = MutableLiveData<List<MediaItem>>()
 
 
     private var saveFileJob: Job? = null
@@ -128,7 +128,7 @@ class MainViewmodel @ViewModelInject constructor(
         }
     }
 
-    private fun savePlaylist(listVideo: List<Playlist>, storagePath: String) {
+    private fun savePlaylist(listVideo: List<MediaItem>, storagePath: String) {
         viewModelScope.launch {
             saveFileJob?.join()
             saveFileJob = launch {

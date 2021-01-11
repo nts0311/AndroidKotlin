@@ -1,29 +1,20 @@
 package app.vtcnews.testvlc
 
 import android.Manifest
-import android.app.DownloadManager
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
-import android.os.StrictMode
-import android.os.StrictMode.VmPolicy
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import app.vtcnews.testvlc.model.PingHubRequest
-import app.vtcnews.testvlc.model.ReponseHub
-import app.vtcnews.testvlc.model.Video
+import app.vtcnews.testvlc.model.*
 import app.vtcnews.testvlc.utils.NetworkUtils
 import app.vtcnews.testvlc.utils.Status
 import app.vtcnews.testvlc.utils.Utils
+import app.vtcnews.testvlc.utils.downloadUpdateApk
 import app.vtcnews.testvlc.viewmodels.MainViewmodel
 import com.microsoft.signalr.HubConnection
 import com.microsoft.signalr.HubConnectionBuilder
@@ -43,11 +34,14 @@ class MainActivity : AppCompatActivity() {
     private val USE_TEXTURE_VIEW = false
     private val ENABLE_SUBTITLES = true
 
+    private val UPDATE_PERMISSION_REQUEST_CODE = 1
+
     private var mVideoLayout: VLCVideoLayout? = null
 
     private lateinit var mLibVLC: LibVLC
     private lateinit var visualPlayer: CustomPlayer
     private lateinit var audioPlayer: CustomPlayer
+    var mainPlayer: CustomPlayer? = null
 
     val viewModel by viewModels<MainViewmodel>()
 
@@ -59,8 +53,10 @@ class MainActivity : AppCompatActivity() {
     lateinit var moshi: Moshi
 
     private var presentImageJob: Job? = null
-    var mainPlayer: CustomPlayer? = null
+    var checkScheduledMediaJob: Job? = null
 
+
+    private lateinit var playlist: Playlist
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,35 +88,76 @@ class MainActivity : AppCompatActivity() {
         btnUpdate = findViewById(R.id.btn_update)
         btnUpdate.setOnClickListener {
             if (needGrantPermission()) {
-                requestAppPermission()
+                requestUpdatePermission()
             } else
-                download("https://mam.tek4tv.vn/download/player_203.apk")
+                downloadUpdateApk("https://mam.tek4tv.vn/download/player_203.apk", this)
         }
 
-        /*if(needGrantPermission())
-            requestAppPermission()*/
+        playlist = Playlist(lifecycleScope)
+        playlist.playMediaByIndex = {
+            playMediaByIndex(it)
+        }
+
 
         connectToHub()
         startPlayingMedia()
         registerObservers()
-
-
     }
 
-    private fun registerObservers() {
-        viewModel.playlist.observe(this)
-        {
-            viewModel.downloadMedias(applicationContext)
+    override fun onStop() {
+        super.onStop()
+        mainPlayer?.stop()
+        audioPlayer.stop()
+        visualPlayer.stop()
+        visualPlayer.detachViews()
+    }
 
-            if (viewModel.playlistIndex >= viewModel.playlist.value!!.size)
-                viewModel.playlistIndex = 0
-            playMediaByIndex(viewModel.playlistIndex)
+    override fun onDestroy() {
+        super.onDestroy()
+        mainPlayer?.release()
+        if (!audioPlayer.isReleased)
+            audioPlayer.release()
+
+        if (!visualPlayer.isReleased)
+            visualPlayer.release()
+
+        mLibVLC.release()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        visualPlayer.attachViews(mVideoLayout!!, null, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        when (requestCode) {
+            UPDATE_PERMISSION_REQUEST_CODE -> {
+
+
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.size > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                ) {
+                    Log.d("quyen", grantResults.toList().toString())
+                    downloadUpdateApk("https://mam.tek4tv.vn/download/player_203.apk", this)
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Permission denied to read your External storage",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                return
+            }
         }
-    }
-
-    private fun startPlayingMedia() {
-        viewModel.getPlaylist(applicationContext, false)
-        viewModel.checkPlaylist(applicationContext)
     }
 
     private fun needGrantPermission(): Boolean {
@@ -142,18 +179,41 @@ class MainActivity : AppCompatActivity() {
         return needGrantPermission
     }
 
-    private fun requestAppPermission() {
+    private fun requestUpdatePermission() {
         val permissions = arrayOf(
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.REQUEST_INSTALL_PACKAGES,
             Manifest.permission.READ_EXTERNAL_STORAGE
         )
-        requestPermissions(permissions, 1)
+        requestPermissions(permissions, UPDATE_PERMISSION_REQUEST_CODE)
+    }
+
+
+    private fun registerObservers() {
+        viewModel.playlist.observe(this)
+        {
+            playlist.mediaItems = it
+
+
+            it[3].fixTime = "10:44:00"
+
+            checkScheduledMedia()
+
+            viewModel.downloadMedias(applicationContext)
+
+            if (viewModel.playlistIndex >= viewModel.playlist.value!!.size)
+                viewModel.playlistIndex = 0
+            playMediaByIndex(viewModel.playlistIndex)
+        }
+    }
+
+    private fun startPlayingMedia() {
+        viewModel.getPlaylist(applicationContext, false)
+        viewModel.checkPlaylist(applicationContext)
     }
 
 
     private fun playMediaByIndex(index: Int) {
-
         val playlist = viewModel.playlist.value
 
         if (playlist == null || playlist.isEmpty()) return
@@ -212,8 +272,6 @@ class MainActivity : AppCompatActivity() {
                 MediaPlayer.Event.Stopped -> viewModel.isPlaying = false
                 MediaPlayer.Event.Playing -> viewModel.isPlaying = true
             }
-
-
         }
     }
 
@@ -231,6 +289,19 @@ class MainActivity : AppCompatActivity() {
             Uri.parse("https://picsum.photos/600/600"),
             Uri.parse("https://picsum.photos/600/600")
         )
+
+        /*val imageList = listOf(
+            Uri.parse("file:///data/data/app.vtcnews.testvlc/files/1.jpg"),
+            Uri.parse("file:///data/data/app.vtcnews.testvlc/files/2.jpg"),
+            Uri.parse("file:///data/data/app.vtcnews.testvlc/files/3.jpg"),
+            Uri.parse("file:///data/data/app.vtcnews.testvlc/files/4.jpg"),
+            Uri.parse("file:///data/data/app.vtcnews.testvlc/files/5.jpg"),
+            Uri.parse("file:///data/data/app.vtcnews.testvlc/files/6.jpg"),
+            Uri.parse("file:///data/data/app.vtcnews.testvlc/files/7.jpg"),
+            Uri.parse("file:///data/data/app.vtcnews.testvlc/files/8.jpg"),
+            Uri.parse("file:///data/data/app.vtcnews.testvlc/files/9.jpg"),
+            Uri.parse("file:///data/data/app.vtcnews.testvlc/files/11.jpg"),
+        )*/
 
         val imageDuration = try {
             (duration.split(":").mapIndexed { index, s ->
@@ -269,54 +340,49 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        visualPlayer!!.release()
-        mLibVLC!!.release()
-    }
+    fun checkScheduledMedia() {
+        checkScheduledMediaJob?.cancel()
+        checkScheduledMediaJob = lifecycleScope.launch(Dispatchers.Default) {
 
-    override fun onStart() {
-        super.onStart()
-        visualPlayer!!.attachViews(mVideoLayout!!, null, ENABLE_SUBTITLES, USE_TEXTURE_VIEW)
+            val playlist = viewModel.playlist.value ?: listOf()
+            val scheduledItems: MutableList<MediaItem> = mutableListOf()
+            scheduledItems.addAll(playlist.filter { it.fixTime.isNotEmpty() })
 
-        /*visualPlayer!!.eventListener = { event ->
+            while (true) {
 
-            when (event) {
-                MediaPlayer.Event.EndReached -> playNextMedia()
-                MediaPlayer.Event.EncounteredError -> playNextMedia()
-                MediaPlayer.Event.Stopped -> viewModel.isPlaying = false
-                MediaPlayer.Event.Playing -> viewModel.isPlaying = true
-            }
-        }*/
-    }
+                Log.d("Playlist", "check scheduled")
+                scheduledItems.forEachIndexed { index, mediaItem ->
+                    if (mediaItem.fixTime.isNotEmpty()) {
+                        try {
+                            val time = mediaItem.fixTime.split(":").map { it.toInt() }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        when (requestCode) {
-            1 -> {
+                            val now = Calendar.getInstance()
+                            val currentHour = now.get(Calendar.HOUR_OF_DAY)
+                            val currentMin = now.get(Calendar.MINUTE)
+                            val currentSecond = now.get(Calendar.SECOND)
 
+                            if (time[0] <= currentHour
+                                && time[1] <= currentMin
+                                && time[2] <= currentSecond
+                            ) {
 
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.size > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                ) {
-                    Log.d("quyen", grantResults.toList().toString())
-                    download("https://mam.tek4tv.vn/download/player_203.apk")
+                                withContext(Dispatchers.Main)
+                                {
+                                    val indexToPlay = playlist.indexOf(mediaItem)
+                                    playMediaByIndex(indexToPlay)
+                                    Log.d("Playlist", "play $index at $time")
+                                    scheduledItems.removeAt(index)
+                                    viewModel.playlistIndex = indexToPlay
+                                }
+                            }
 
-                } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                    Toast.makeText(
-                        this@MainActivity,
-                        "Permission denied to read your External storage",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                        } catch (e: NumberFormatException) {
+                            Log.e("checkScheduledMedia", "error parsing media fixtime")
+                        }
+                    }
                 }
-                return
+
+                delay(1000)
             }
         }
     }
@@ -354,13 +420,6 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
-    }
-
-
-    override fun onStop() {
-        super.onStop()
-        visualPlayer!!.stop()
-        visualPlayer!!.detachViews()
     }
 
     private fun onMessage() {
@@ -403,14 +462,11 @@ class MainActivity : AppCompatActivity() {
             //count_ping_hub = 0
             var reponseHub = ReponseHub()
             if (message.startsWith("{")) {
-                //reponseHub = gson.fromJson(message, ReponseHub::class.java)
-
                 val jsonAdapter = moshi.adapter(ReponseHub::class.java)
                 reponseHub = jsonAdapter.fromJson(message)!!
             }
             val isImei = Utils.getDeviceId(applicationContext) == reponseHub.imei
             if (isImei) {
-                //deviceAdrress = ""
                 when (commamd) {
                     Status.GET_LIST -> {
                     }
@@ -430,7 +486,7 @@ class MainActivity : AppCompatActivity() {
                         /*volume = reponseHub.getVolume()
                         playURLVideo(reponseHub.getMessage().trim(), false)*/
                     }
-                    //Status.UPDATE_STATUS -> pingHub(true)
+                    Status.UPDATE_STATUS -> pingHub(true)
                     Status.GET_LOCATION -> {
                     }
                     Status.SET_VOLUME -> {
@@ -487,7 +543,7 @@ class MainActivity : AppCompatActivity() {
                 //  val date: String = simpleDateFormat.format(Date())
                 Log.d("test", "ping hub")
                 var request: PingHubRequest? = null
-                var video: Video? = null
+
                 val i = viewModel.playlistIndex
                 Log.d("player:", java.lang.String.valueOf(i))
                 //if (i >= 0 && i < mainViewModel.lstLiveData.getValue().size()) {
@@ -500,26 +556,16 @@ class MainActivity : AppCompatActivity() {
                     else "0"
                 }
 
-                video = Video("" + i, mode)
-                /*request = PingHubRequest.builder().connectionId(hubConnection!!.connectionId)
-                    .imei(Utils.getDeviceId(this)).status(if (isPlaying()) "START" else "STOP")
-                    .startTine(date)
-                    .video(Gson().toJson(video))
-                    .build()
-                //}*/
+                val video = Video("" + i, mode)
 
-                val videoAdater = moshi.adapter(Video::class.java)
+                val videoAdapter = moshi.adapter(Video::class.java)
 
                 request = PingHubRequest().apply {
                     imei = Utils.getDeviceId(applicationContext)
                     status = "START"
                     connectionId = (hubConnection!!.connectionId)
-                    this.video = videoAdater.toJson(video)
-
+                    this.video = videoAdapter.toJson(video)
                     val dateformat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
-
-
-
                     startTine = dateformat.format(Date())
                 }
 
@@ -534,7 +580,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun pingTimer() {
+    private fun pingTimer() {
         lifecycleScope.launchWhenResumed {
             while (true) {
                 pingHub(true)
@@ -544,72 +590,5 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun download(url: String) {
-        var destination: String =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                .toString() + "/"
-        val fileName = "AppName.apk"
-        destination += fileName
-        val uri = Uri.parse("file://$destination")
-        /*val uriInstall = FileProvider.getUriForFile(
-            applicationContext, "$packageName.provider", File(
-                destination
-            )
-        )*/
-        //Uri.parse("file://$destination")
 
-        //Delete update file if exists
-        val file = File(destination)
-        if (file.exists()) //file.delete() - test this, I think sometimes it doesnt work
-            file.delete()
-        //set downloadmanager
-        val request = DownloadManager.Request(Uri.parse(url))
-        request.setDescription("update version")
-        request.setTitle("Updating APK...")
-
-        //set destination
-        request.setDestinationUri(uri)
-
-        // get download service and enqueue file
-        val manager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-        val downloadId = manager.enqueue(request)
-
-        //set BroadcastReceiver to install app when .apk is downloaded
-        val finalDestination = destination
-        Log.d("apk", finalDestination)
-
-
-        val onComplete: BroadcastReceiver = object : BroadcastReceiver() {
-            override fun onReceive(ctxt: Context?, intent: Intent?) {
-                //
-                //
-                // Install Updated APK
-                try {
-                    val builder = VmPolicy.Builder()
-                    StrictMode.setVmPolicy(builder.build())
-
-                    val install = Intent(Intent.ACTION_VIEW)
-                    install.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    install.setDataAndType(
-                        uri,
-                        manager.getMimeTypeForDownloadedFile(downloadId)
-                    )
-                    startActivity(install)
-
-                    //                    if (proc.exitValue() == 0) {
-//                        // Successfully installed updated app
-//                        doRestart();
-//                    }
-                } catch (e: java.lang.Exception) {
-                    e.printStackTrace()
-                }
-            }
-        }
-        //register receiver for when .apk download is compete
-        registerReceiver(onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
-    }
-
-    private fun doRestart() {
-        //writeToDevice(buildReadMessage(Define.FUNC_WRITE_RESTART_DEVICE, ""))
-    }
 }

@@ -2,7 +2,7 @@ package app.vtcnews.testvlc.repo
 
 import android.content.Context
 import android.util.Log
-import app.vtcnews.testvlc.model.Playlist
+import app.vtcnews.testvlc.model.MediaItem
 import app.vtcnews.testvlc.network.PlaylistService
 import app.vtcnews.testvlc.utils.*
 import com.squareup.moshi.JsonAdapter
@@ -21,16 +21,16 @@ class PlaylistRepo @Inject constructor(
     private val moshi: Moshi,
     @ApplicationContext private val appContext: Context
 ) {
-    var playlist = listOf<Playlist>()
+    var playlist = listOf<MediaItem>()
 
-    private val type = Types.newParameterizedType(List::class.java, Playlist::class.java)
-    private val jsonAdapter: JsonAdapter<List<Playlist>> = moshi.adapter(type)
+    private val type = Types.newParameterizedType(List::class.java, MediaItem::class.java)
+    private val jsonAdapter: JsonAdapter<List<MediaItem>> = moshi.adapter(type)
 
     var body = mapOf(
         "IMEI" to Utils.getDeviceId(appContext)!!
     )
 
-    suspend fun getPlaylist(storagePath: String, needUpdate: Boolean): List<Playlist> {
+    suspend fun getPlaylist(storagePath: String, needUpdate: Boolean): List<MediaItem> {
 
         return if (needUpdate) {
             updatePlaylist(storagePath)
@@ -45,8 +45,8 @@ class PlaylistRepo @Inject constructor(
         }
     }
 
-    suspend fun updatePlaylist(storagePath: String): List<Playlist> {
-        var result = listOf<Playlist>()
+    suspend fun updatePlaylist(storagePath: String): List<MediaItem> {
+        var result = listOf<MediaItem>()
 
         try {
             val res = playlistService.getPlaylist(body)
@@ -65,7 +65,7 @@ class PlaylistRepo @Inject constructor(
         return result
     }
 
-    suspend fun savePlaylistToFile(playlist: List<Playlist>, storagePath: String) {
+    suspend fun savePlaylistToFile(playlist: List<MediaItem>, storagePath: String) {
         withContext(Dispatchers.IO)
         {
 
@@ -82,9 +82,9 @@ class PlaylistRepo @Inject constructor(
         }
     }
 
-    private suspend fun readPlaylistFromFile(storagePath: String): List<Playlist> {
+    private suspend fun readPlaylistFromFile(storagePath: String): List<MediaItem> {
 
-        var result = listOf<Playlist>()
+        var result = listOf<MediaItem>()
 
         withContext(Dispatchers.IO)
         {
