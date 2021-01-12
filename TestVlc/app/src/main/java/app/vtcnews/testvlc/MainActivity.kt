@@ -210,51 +210,56 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun playMediaByIndex(index: Int) {
-        val playlist = viewModel.playlist.value
+        try {
+            val playlist = viewModel.playlist.value
 
-        if (playlist == null || playlist.isEmpty()) return
-        val mediaItem = viewModel.playlist.value!![index]
-        val media = mediaItem.getVlcMedia(mLibVLC)
-        presentImageJob?.cancel()
-        when (mediaItem.getMediaType()) {
-            /*isAudio -> {
-                mainPlayer = audioPlayer
-                audioPlayer.play(media1)
-                presentImage(mediaItem.duration!!)
-            }*/
-            MediaType.VIDEO -> {
-                audioPlayer.stop()
-                media.addOption(":fullscreen")
-                mainPlayer = visualPlayer
-                visualPlayer.play(media)
-            }
-            MediaType.IMAGE -> {
-                presentImage(mediaItem)
-                mainPlayer = audioPlayer
-            }
-            else -> {
-            }
-        }
-
-        mainPlayer!!.eventListener = { event ->
-            when (event) {
-                MediaPlayer.Event.EndReached -> {
-                    playNextMedia()
-                    //remove callback
-                    mainPlayer!!.eventListener = {}
+            if (playlist == null || playlist.isEmpty()) return
+            val mediaItem = viewModel.playlist.value!![index]
+            val media = mediaItem.getVlcMedia(mLibVLC)
+            presentImageJob?.cancel()
+            when (mediaItem.getMediaType()) {
+                /*isAudio -> {
+                    mainPlayer = audioPlayer
+                    audioPlayer.play(media1)
+                    presentImage(mediaItem.duration!!)
+                }*/
+                MediaType.VIDEO -> {
+                    audioPlayer.stop()
+                    media.addOption(":fullscreen")
+                    mainPlayer = visualPlayer
+                    visualPlayer.play(media)
                 }
-
-                MediaPlayer.Event.EncounteredError -> {
-                    presentImageJob?.cancel()
-                    presentImageJob = null
-
-                    playNextMedia()
-                    //remove callback
-                    mainPlayer!!.eventListener = {}
+                MediaType.IMAGE -> {
+                    presentImage(mediaItem)
+                    mainPlayer = audioPlayer
                 }
-                MediaPlayer.Event.Stopped -> viewModel.isPlaying = false
-                MediaPlayer.Event.Playing -> viewModel.isPlaying = true
+                else -> {
+                }
             }
+
+            mainPlayer!!.eventListener = { event ->
+                when (event) {
+                    MediaPlayer.Event.EndReached -> {
+                        playNextMedia()
+                        //remove callback
+                        mainPlayer!!.eventListener = {}
+                    }
+
+                    MediaPlayer.Event.EncounteredError -> {
+                        presentImageJob?.cancel()
+                        presentImageJob = null
+
+                        playNextMedia()
+                        //remove callback
+                        mainPlayer!!.eventListener = {}
+                    }
+                    MediaPlayer.Event.Stopped -> viewModel.isPlaying = false
+                    MediaPlayer.Event.Playing -> viewModel.isPlaying = true
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("Main", e.message)
+            e.printStackTrace()
         }
     }
 
@@ -312,7 +317,10 @@ class MainActivity : AppCompatActivity() {
                     checkScheduledMediaJob?.cancel()
 
                 Log.d("Playlist", "check scheduled")
-                scheduledItems.forEachIndexed { index, mediaItem ->
+
+                var index = -1
+
+                scheduledItems.forEachIndexed { i, mediaItem ->
                     if (mediaItem.fixTime.isNotEmpty() && mediaItem.fixTime != "00:00:00") {
                         try {
                             val time = mediaItem.fixTime.split(":").map { it.toInt() }
@@ -326,20 +334,24 @@ class MainActivity : AppCompatActivity() {
                             }.timeInMillis
 
                             if (scheduledTime <= now) {
-
-                                withContext(Dispatchers.Main)
-                                {
-                                    scheduledItems.removeAt(index)
-                                    val indexToPlay = playlist.indexOf(mediaItem)
-                                    playMediaByIndex(indexToPlay)
-                                    Log.d("Playlist", "play $index at $time")
-                                    viewModel.playlistIndex = indexToPlay
-                                }
+                                index = i
                             }
 
                         } catch (e: NumberFormatException) {
                             Log.e("checkScheduledMedia", "error parsing media fixtime")
                         }
+                    }
+                }
+
+                if (index != -1) {
+                    withContext(Dispatchers.Main)
+                    {
+                        val indexToPlay = playlist.indexOf(scheduledItems[index])
+
+                        playMediaByIndex(indexToPlay)
+                        Log.d("Playlist", "play $index")
+                        viewModel.playlistIndex = indexToPlay
+                        scheduledItems.removeAt(index)
                     }
                 }
 
