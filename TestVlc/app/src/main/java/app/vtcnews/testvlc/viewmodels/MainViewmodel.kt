@@ -128,7 +128,7 @@ class MainViewmodel @ViewModelInject constructor(
         }
     }
 
-    private fun savePlaylist(listVideo: List<MediaItem>, storagePath: String) {
+    fun savePlaylist(listVideo: List<MediaItem>, storagePath: String) {
         viewModelScope.launch {
             saveFileJob?.join()
             saveFileJob = launch {

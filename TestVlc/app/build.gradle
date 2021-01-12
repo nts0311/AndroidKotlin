@@ -6,13 +6,13 @@ plugins {
 }
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 28
     buildToolsVersion "30.0.2"
 
     defaultConfig {
         applicationId "app.vtcnews.testvlc"
-        minSdkVersion 23
-        targetSdkVersion 29
+        minSdkVersion 25
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
 
@@ -75,4 +75,6 @@ dependencies {
 
     //prdownloader
     implementation 'com.mindorks.android:prdownloader:0.6.0'
+
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 }

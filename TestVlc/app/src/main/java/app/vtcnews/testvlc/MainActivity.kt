@@ -1,12 +1,12 @@
 package app.vtcnews.testvlc
 
 import android.Manifest
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -60,6 +60,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        //Rotate screen
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+
+        if (needGrantPermission())
+            requestUpdatePermission()
+
         val args = ArrayList<String>()
         args.add("-vvv")
         args.add("--aout=opensles")
@@ -85,10 +91,7 @@ class MainActivity : AppCompatActivity() {
 
         /*btnUpdate = findViewById(R.id.btn_update)
         btnUpdate.setOnClickListener {
-            if (needGrantPermission()) {
-                requestUpdatePermission()
-            } else
-                downloadUpdateApk("https://mam.tek4tv.vn/download/player_203.apk", this)
+
         }*/
 
         audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
@@ -143,17 +146,17 @@ class MainActivity : AppCompatActivity() {
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED
                 ) {
                     Log.d("quyen", grantResults.toList().toString())
-                    downloadUpdateApk("https://mam.tek4tv.vn/download/player_203.apk", this)
+                    //downloadUpdateApk("https://mam.tek4tv.vn/download/player_203.apk", this)
 
                 } else {
 
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
-                    Toast.makeText(
+                    /*Toast.makeText(
                         this@MainActivity,
-                        "Permission denied to read your External storage",
+                        "Permission denied!!!",
                         Toast.LENGTH_SHORT
-                    ).show()
+                    ).show()*/
                 }
                 return
             }
@@ -164,7 +167,10 @@ class MainActivity : AppCompatActivity() {
         val permissions = arrayOf(
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.REQUEST_INSTALL_PACKAGES
+            Manifest.permission.REQUEST_INSTALL_PACKAGES,
+            Manifest.permission.INTERNET,
+            Manifest.permission.ACCESS_NETWORK_STATE,
+            Manifest.permission.READ_PHONE_STATE
         )
 
         var needGrantPermission = false
@@ -182,8 +188,11 @@ class MainActivity : AppCompatActivity() {
     private fun requestUpdatePermission() {
         val permissions = arrayOf(
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.REQUEST_INSTALL_PACKAGES,
-            Manifest.permission.READ_EXTERNAL_STORAGE
+            Manifest.permission.INTERNET,
+            Manifest.permission.ACCESS_NETWORK_STATE,
+            Manifest.permission.READ_PHONE_STATE
         )
         requestPermissions(permissions, UPDATE_PERMISSION_REQUEST_CODE)
     }
@@ -312,44 +321,51 @@ class MainActivity : AppCompatActivity() {
             scheduledItems.addAll(playlist.filter { it.fixTime.isNotEmpty() && it.fixTime != "00:00:00" })
 
             while (true) {
+                if (scheduledItems.isEmpty()) {
+                    scheduledItems.addAll(playlist.filter { it.fixTime.isNotEmpty() && it.fixTime != "00:00:00" })
+                }
 
-                if (scheduledItems.isEmpty())
-                    checkScheduledMediaJob?.cancel()
-
-                Log.d("Playlist", "check scheduled")
 
                 var index = -1
 
                 scheduledItems.forEachIndexed { i, mediaItem ->
-                    if (mediaItem.fixTime.isNotEmpty() && mediaItem.fixTime != "00:00:00") {
-                        try {
-                            val time = mediaItem.fixTime.split(":").map { it.toInt() }
+                    try {
+                        val time = mediaItem.fixTime.split(":").map { it.toInt() }
 
-                            val now = Calendar.getInstance().timeInMillis
+                        val now = Calendar.getInstance()
 
-                            val scheduledTime = Calendar.getInstance().apply {
-                                set(Calendar.HOUR_OF_DAY, time[0])
-                                set(Calendar.MINUTE, time[1])
-                                set(Calendar.SECOND, time[2])
-                            }.timeInMillis
-
-                            if (scheduledTime <= now) {
-                                index = i
-                            }
-
-                        } catch (e: NumberFormatException) {
-                            Log.e("checkScheduledMedia", "error parsing media fixtime")
+                        val scheduledTime = Calendar.getInstance().apply {
+                            set(Calendar.HOUR_OF_DAY, time[0])
+                            set(Calendar.MINUTE, time[1])
+                            set(Calendar.SECOND, time[2])
                         }
+
+                        val mediaDuration = getDurationInSecond(mediaItem.duration!!)
+
+                        if (scheduledTime.timeInMillis <= now.timeInMillis
+                            && now.timeInMillis <= scheduledTime.timeInMillis + mediaDuration * 1000
+                        ) {
+                            Log.d(
+                                "hengio",
+                                "${now.timeInMillis} - ${scheduledTime.timeInMillis} - ${scheduledTime.timeInMillis + mediaDuration * 1000}"
+                            )
+                            index = i
+                        }
+
+                    } catch (e: NumberFormatException) {
+                        Log.e("checkScheduledMedia", "error parsing media fixtime")
+                    } catch (e: Exception) {
+                        Log.e("checkScheduledMedia", "error checking media fixtime")
                     }
                 }
 
-                if (index != -1) {
+                if (index != -1 && index < scheduledItems.size) {
                     withContext(Dispatchers.Main)
                     {
                         val indexToPlay = playlist.indexOf(scheduledItems[index])
 
                         playMediaByIndex(indexToPlay)
-                        Log.d("Playlist", "play $index")
+                        Log.d("Scheduled", "play scheduled $indexToPlay")
                         viewModel.playlistIndex = indexToPlay
                         scheduledItems.removeAt(index)
                     }
@@ -472,7 +488,10 @@ class MainActivity : AppCompatActivity() {
                     }
                     Status.RESTART -> {
                     }
-                    Status.RELOAD -> viewModel.getPlaylist(applicationContext, true)
+                    Status.RELOAD -> {
+                        viewModel.playlistIndex = 0
+                        viewModel.getPlaylist(applicationContext, true)
+                    }
                     Status.SWITCH_MODE_FM -> {
                     }
                     Status.SET_MUTE_DEVICE -> {
@@ -496,6 +515,13 @@ class MainActivity : AppCompatActivity() {
                     Status.GET_AM_FQ -> {
                     }
                     Status.GET_TEMPERATURE -> {
+                    }
+
+                    Status.UPDATE_VERSION -> {
+                        if (reponseHub.message != null) {
+                            Log.d("update", reponseHub.message!!)
+                            downloadUpdateApk(reponseHub.message!!, this)
+                        }
                     }
                 }
             }

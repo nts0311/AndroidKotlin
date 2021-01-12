@@ -41,7 +41,11 @@ data class MediaItem(
     var isCheck: Boolean = false,
 
     @Json(name = "FixTime")
-    var fixTime: String = ""
+    var fixTime: String = "",
+
+    var played: Boolean = false,
+
+    var lastPlay: Long = -1L
 ) : Serializable {
 
     var pathBackup: String = ""

@@ -24,4 +24,5 @@ object Status {
     const val GET_AM_FQ = "GET_AM_FQ"
     const val GET_TEMPERATURE = "GET_TEMPERATURE"
     const val GET_LOCATION = "GET_LOCATION"
+    const val UPDATE_VERSION = "UPDATE_VERSION"
 }
